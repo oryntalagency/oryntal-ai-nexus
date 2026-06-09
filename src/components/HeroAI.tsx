@@ -158,7 +158,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             </defs>
 
             {/* connection lines + traveling particles */}
-            {NODES.map(([x, y], i) => {
+            {NODES.map(({ x, y }, i) => {
               const path = `M${x} ${y} L 200 200`;
               return (
                 <g key={i}>
@@ -181,7 +181,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             })}
 
             {/* outgoing particles (core → node) */}
-            {NODES.map(([x, y], i) => {
+            {NODES.map(({ x, y }, i) => {
               const path = `M200 200 L ${x} ${y}`;
               return (
                 <circle key={`o-${i}`} r="1.8" fill="oklch(0.88 0.09 86)" opacity="0.8">
@@ -191,16 +191,6 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
               );
             })}
 
-            {/* nodes */}
-            {NODES.map(([cx, cy], i) => (
-              <g key={`n-${i}`}>
-                <circle cx={cx} cy={cy} r="15" fill="oklch(0.2 0.01 60)" stroke="oklch(0.78 0.13 82 / 0.6)" />
-                <circle cx={cx} cy={cy} r="4.5" fill="url(#node)">
-                  <animate attributeName="r" values="3;6;3" dur="2.4s" begin={`${i * 0.25}s`} repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.7;1;0.7" dur="2.4s" begin={`${i * 0.25}s`} repeatCount="indefinite" />
-                </circle>
-              </g>
-            ))}
 
             {/* expanding rings from core */}
             {[0, 1, 2].map((i) => (
