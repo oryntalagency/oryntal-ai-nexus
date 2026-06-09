@@ -65,7 +65,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
         <div className="min-w-0">
           <p className="mb-5 inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-[11px] sm:text-xs text-muted-foreground ring-1 ring-border">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            Live · 2,400+ models · Curated daily
+            Live · 73 models · Curated daily
           </p>
 
           <div className="mb-3 h-5 overflow-hidden text-[10px] sm:text-xs font-medium uppercase tracking-[0.18em] text-primary">
