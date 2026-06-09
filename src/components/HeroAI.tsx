@@ -272,10 +272,10 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
       {/* Stats row */}
       <div className="mt-10 grid grid-cols-2 gap-4 border-t border-border/60 pt-6 md:grid-cols-4">
         {[
-          ["2,400+", "Curated models"],
-          ["180+", "Verified labs"],
-          ["<40ms", "Median latency"],
-          ["14M", "Monthly deploys"],
+          ["73", "Curated models"],
+          ["28", "Verified labs"],
+          ["<120ms", "Median latency"],
+          ["41K", "Monthly deploys"],
         ].map(([v, l]) => (
           <div key={l}>
             <p className="font-display text-2xl md:text-3xl font-semibold text-gold-gradient">{v}</p>
