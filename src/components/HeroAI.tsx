@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Search, Sparkles, Cpu, Wand2, Image as ImageIcon, MessageSquare, Mic } from "lucide-react";
+import { Search, Cpu, Wand2, Image as ImageIcon, MessageSquare, Mic } from "lucide-react";
+import logoAsset from "@/assets/oryntal-logo.asset.json";
 
 const ROTATING = [
   { kicker: "Generative Intelligence", word: "Imagine." },
