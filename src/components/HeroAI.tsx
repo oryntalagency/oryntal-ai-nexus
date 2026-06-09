@@ -65,7 +65,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
         <div className="min-w-0">
           <p className="mb-5 inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-[11px] sm:text-xs text-muted-foreground ring-1 ring-border">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            Live · 2,400+ models · Curated daily
+            Live · 73 models · Curated daily
           </p>
 
           <div className="mb-3 h-5 overflow-hidden text-[10px] sm:text-xs font-medium uppercase tracking-[0.18em] text-primary">
@@ -272,10 +272,10 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
       {/* Stats row */}
       <div className="mt-10 grid grid-cols-2 gap-4 border-t border-border/60 pt-6 md:grid-cols-4">
         {[
-          ["2,400+", "Curated models"],
-          ["180+", "Verified labs"],
-          ["<40ms", "Median latency"],
-          ["14M", "Monthly deploys"],
+          ["73", "Curated models"],
+          ["28", "Verified labs"],
+          ["<120ms", "Median latency"],
+          ["41K", "Monthly deploys"],
         ].map(([v, l]) => (
           <div key={l}>
             <p className="font-display text-2xl md:text-3xl font-semibold text-gold-gradient">{v}</p>
