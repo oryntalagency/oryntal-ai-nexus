@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, TrendingUp, Download } from "lucide-react";
+import { TrendingUp, Download } from "lucide-react";
 import { models, categories, labs } from "@/lib/mockData";
 import { ModelCard } from "@/components/ModelCard";
+import { HeroAI } from "@/components/HeroAI";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,35 +35,7 @@ function Home() {
 
   return (
     <div className="px-6 py-10 md:px-12 md:py-14 max-w-[1600px] mx-auto">
-      {/* Hero */}
-      <section className="mx-auto max-w-4xl text-center">
-        <p className="mb-4 inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-xs text-muted-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-          Curated · v2026.06
-        </p>
-        <h1 className="font-display text-5xl md:text-7xl font-semibold leading-[1.02] tracking-tight">
-          <span className="text-platinum-gradient">Deploy the Future.</span>
-          <br />
-          <span className="text-gold-gradient">Handcrafted AI Models.</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg text-muted-foreground">
-          A curated marketplace for production-ready open-source and fine-tuned AI models.
-        </p>
-
-        {/* Search */}
-        <div className="mx-auto mt-9 flex max-w-2xl items-center gap-3 rounded-full glass px-5 py-3 ring-1 ring-border focus-within:ring-primary/50 transition">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search models, creators, capabilities…"
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          />
-          <kbd className="hidden md:inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-[10px] text-muted-foreground ring-1 ring-border">
-            ⌘K
-          </kbd>
-        </div>
-      </section>
+      <HeroAI query={query} setQuery={setQuery} />
 
       {/* Categories */}
       <div className="mt-12 -mx-2 overflow-x-auto scrollbar-hide">
