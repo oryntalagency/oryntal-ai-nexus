@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Cpu, Wand2, Image as ImageIcon, MessageSquare, Mic } from "lucide-react";
+import { Search, Cpu, Wand2, Image as ImageIcon, MessageSquare, Mic, Bot, Workflow, Database, Eye, Code2, Network } from "lucide-react";
 import logoAsset from "@/assets/oryntal-logo.asset.json";
 
 const ROTATING = [
