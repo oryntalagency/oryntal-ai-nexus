@@ -214,6 +214,28 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             <circle cx="200" cy="200" r="38" fill="oklch(0.16 0.01 60)" stroke="oklch(0.88 0.09 86)" strokeWidth="1" />
           </svg>
 
+          {/* Vector icon nodes — each represents a category of AI work */}
+          {NODES.map(({ x, y, icon: Icon, label }, i) => (
+            <div
+              key={`icon-${i}`}
+              className="group absolute -translate-x-1/2 -translate-y-1/2 animate-[float_6s_ease-in-out_infinite]"
+              style={{
+                left: `${(x / 400) * 100}%`,
+                top: `${(y / 400) * 100}%`,
+                animationDelay: `${i * 0.4}s`,
+              }}
+            >
+              <div className="relative grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl glass ring-1 ring-primary/40 shadow-gold-glow transition hover:scale-110 hover:ring-primary">
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" strokeWidth={1.8} />
+                <span className="pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_center,oklch(0.78_0.13_82/0.25),transparent_70%)] animate-[breathe_3s_ease-in-out_infinite]" style={{ animationDelay: `${i * 0.3}s` }} />
+              </div>
+              <span className="pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-background/80 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-primary opacity-0 ring-1 ring-border backdrop-blur transition-opacity group-hover:opacity-100">
+                {label}
+              </span>
+            </div>
+          ))}
+
+
           {/* Center logo */}
           <div className="absolute inset-0 grid place-items-center">
             <div className="relative grid h-24 w-24 sm:h-28 sm:w-28 place-items-center rounded-full bg-[oklch(0.14_0.01_60)] ring-1 ring-primary/50 shadow-gold-glow animate-[breathe_4s_ease-in-out_infinite] overflow-hidden">
