@@ -224,10 +224,15 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             <circle cx="200" cy="200" r="38" fill="oklch(0.16 0.01 60)" stroke="oklch(0.88 0.09 86)" strokeWidth="1" />
           </svg>
 
-          {/* Center sparkle */}
+          {/* Center logo */}
           <div className="absolute inset-0 grid place-items-center">
-            <div className="relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-2xl bg-[oklch(0.18_0.01_60)] ring-1 ring-primary/40 shadow-gold-glow">
-              <Sparkles className="h-7 w-7 sm:h-8 sm:w-8 text-primary animate-[breathe_3s_ease-in-out_infinite]" />
+            <div className="relative grid h-24 w-24 sm:h-28 sm:w-28 place-items-center rounded-full bg-[oklch(0.14_0.01_60)] ring-1 ring-primary/50 shadow-gold-glow animate-[breathe_4s_ease-in-out_infinite] overflow-hidden">
+              <img
+                src={logoAsset.url}
+                alt="Oryntal AI Labs"
+                className="h-full w-full object-cover"
+              />
+              <span className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,transparent_50%,oklch(0.14_0.01_60/0.6))]" />
             </div>
           </div>
 
