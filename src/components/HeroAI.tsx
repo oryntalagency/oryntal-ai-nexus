@@ -23,16 +23,16 @@ type HeroAIProps = {
   setQuery: (v: string) => void;
 };
 
-// Outer nodes around the core
-const NODES: Array<[number, number]> = [
-  [80, 90],
-  [320, 110],
-  [70, 290],
-  [330, 300],
-  [200, 50],
-  [200, 360],
-  [50, 200],
-  [350, 200],
+// Outer nodes around the core — each represents a category of AI work
+const NODES: Array<{ x: number; y: number; icon: typeof Bot; label: string }> = [
+  { x: 80, y: 90, icon: Bot, label: "LLM Agents" },
+  { x: 320, y: 110, icon: Workflow, label: "Automation" },
+  { x: 70, y: 290, icon: Database, label: "RAG" },
+  { x: 330, y: 300, icon: Eye, label: "Vision" },
+  { x: 200, y: 50, icon: Wand2, label: "Diffusion" },
+  { x: 200, y: 360, icon: Mic, label: "Voice" },
+  { x: 50, y: 200, icon: Code2, label: "Code" },
+  { x: 350, y: 200, icon: Network, label: "Edge" },
 ];
 
 export function HeroAI({ query, setQuery }: HeroAIProps) {
