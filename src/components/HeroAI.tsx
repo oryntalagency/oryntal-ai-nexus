@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Cpu, Wand2, Image as ImageIcon, MessageSquare, Mic } from "lucide-react";
+import { Search, Cpu, Wand2, Image as ImageIcon, MessageSquare, Mic, Bot, Workflow, Database, Eye, Code2, Network } from "lucide-react";
 import logoAsset from "@/assets/oryntal-logo.asset.json";
 
 const ROTATING = [
@@ -23,16 +23,16 @@ type HeroAIProps = {
   setQuery: (v: string) => void;
 };
 
-// Outer nodes around the core
-const NODES: Array<[number, number]> = [
-  [80, 90],
-  [320, 110],
-  [70, 290],
-  [330, 300],
-  [200, 50],
-  [200, 360],
-  [50, 200],
-  [350, 200],
+// Outer nodes around the core — each represents a category of AI work
+const NODES: Array<{ x: number; y: number; icon: typeof Bot; label: string }> = [
+  { x: 80, y: 90, icon: Bot, label: "LLM Agents" },
+  { x: 320, y: 110, icon: Workflow, label: "Automation" },
+  { x: 70, y: 290, icon: Database, label: "RAG" },
+  { x: 330, y: 300, icon: Eye, label: "Vision" },
+  { x: 200, y: 50, icon: Wand2, label: "Diffusion" },
+  { x: 200, y: 360, icon: Mic, label: "Voice" },
+  { x: 50, y: 200, icon: Code2, label: "Code" },
+  { x: 350, y: 200, icon: Network, label: "Edge" },
 ];
 
 export function HeroAI({ query, setQuery }: HeroAIProps) {
@@ -158,7 +158,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             </defs>
 
             {/* connection lines + traveling particles */}
-            {NODES.map(([x, y], i) => {
+            {NODES.map(({ x, y }, i) => {
               const path = `M${x} ${y} L 200 200`;
               return (
                 <g key={i}>
@@ -181,7 +181,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             })}
 
             {/* outgoing particles (core → node) */}
-            {NODES.map(([x, y], i) => {
+            {NODES.map(({ x, y }, i) => {
               const path = `M200 200 L ${x} ${y}`;
               return (
                 <circle key={`o-${i}`} r="1.8" fill="oklch(0.88 0.09 86)" opacity="0.8">
@@ -191,16 +191,6 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
               );
             })}
 
-            {/* nodes */}
-            {NODES.map(([cx, cy], i) => (
-              <g key={`n-${i}`}>
-                <circle cx={cx} cy={cy} r="15" fill="oklch(0.2 0.01 60)" stroke="oklch(0.78 0.13 82 / 0.6)" />
-                <circle cx={cx} cy={cy} r="4.5" fill="url(#node)">
-                  <animate attributeName="r" values="3;6;3" dur="2.4s" begin={`${i * 0.25}s`} repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.7;1;0.7" dur="2.4s" begin={`${i * 0.25}s`} repeatCount="indefinite" />
-                </circle>
-              </g>
-            ))}
 
             {/* expanding rings from core */}
             {[0, 1, 2].map((i) => (
@@ -223,6 +213,28 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             <circle cx="200" cy="200" r="90" fill="url(#core)" opacity="0.55" className="animate-[breathe_4s_ease-in-out_infinite]" />
             <circle cx="200" cy="200" r="38" fill="oklch(0.16 0.01 60)" stroke="oklch(0.88 0.09 86)" strokeWidth="1" />
           </svg>
+
+          {/* Vector icon nodes — each represents a category of AI work */}
+          {NODES.map(({ x, y, icon: Icon, label }, i) => (
+            <div
+              key={`icon-${i}`}
+              className="group absolute -translate-x-1/2 -translate-y-1/2 animate-[float_6s_ease-in-out_infinite]"
+              style={{
+                left: `${(x / 400) * 100}%`,
+                top: `${(y / 400) * 100}%`,
+                animationDelay: `${i * 0.4}s`,
+              }}
+            >
+              <div className="relative grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl glass ring-1 ring-primary/40 shadow-gold-glow transition hover:scale-110 hover:ring-primary">
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" strokeWidth={1.8} />
+                <span className="pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_center,oklch(0.78_0.13_82/0.25),transparent_70%)] animate-[breathe_3s_ease-in-out_infinite]" style={{ animationDelay: `${i * 0.3}s` }} />
+              </div>
+              <span className="pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-background/80 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-primary opacity-0 ring-1 ring-border backdrop-blur transition-opacity group-hover:opacity-100">
+                {label}
+              </span>
+            </div>
+          ))}
+
 
           {/* Center logo */}
           <div className="absolute inset-0 grid place-items-center">
