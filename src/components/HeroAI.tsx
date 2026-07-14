@@ -157,7 +157,30 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
               </radialGradient>
             </defs>
 
-            {/* connection lines + traveling particles */}
+            {/* inter-node connections — neural network mesh */}
+            {(() => {
+              const edges: Array<[number, number]> = [
+                [0, 4], [4, 1], [1, 7], [7, 3], [3, 5], [5, 2], [2, 6], [6, 0],
+                [0, 1], [2, 3], [4, 5], [6, 7],
+                [0, 5], [1, 3], [4, 7], [6, 2],
+              ];
+              return edges.map(([a, b], i) => (
+                <line
+                  key={`e-${i}`}
+                  x1={NODES[a].x}
+                  y1={NODES[a].y}
+                  x2={NODES[b].x}
+                  y2={NODES[b].y}
+                  stroke="oklch(0.78 0.13 82)"
+                  strokeOpacity="0.18"
+                  strokeWidth="0.8"
+                  className="animate-[pulseLine_4s_ease-in-out_infinite]"
+                  style={{ animationDelay: `${i * 0.2}s` }}
+                />
+              ));
+            })()}
+
+            {/* node → core connections + traveling particles */}
             {NODES.map(({ x, y }, i) => {
               const path = `M${x} ${y} L 200 200`;
               return (
@@ -180,16 +203,22 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
               );
             })}
 
-            {/* outgoing particles (core → node) */}
-            {NODES.map(({ x, y }, i) => {
-              const path = `M200 200 L ${x} ${y}`;
-              return (
-                <circle key={`o-${i}`} r="1.8" fill="oklch(0.88 0.09 86)" opacity="0.8">
-                  <animateMotion dur={`${2.6 + (i % 4) * 0.4}s`} repeatCount="indefinite" path={path} begin={`${i * 0.4 + 1}s`} />
-                  <animate attributeName="opacity" values="0;0.9;0" dur={`${2.6 + (i % 4) * 0.4}s`} repeatCount="indefinite" begin={`${i * 0.4 + 1}s`} />
-                </circle>
-              );
-            })}
+            {/* synapse pulses across inter-node edges */}
+            {(() => {
+              const edges: Array<[number, number]> = [
+                [0, 4], [4, 1], [1, 7], [7, 3], [3, 5], [5, 2], [2, 6], [6, 0],
+              ];
+              return edges.map(([a, b], i) => {
+                const path = `M${NODES[a].x} ${NODES[a].y} L ${NODES[b].x} ${NODES[b].y}`;
+                return (
+                  <circle key={`sp-${i}`} r="1.6" fill="oklch(0.92 0.1 86)" opacity="0.9">
+                    <animateMotion dur={`${3 + (i % 3) * 0.5}s`} repeatCount="indefinite" path={path} begin={`${i * 0.5}s`} />
+                    <animate attributeName="opacity" values="0;0.9;0" dur={`${3 + (i % 3) * 0.5}s`} repeatCount="indefinite" begin={`${i * 0.5}s`} />
+                  </circle>
+                );
+              });
+            })()}
+
 
 
             {/* expanding rings from core */}
