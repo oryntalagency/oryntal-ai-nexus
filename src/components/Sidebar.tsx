@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, BookOpen, User, Plus } from "lucide-react";
-import logo from "@/assets/oryntal-logo.asset.json";
+import logo from "@/assets/oryntal-logo.png";
 
 const items = [
   { to: "/", label: "Home", icon: Home },
@@ -14,7 +14,7 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden md:flex w-20 flex-col items-center justify-between border-r border-border bg-surface/60 backdrop-blur-xl py-5">
       <Link to="/" className="group relative h-12 w-12 overflow-hidden rounded-2xl ring-1 ring-border">
-        <img src={logo.url} alt="Oryntal AI Labs" className="h-full w-full object-cover" />
+        <img src={logo} alt="Oryntal AI Labs" className="h-full w-full object-cover" />
       </Link>
 
       <nav className="flex flex-col items-center gap-2">
