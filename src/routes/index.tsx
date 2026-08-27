@@ -1,138 +1,218 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { TrendingUp, Download } from "lucide-react";
-import { models, categories, labs } from "@/lib/mockData";
-import { ModelCard } from "@/components/ModelCard";
+import { TrendingUp, ArrowUpRight, ArrowRight, Sparkles } from "lucide-react";
+import { listings, PROBLEMS, INDUSTRIES, TECHS } from "@/lib/mockData";
+import type { Listing } from "@/lib/mockData";
+import { ListingCard } from "@/components/ListingCard";
+import { ListingDetail, VideoLightbox } from "@/components/ListingModals";
+import { PackageTierCards } from "@/components/PackageTiers";
 import { HeroAI } from "@/components/HeroAI";
-import { FacetFilterBar, type PriceFilter, type SortKey } from "@/components/FacetFilterBar";
+import { FacetFilterBar, type OfferingFilter } from "@/components/FacetFilterBar";
+import { OfferingIcon } from "@/components/OfferingBadge";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Oryntal AI Labs — Handcrafted AI Models" },
-      { name: "description", content: "A curated marketplace for production-ready open-source and fine-tuned AI models." },
+      { title: "Oryntal AI Labs — Products, Automations & AI Models" },
+      {
+        name: "description",
+        content:
+          "A curated catalog of SaaS products, AI automations, and fine-tuned models, built by Oryntal AI Labs to close real gaps.",
+      },
     ],
   }),
   component: Home,
 });
 
-const FACET_CATEGORIES = categories.filter((c) => c !== "All");
-
-const parseLatency = (s: string) => Number(s.replace(/[^0-9.]/g, "") || 0);
-const parseSize = (s: string) => {
-  const n = Number(s.replace(/[^0-9.]/g, "") || 0);
-  return s.includes("M") ? n / 1000 : n; // "120M" → 0.12B
-};
-
 function Home() {
-  const [selectedCats, setSelectedCats] = useState<string[]>([]);
-  const [price, setPrice] = useState<PriceFilter>("All");
-  const [sort, setSort] = useState<SortKey>("featured");
+  const [selectedProblems, setSelectedProblems] = useState<string[]>([]);
+  const [offering, setOffering] = useState<OfferingFilter>("all");
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
   const [query, setQuery] = useState("");
+  const [activeListing, setActiveListing] = useState<Listing | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const resetFilters = () => {
-    setSelectedCats([]);
-    setPrice("All");
-    setSort("featured");
+    setSelectedProblems([]);
+    setOffering("all");
+    setSelectedIndustries([]);
+    setSelectedTechs([]);
   };
 
   const filtered = useMemo(() => {
-    let list = models.filter(
-      (m) =>
-        (selectedCats.length === 0 || selectedCats.includes(m.category)) &&
-        (price === "All" || m.price === price) &&
-        (query === "" || m.title.toLowerCase().includes(query.toLowerCase()))
-    );
-    if (sort === "fastest") list = [...list].sort((a, b) => parseLatency(a.latency) - parseLatency(b.latency));
-    if (sort === "smallest") list = [...list].sort((a, b) => parseSize(a.size) - parseSize(b.size));
-    return list;
-  }, [selectedCats, price, sort, query]);
+    const q = query.trim().toLowerCase();
+    return listings.filter((l) => {
+      const problemsOk =
+        selectedProblems.length === 0 || l.problems.some((p) => selectedProblems.includes(p));
+      const offeringOk = offering === "all" || l.offeringType === offering;
+      const industriesOk =
+        selectedIndustries.length === 0 ||
+        l.industries.some((ind) => selectedIndustries.includes(ind));
+      const techsOk = selectedTechs.length === 0 || l.techs.some((t) => selectedTechs.includes(t));
+      const queryOk =
+        q === "" ||
+        [l.title, l.tagline, l.creator, ...l.problems, ...l.industries, ...l.techs]
+          .join(" ")
+          .toLowerCase()
+          .includes(q);
+      return problemsOk && offeringOk && industriesOk && techsOk && queryOk;
+    });
+  }, [selectedProblems, offering, selectedIndustries, selectedTechs, query]);
 
-  const half = Math.ceil(filtered.length / 2);
-  const first = filtered.slice(0, half);
-  const second = filtered.slice(half);
+  const featured = useMemo(() => listings.filter((l) => l.featured), []);
+
+  const openVideo = (l: Listing) => setVideoUrl(l.video ?? null);
 
   return (
     <div className="px-6 py-10 md:px-12 md:py-14 max-w-[1600px] mx-auto">
       <HeroAI query={query} setQuery={setQuery} />
 
-      {/* Facet Filter Bar (Section 2) */}
+      {/* Facet Filter Bar */}
       <FacetFilterBar
-        categories={FACET_CATEGORIES}
-        selected={selectedCats}
-        onToggleCategory={(c) =>
-          setSelectedCats((prev) =>
-            prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+        problems={[...PROBLEMS]}
+        selectedProblems={selectedProblems}
+        onToggleProblem={(p) => {
+          if (p === "All") {
+            setSelectedProblems([]);
+            return;
+          }
+          setSelectedProblems((prev) =>
+            prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p],
+          );
+        }}
+        offering={offering}
+        onOffering={setOffering}
+        industries={[...INDUSTRIES]}
+        selectedIndustries={selectedIndustries}
+        onToggleIndustry={(ind) =>
+          setSelectedIndustries((prev) =>
+            prev.includes(ind) ? prev.filter((x) => x !== ind) : [...prev, ind],
           )
         }
-        price={price}
-        onPrice={setPrice}
-        sort={sort}
-        onSort={setSort}
+        techs={[...TECHS]}
+        selectedTechs={selectedTechs}
+        onToggleTech={(t) =>
+          setSelectedTechs((prev) =>
+            prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t],
+          )
+        }
         count={filtered.length}
-        total={models.length}
+        total={listings.length}
         onClear={resetFilters}
       />
 
-      {/* Masonry — first half */}
-      <section className="mt-10 columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
-        {first.map((m) => <ModelCard key={m.id} model={m} />)}
-      </section>
-
-      {/* Trending Labs Slider */}
-      <section className="mt-14">
-        <div className="mb-5 flex items-end justify-between">
-          <div>
-            <h2 className="flex items-center gap-2 font-display text-2xl font-semibold">
-              <TrendingUp className="h-5 w-5 text-primary" /> Trending Labs
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">Featured creators shaping the open AI frontier.</p>
-          </div>
-          <button className="hidden md:block text-xs text-primary hover:underline">View all</button>
+      {/* Masonry grid */}
+      {filtered.length > 0 ? (
+        <section className="mt-10 columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
+          {filtered.map((l) => (
+            <ListingCard key={l.id} listing={l} onShow={setActiveListing} onPlay={openVideo} />
+          ))}
+        </section>
+      ) : (
+        <div className="mt-10 rounded-2xl glass p-12 text-center ring-1 ring-border">
+          <p className="font-display text-lg font-semibold">No listings match those filters.</p>
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="mt-4 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-gold-glow"
+          >
+            Clear all filters
+          </button>
         </div>
+      )}
 
-        <div className="-mx-2 overflow-x-auto scrollbar-hide">
-          <div className="flex gap-4 px-2 min-w-max pb-2">
-            {labs.map((lab) => (
-              <div
-                key={lab.id}
-                className="group w-[280px] shrink-0 rounded-2xl glass p-5 ring-1 ring-border transition hover:ring-primary/40"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[oklch(0.86_0.09_86)] to-[oklch(0.6_0.14_70)] font-display text-sm font-bold text-primary-foreground">
-                    {lab.initials}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold leading-tight truncate">{lab.name}</p>
-                    <p className="text-xs text-primary truncate">{lab.handle}</p>
-                  </div>
-                </div>
-                <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{lab.bio}</p>
-                <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                    <Download className="h-3 w-3" /> {lab.downloads}
-                  </span>
-                  <button className="rounded-full bg-secondary px-3 py-1 text-xs font-medium hover:bg-primary hover:text-primary-foreground transition">
-                    Follow
-                  </button>
-                </div>
-              </div>
-            ))}
+      {/* Featured strip */}
+      {featured.length > 0 && (
+        <section className="mt-16">
+          <div className="mb-5 flex items-end justify-between">
+            <div>
+              <h2 className="flex items-center gap-2 font-display text-2xl font-semibold">
+                <TrendingUp className="h-5 w-5 text-primary" /> Featured
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                A taste of the catalog — products, automations, and models, hand-picked by the lab.
+              </p>
+            </div>
+            <span className="hidden md:block text-xs text-muted-foreground">
+              {featured.length} picks
+            </span>
           </div>
-        </div>
-      </section>
 
-      {/* Masonry — second half */}
-      {second.length > 0 && (
-        <section className="mt-14 columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
-          {second.map((m) => <ModelCard key={m.id} model={m} />)}
+          <div className="-mx-2 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-4 px-2 min-w-max pb-2">
+              {featured.map((l) => (
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => setActiveListing(l)}
+                  className="group w-[300px] shrink-0 rounded-2xl glass p-3 text-left ring-1 ring-border transition hover:ring-primary/40"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl ring-1 ring-border/60">
+                      {l.image ? (
+                        <img
+                          src={l.image}
+                          alt={l.title}
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className={`h-full w-full bg-gradient-to-br ${l.gradient}`} />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <OfferingIcon type={l.offeringType} className="h-3 w-3" />
+                        <h3 className="truncate font-display text-sm font-semibold">{l.title}</h3>
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{l.tagline}</p>
+                    </div>
+                    <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-primary" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
         </section>
       )}
 
+      {/* Packages */}
+      <section className="mt-16">
+        <div className="mb-5 flex items-end justify-between">
+          <div>
+            <p className="mb-2 inline-flex items-center gap-1.5 rounded-full glass px-3 py-1 text-[11px] text-muted-foreground ring-1 ring-border">
+              <Sparkles className="h-3 w-3 text-primary" /> Packages
+            </p>
+            <h2 className="font-display text-2xl font-semibold">Engagements, not price tiers.</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              We manage the build, the automation, and the iteration — you keep the outcomes.
+            </p>
+          </div>
+          <Link
+            to="/packages"
+            className="hidden md:inline-flex items-center gap-1 text-xs text-primary hover:underline"
+          >
+            Explore all packages <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+        <PackageTierCards />
+      </section>
+
       <footer className="mt-20 border-t border-border pt-8 pb-4 text-center text-xs text-muted-foreground">
         © 2026 Oryntal AI Labs · Crafted with intent.{" "}
-        <Link to="/admin" className="text-primary hover:underline">Admin</Link>
+        <Link to="/admin" className="text-primary hover:underline">
+          Admin
+        </Link>
       </footer>
+
+      {/* Detail + video overlays */}
+      <ListingDetail
+        listing={activeListing}
+        onClose={() => setActiveListing(null)}
+        onPlay={openVideo}
+      />
+      <VideoLightbox url={videoUrl} onClose={() => setVideoUrl(null)} />
     </div>
   );
 }

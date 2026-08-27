@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, ArrowRight, Sparkles } from "lucide-react";
-import { packages } from "@/lib/mockData";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { PackageTierCards } from "@/components/PackageTiers";
 
 export const Route = createFileRoute("/packages")({
   head: () => ({
@@ -9,12 +9,30 @@ export const Route = createFileRoute("/packages")({
       {
         name: "description",
         content:
-          "Productized AI packages from Oryntal AI Labs — launch kits, fine-tuning, edge deployment, and full builds.",
+          "Engagement tiers from Oryntal AI Labs — automation, SaaS builds, fine-tuning, and ongoing iteration under one roof.",
       },
     ],
   }),
   component: Packages,
 });
+
+const ENGAGEMENT_STEPS = [
+  {
+    step: "01",
+    title: "Scope call",
+    text: "We map the gap you're closing, the workflows involved, and what a shipped outcome looks like in week one.",
+  },
+  {
+    step: "02",
+    title: "Build & wire",
+    text: "Automations, SaaS features, and models are built against your real tools — no screenshots of a demo app.",
+  },
+  {
+    step: "03",
+    title: "Launch & iterate",
+    text: "We ship, watch it run, and keep tuning. Support and iteration are part of the package, not an upsell.",
+  },
+];
 
 function Packages() {
   return (
@@ -23,15 +41,15 @@ function Packages() {
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="mb-3 inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-[11px] sm:text-xs text-muted-foreground ring-1 ring-border">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Services · handcrafted engagements
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Packages · engagement tiers
           </p>
           <h1 className="font-display text-4xl md:text-6xl font-semibold tracking-tight">
             <span className="text-platinum-gradient">Oryntal</span>{" "}
             <span className="text-gold-gradient">Packages</span>
           </h1>
           <p className="mt-3 max-w-xl text-muted-foreground">
-            Productized AI engagements — from a single edge deploy to a full product build. Fixed
-            scope, fixed nerves.
+            Three ways to work with the lab — from one tight automation to a full product squad.
+            Fixed scope, no pricing games.
           </p>
         </div>
         <Link
@@ -42,63 +60,29 @@ function Packages() {
         </Link>
       </div>
 
-      {/* Package grid */}
-      <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {packages.map((p) => (
-          <article
-            key={p.id}
-            className="group relative flex flex-col overflow-hidden rounded-2xl bg-surface ring-1 ring-border transition-all duration-300 hover:-translate-y-1 hover:ring-primary/40 hover:shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)]"
-          >
-            {p.badge && (
-              <span className="absolute right-4 top-4 z-10 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-gold-glow">
-                {p.badge}
-              </span>
-            )}
-
-            {/* Art */}
-            <div className={`relative h-32 w-full bg-gradient-to-br ${p.gradient} overflow-hidden`}>
-              <div className="absolute inset-0 opacity-30 animate-shimmer bg-[linear-gradient(110deg,transparent_40%,oklch(0.95_0.05_86/0.4)_50%,transparent_60%)]" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-platinum-gradient font-display text-[64px] leading-none opacity-40 select-none">
-                  {p.glyph}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-1 flex-col p-6">
-              <h2 className="font-display text-xl font-semibold">{p.name}</h2>
-              <p className="mt-1 text-sm text-primary">{p.tagline}</p>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
-
-              <ul className="mt-5 space-y-2.5">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-foreground/90">
-                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-                      <Check className="h-3 w-3" strokeWidth={3} />
-                    </span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-6 flex items-end justify-between border-t border-border pt-5">
-                <div>
-                  <p className="font-display text-2xl font-semibold text-gold-gradient">
-                    {p.price}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground">{p.priceNote}</p>
-                </div>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-xs font-semibold transition hover:bg-primary hover:text-primary-foreground"
-                >
-                  Request <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-            </div>
-          </article>
-        ))}
+      {/* Tier cards */}
+      <div className="mt-12">
+        <PackageTierCards />
       </div>
+
+      {/* How it works */}
+      <section className="mt-16">
+        <h2 className="font-display text-2xl md:text-3xl font-semibold">How it works</h2>
+        <p className="mt-2 max-w-lg text-sm text-muted-foreground">
+          Every engagement follows the same three beats — no surprises, no scope creep.
+        </p>
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {ENGAGEMENT_STEPS.map((s) => (
+            <div key={s.step} className="rounded-2xl glass p-6 ring-1 ring-border">
+              <span className="font-display text-3xl font-semibold text-gold-gradient">
+                {s.step}
+              </span>
+              <h3 className="mt-3 font-display text-lg font-semibold">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* CTA strip */}
       <section className="mt-14 rounded-3xl glass p-8 md:p-12 ring-1 ring-border relative overflow-hidden">

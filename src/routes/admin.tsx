@@ -8,17 +8,20 @@ import {
   Plus,
   Trash2,
   Boxes,
-  Zap,
   Download,
   ShieldCheck,
+  Layers,
+  Briefcase,
+  Rocket,
 } from "lucide-react";
 import {
-  models as seedModels,
+  listings as seedListings,
   packages as seedPackages,
   blogs as seedBlogs,
-  categories,
+  PROBLEMS,
+  OFFERING_META,
 } from "@/lib/mockData";
-import type { ModelCard, AIPackage, Blog } from "@/lib/mockData";
+import type { Listing, AIPackage, Blog, OfferingType } from "@/lib/mockData";
 import {
   Dialog,
   DialogContent,
@@ -41,7 +44,9 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type Section = "overview" | "models" | "packages" | "community";
+type Section = "overview" | "listings" | "packages" | "community";
+
+const TIER_ICONS = { layers: Layers, briefcase: Briefcase, rocket: Rocket };
 
 const GRADIENTS = [
   "from-[oklch(0.45_0.12_60)] via-[oklch(0.3_0.08_50)] to-[oklch(0.78_0.13_82)]",
@@ -52,35 +57,37 @@ const GRADIENTS = [
   "from-[oklch(0.15_0.02_60)] via-[oklch(0.5_0.12_70)] to-[oklch(0.88_0.09_86)]",
 ];
 
+const PROBLEM_OPTIONS = PROBLEMS.filter((p) => p !== "All");
+
 const EMPTY_FORM = {
   title: "",
-  creator: "",
-  category: "LLMs",
-  latency: "<40ms",
-  size: "7B",
+  creator: "Oryntal AI Labs",
+  tagline: "",
+  offeringType: "saas" as OfferingType,
   price: "Free" as "Free" | "Premium",
-  height: "280",
+  height: "300",
   glyph: "◉",
   gradient: GRADIENTS[0],
+  problems: [] as string[],
 };
 
 function Admin() {
   const [section, setSection] = useState<Section>("overview");
-  const [modellist, setModellist] = useState<ModelCard[]>(seedModels);
+  const [listings, setListings] = useState<Listing[]>(seedListings);
   const [pkglist, setPkglist] = useState<AIPackage[]>(seedPackages);
   const [bloglist, setBloglist] = useState<Blog[]>(seedBlogs);
   const [published, setPublished] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries([...seedModels, ...seedPackages, ...seedBlogs].map((x) => [x.id, true])),
+    Object.fromEntries([...seedListings, ...seedPackages, ...seedBlogs].map((x) => [x.id, true])),
   );
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({ ...EMPTY_FORM });
+  const [form, setForm] = useState({ ...EMPTY_FORM, problems: [...EMPTY_FORM.problems] });
 
   const publishedCount = Object.values(published).filter(Boolean).length;
 
   const togglePublished = (id: string) => setPublished((p) => ({ ...p, [id]: !p[id] }));
 
-  const removeModel = (id: string) => {
-    setModellist((list) => list.filter((m) => m.id !== id));
+  const removeListing = (id: string) => {
+    setListings((list) => list.filter((l) => l.id !== id));
     setPublished((p) => {
       const next = { ...p };
       delete next[id];
@@ -88,31 +95,40 @@ function Admin() {
     });
   };
 
-  const submitModel = () => {
-    if (!form.title.trim() || !form.creator.trim()) return;
-    const model: ModelCard = {
+  const submitListing = () => {
+    if (!form.title.trim() || !form.tagline.trim()) return;
+    const listing: Listing = {
       id: `m-${Math.random().toString(36).slice(2)}`,
       title: form.title.trim(),
-      creator: form.creator.trim().startsWith("@")
-        ? form.creator.trim()
-        : `@${form.creator.trim()}`,
-      category: form.category,
-      latency: form.latency,
-      size: form.size,
+      tagline: form.tagline.trim(),
+      creator: form.creator.trim(),
+      offeringType: form.offeringType,
+      problems: form.problems,
+      industries: [],
+      techs: [],
+      problemPoints: [],
+      advantagePoints: [],
+      image: "",
       price: form.price,
-      height: Number(form.height) || 280,
-      glyph: form.glyph.trim() || "◉",
       gradient: form.gradient,
+      glyph: form.glyph.trim() || "◉",
+      height: Number(form.height) || 300,
     };
-    setModellist((list) => [model, ...list]);
-    setPublished((p) => ({ ...p, [model.id]: true }));
+    setListings((list) => [listing, ...list]);
+    setPublished((p) => ({ ...p, [listing.id]: true }));
     setDialogOpen(false);
-    setForm({ ...EMPTY_FORM });
+    setForm({ ...EMPTY_FORM, problems: [...EMPTY_FORM.problems] });
   };
+
+  const toggleProblemForm = (p: string) =>
+    setForm((f) => ({
+      ...f,
+      problems: f.problems.includes(p) ? f.problems.filter((x) => x !== p) : [...f.problems, p],
+    }));
 
   const tabs: { key: Section; label: string; icon: typeof Cpu }[] = [
     { key: "overview", label: "Overview", icon: LayoutDashboard },
-    { key: "models", label: "Models", icon: Cpu },
+    { key: "listings", label: "Listings", icon: Cpu },
     { key: "packages", label: "Packages", icon: Package },
     { key: "community", label: "Community", icon: BookOpen },
   ];
@@ -130,14 +146,14 @@ function Admin() {
             <span className="text-gold-gradient">Panel</span>
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            You publish the listings here. The public marketplace only reflects what you mark live.
+            You publish the listings here. The public catalog only reflects what you mark live.
           </p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
           className="self-start md:self-auto h-11 rounded-full px-5 text-sm font-semibold shadow-gold-glow"
         >
-          <Plus className="h-4 w-4" /> Publish a model
+          <Plus className="h-4 w-4" /> Publish a listing
         </Button>
       </div>
 
@@ -162,19 +178,19 @@ function Admin() {
       <div className="mt-8">
         {section === "overview" && (
           <Overview
-            models={modellist}
+            listings={listings}
             packages={pkglist}
             blogs={bloglist}
             published={published}
             publishedCount={publishedCount}
           />
         )}
-        {section === "models" && (
-          <ModelsManager
-            models={modellist}
+        {section === "listings" && (
+          <ListingsManager
+            listings={listings}
             published={published}
             onToggle={togglePublished}
-            onRemove={removeModel}
+            onRemove={removeListing}
             onPublish={() => setDialogOpen(true)}
           />
         )}
@@ -186,113 +202,125 @@ function Admin() {
         )}
       </div>
 
-      {/* Publish model dialog */}
+      {/* Publish listing dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Publish a model</DialogTitle>
+            <DialogTitle>Publish a listing</DialogTitle>
             <p className="text-sm text-muted-foreground">
               New listings default to live. Toggle them off anytime below.
             </p>
           </DialogHeader>
           <div className="grid gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="l-title">Title</Label>
+              <Input
+                id="l-title"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="LeadPilot"
+              />
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="m-title">Title</Label>
+                <Label htmlFor="l-tagline">One-line hook</Label>
                 <Input
-                  id="m-title"
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="Oryntal-Reason-70B"
+                  id="l-tagline"
+                  value={form.tagline}
+                  onChange={(e) => setForm({ ...form, tagline: e.target.value })}
+                  placeholder="Qualify, enrich, and route leads."
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="m-creator">Creator</Label>
+                <Label htmlFor="l-creator">Brand / creator</Label>
                 <Input
-                  id="m-creator"
+                  id="l-creator"
                   value={form.creator}
                   onChange={(e) => setForm({ ...form, creator: e.target.value })}
-                  placeholder="@oryntal"
                 />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Offering type</Label>
+              <div className="inline-flex flex-wrap rounded-full glass p-1 ring-1 ring-border">
+                {(["saas", "automation", "model"] as OfferingType[]).map((o) => (
+                  <button
+                    key={o}
+                    type="button"
+                    onClick={() => setForm({ ...form, offeringType: o })}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition ${
+                      form.offeringType === o
+                        ? "bg-primary text-primary-foreground shadow-gold-glow"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {OFFERING_META[o].label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Problem solved</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {PROBLEM_OPTIONS.map((p) => {
+                  const on = form.problems.includes(p);
+                  return (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => toggleProblemForm(p)}
+                      className={`rounded-full px-3 py-1 text-[11px] font-medium ring-1 transition ${
+                        on
+                          ? "bg-primary text-primary-foreground ring-primary shadow-gold-glow"
+                          : "glass text-muted-foreground ring-border hover:text-foreground"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <Label htmlFor="m-category">Category</Label>
-                <select
-                  id="m-category"
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  {categories
-                    .filter((c) => c !== "All")
-                    .map((c) => (
-                      <option key={c} value={c} className="bg-popover">
-                        {c}
-                      </option>
-                    ))}
-                </select>
+                <Label>Price</Label>
+                <div className="inline-flex rounded-full glass p-1 ring-1 ring-border">
+                  {(["Free", "Premium"] as const).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setForm({ ...form, price: p })}
+                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                        form.price === p
+                          ? "bg-primary text-primary-foreground shadow-gold-glow"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="m-latency">Latency</Label>
+                <Label htmlFor="l-height">Card height (px)</Label>
                 <Input
-                  id="m-latency"
-                  value={form.latency}
-                  onChange={(e) => setForm({ ...form, latency: e.target.value })}
-                  placeholder="<40ms"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="m-size">Size</Label>
-                <Input
-                  id="m-size"
-                  value={form.size}
-                  onChange={(e) => setForm({ ...form, size: e.target.value })}
-                  placeholder="7B"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="m-height">Card height (px)</Label>
-                <Input
-                  id="m-height"
+                  id="l-height"
                   type="number"
                   value={form.height}
                   onChange={(e) => setForm({ ...form, height: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="m-glyph">Glyph</Label>
+                <Label htmlFor="l-glyph">Glyph</Label>
                 <Input
-                  id="m-glyph"
+                  id="l-glyph"
                   value={form.glyph}
                   onChange={(e) => setForm({ ...form, glyph: e.target.value })}
                   placeholder="◉"
                 />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>Price</Label>
-              <div className="inline-flex rounded-full glass p-1 ring-1 ring-border">
-                {(["Free", "Premium"] as const).map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setForm({ ...form, price: p })}
-                    className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${
-                      form.price === p
-                        ? "bg-primary text-primary-foreground shadow-gold-glow"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
               </div>
             </div>
 
@@ -319,8 +347,8 @@ function Admin() {
               Cancel
             </Button>
             <Button
-              onClick={submitModel}
-              disabled={!form.title.trim() || !form.creator.trim()}
+              onClick={submitListing}
+              disabled={!form.title.trim() || !form.tagline.trim()}
               className="rounded-full shadow-gold-glow"
             >
               <Plus className="h-4 w-4" /> Publish
@@ -338,23 +366,23 @@ function Admin() {
 }
 
 function Overview({
-  models,
+  listings,
   packages,
   blogs,
   published,
   publishedCount,
 }: {
-  models: ModelCard[];
+  listings: Listing[];
   packages: AIPackage[];
   blogs: Blog[];
   published: Record<string, boolean>;
   publishedCount: number;
 }) {
   const stats = [
-    { icon: Cpu, label: "Models", value: models.filter((m) => published[m.id]).length },
+    { icon: Boxes, label: "Live listings", value: listings.filter((l) => published[l.id]).length },
     { icon: Package, label: "Packages", value: packages.filter((p) => published[p.id]).length },
     { icon: BookOpen, label: "Posts", value: blogs.filter((b) => published[b.id]).length },
-    { icon: Download, label: "Live listings", value: publishedCount },
+    { icon: Download, label: "Total live", value: publishedCount },
   ];
   return (
     <div>
@@ -374,21 +402,27 @@ function Overview({
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold">Recently published</h2>
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Boxes className="h-3.5 w-3.5" /> {models.length} total models
+            <Cpu className="h-3.5 w-3.5" /> {listings.length} total listings
           </span>
         </div>
         <div className="mt-4 divide-y divide-border">
-          {models.slice(0, 5).map((m) => (
-            <div key={m.id} className="flex items-center gap-3 py-3">
-              <div className={`h-9 w-9 shrink-0 rounded-lg bg-gradient-to-br ${m.gradient}`} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{m.title}</p>
-                <p className="truncate text-xs text-muted-foreground">{m.creator}</p>
+          {listings.slice(0, 5).map((l) => (
+            <div key={l.id} className="flex items-center gap-3 py-3">
+              <div
+                className={`h-9 w-9 shrink-0 overflow-hidden rounded-lg ${l.image ? "" : "bg-gradient-to-br " + l.gradient}`}
+              >
+                {l.image ? (
+                  <img src={l.image} alt="" className="h-full w-full object-cover" />
+                ) : null}
               </div>
-              <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium ring-1 ring-border">
-                <Zap className="h-3 w-3" /> {m.latency}
-              </span>
-              <Sw status={!!published[m.id]} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{l.title}</p>
+                <p className="truncate text-xs text-muted-foreground">{l.creator}</p>
+              </div>
+              <MiniTag gold={l.offeringType === "saas"}>
+                {OFFERING_META[l.offeringType].label}
+              </MiniTag>
+              <Sw status={!!published[l.id]} />
             </div>
           ))}
         </div>
@@ -397,14 +431,14 @@ function Overview({
   );
 }
 
-function ModelsManager({
-  models,
+function ListingsManager({
+  listings,
   published,
   onToggle,
   onRemove,
   onPublish,
 }: {
-  models: ModelCard[];
+  listings: Listing[];
   published: Record<string, boolean>;
   onToggle: (id: string) => void;
   onRemove: (id: string) => void;
@@ -413,48 +447,53 @@ function ModelsManager({
   return (
     <div>
       <SectionHeader
-        title="Model listings"
-        hint={`${models.length} total`}
-        actionLabel="Publish a model"
+        title="Catalog listings"
+        hint={`${listings.length} total`}
+        actionLabel="Publish a listing"
         onAction={onPublish}
       />
       <div className="mt-4 overflow-hidden rounded-2xl ring-1 ring-border bg-surface">
-        {models.map((m, i) => (
+        {listings.map((l, i) => (
           <div
-            key={m.id}
+            key={l.id}
             className={`flex flex-wrap items-center gap-3 px-5 py-4 ${i > 0 ? "border-t border-border" : ""}`}
           >
-            <div className={`h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br ${m.gradient}`} />
+            <div
+              className={`h-10 w-10 shrink-0 overflow-hidden rounded-xl ${l.image ? "" : "bg-gradient-to-br " + l.gradient}`}
+            >
+              {l.image ? <img src={l.image} alt="" className="h-full w-full object-cover" /> : null}
+            </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{m.title}</p>
+              <p className="truncate text-sm font-semibold">{l.title}</p>
               <p className="truncate text-xs text-muted-foreground">
-                {m.creator} · {m.category}
+                {l.creator} · {OFFERING_META[l.offeringType].label}
               </p>
             </div>
             <div className="hidden sm:flex gap-1.5">
-              <MiniTag>{m.latency}</MiniTag>
-              <MiniTag>{m.size}</MiniTag>
-              <MiniTag gold={m.price === "Premium"}>{m.price}</MiniTag>
+              {l.problems.slice(0, 2).map((p) => (
+                <MiniTag key={p}>{p}</MiniTag>
+              ))}
+              {l.problems.length > 2 && <MiniTag>+{l.problems.length - 2}</MiniTag>}
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className={published[m.id] ? "text-primary" : ""}>
-                  {published[m.id] ? "Live" : "Draft"}
+                <span className={published[l.id] ? "text-primary" : ""}>
+                  {published[l.id] ? "Live" : "Draft"}
                 </span>
-                <Switch checked={!!published[m.id]} onCheckedChange={() => onToggle(m.id)} />
+                <Switch checked={!!published[l.id]} onCheckedChange={() => onToggle(l.id)} />
               </div>
               <button
                 type="button"
-                onClick={() => onRemove(m.id)}
+                onClick={() => onRemove(l.id)}
                 className="text-muted-foreground transition hover:text-destructive"
-                aria-label={`Delete ${m.title}`}
+                aria-label={`Delete ${l.title}`}
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
           </div>
         ))}
-        {models.length === 0 && <Empty label="No models yet. Publish your first one." />}
+        {listings.length === 0 && <Empty label="No listings yet. Publish your first one." />}
       </div>
     </div>
   );
@@ -469,36 +508,37 @@ function PackagesManager({
   published: Record<string, boolean>;
   onToggle: (id: string) => void;
 }) {
+  const tierIcons = TIER_ICONS;
   return (
     <div>
-      <SectionHeader title="Package listings" hint={`${packages.length} total`} />
+      <SectionHeader title="Engagement tiers" hint={`${packages.length} total`} />
       <div className="mt-4 overflow-hidden rounded-2xl ring-1 ring-border bg-surface">
-        {packages.map((p, i) => (
-          <div
-            key={p.id}
-            className={`flex flex-wrap items-center gap-3 px-5 py-4 ${i > 0 ? "border-t border-border" : ""}`}
-          >
-            <div className={`h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br ${p.gradient}`}>
-              <div className="grid h-full w-full place-items-center">
-                <span className="text-platinum-gradient font-display text-lg leading-none opacity-60">
-                  {p.glyph}
+        {packages.map((p, i) => {
+          const TierIcon = tierIcons[p.tierIcon];
+          return (
+            <div
+              key={p.id}
+              className={`flex flex-wrap items-center gap-3 px-5 py-4 ${i > 0 ? "border-t border-border" : ""}`}
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl glass ring-1 ring-border text-primary">
+                <TierIcon className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{p.name}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {p.tagline} · {p.items.length} managed items
+                </p>
+              </div>
+              <MiniTag gold={!!p.featured}>{p.featured ? "Most asked for" : p.cta}</MiniTag>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className={published[p.id] ? "text-primary" : ""}>
+                  {published[p.id] ? "Live" : "Draft"}
                 </span>
+                <Switch checked={!!published[p.id]} onCheckedChange={() => onToggle(p.id)} />
               </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{p.name}</p>
-              <p className="truncate text-xs text-muted-foreground">
-                {p.tagline} · {p.price}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className={published[p.id] ? "text-primary" : ""}>
-                {published[p.id] ? "Live" : "Draft"}
-              </span>
-              <Switch checked={!!published[p.id]} onCheckedChange={() => onToggle(p.id)} />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

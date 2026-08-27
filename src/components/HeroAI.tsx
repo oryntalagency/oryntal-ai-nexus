@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
-import { Search, Cpu, Wand2, Image as ImageIcon, MessageSquare, Mic, Bot, Workflow, Database, Eye, Code2, Network } from "lucide-react";
+import {
+  Search,
+  Cpu,
+  Boxes,
+  Bot,
+  Workflow,
+  Database,
+  Eye,
+  Code2,
+  Network,
+  Wand2,
+  Mic,
+} from "lucide-react";
 
 const ROTATING = [
-  { kicker: "Generative Intelligence", word: "Imagine." },
-  { kicker: "Reasoning Engines", word: "Think." },
-  { kicker: "Vision Models", word: "See." },
-  { kicker: "Voice & Audio", word: "Speak." },
-  { kicker: "Diffusion Art", word: "Create." },
+  { kicker: "Curated Catalog", word: "Products." },
+  { kicker: "Built to Close Gaps", word: "Automations." },
+  { kicker: "Fine-Tuned Intelligence", word: "Models." },
+  { kicker: "Everyday Ops", word: "Agents." },
+  { kicker: "Production Proven", word: "Workflows." },
 ];
 
 const STREAM_LINES = [
   "→ loading oryntal-reason-13b…",
-  "✓ context window: 128k tokens",
-  "→ generating multimodal response…",
-  "✓ latency 42ms · 1.4M tok/sec",
-  "★ deployed · 14 edge regions",
+  "✓ routing lead from form → CRM → rep",
+  "→ drafting reply in brand voice…",
+  "✓ invoice reconciled · ledger updated",
+  "★ shipped · 14 edge regions · 0 tickets",
 ];
 
 type HeroAIProps = {
@@ -64,7 +76,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
         <div className="min-w-0">
           <p className="mb-5 inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-[11px] sm:text-xs text-muted-foreground ring-1 ring-border">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            Live · 73 models · Curated daily
+            Live · Curated catalog · Updated weekly
           </p>
 
           <div className="mb-3 h-5 overflow-hidden text-[10px] sm:text-xs font-medium uppercase tracking-[0.18em] text-primary">
@@ -73,17 +85,17 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             </div>
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-semibold leading-[1.02] tracking-tight">
-            <span className="text-platinum-gradient">Where AI Models</span>
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.04] tracking-tight">
+            <span className="text-platinum-gradient">Deploy the Future.</span>
             <br />
-            <span className="text-gold-gradient inline-block min-w-[5ch]" key={current.word}>
-              <span className="inline-block animate-[heroSlide_0.6s_ease-out]">{current.word}</span>
-            </span>
+            <span className="text-gold-gradient">Products, Automations, and AI Models —</span>
+            <br />
+            <span className="text-platinum-gradient">Built to Close Real Gaps.</span>
           </h1>
 
           <p className="mt-5 max-w-xl text-sm sm:text-base md:text-lg text-muted-foreground">
-            A handcrafted marketplace where the sharpest builders deploy production-ready intelligence —
-            from 120M edge nano-models to 70B reasoning engines.
+            A curated catalog of SaaS products, AI automations, and fine-tuned models, built by
+            Oryntal AI Labs.
           </p>
 
           {/* Responsive search */}
@@ -92,7 +104,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search models, creators…"
+              placeholder="Search products, automations, models…"
               className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
             <button className="shrink-0 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110 sm:px-4">
@@ -100,22 +112,21 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             </button>
           </div>
 
-          {/* Modality chips */}
+          {/* Offering chips */}
           <div className="mt-5 flex flex-wrap gap-2">
             {[
-              { icon: MessageSquare, label: "LLMs" },
-              { icon: ImageIcon, label: "Vision" },
-              { icon: Mic, label: "Voice" },
-              { icon: Wand2, label: "Diffusion" },
-              { icon: Cpu, label: "Edge" },
+              { icon: Boxes, label: "SaaS Products" },
+              { icon: Workflow, label: "AI Automations" },
+              { icon: Cpu, label: "AI Models & Agents" },
+              { icon: Bot, label: "Custom Builds" },
             ].map((c) => (
-              <button
+              <span
                 key={c.label}
-                className="inline-flex items-center gap-1.5 rounded-full glass px-3 py-1.5 text-xs text-muted-foreground ring-1 ring-border transition hover:text-foreground hover:ring-primary/40"
+                className="inline-flex items-center gap-1.5 rounded-full glass px-3 py-1.5 text-xs text-muted-foreground ring-1 ring-border"
               >
                 <c.icon className="h-3 w-3" />
                 {c.label}
-              </button>
+              </span>
             ))}
           </div>
         </div>
@@ -159,9 +170,22 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             {/* inter-node connections — neural network mesh */}
             {(() => {
               const edges: Array<[number, number]> = [
-                [0, 4], [4, 1], [1, 7], [7, 3], [3, 5], [5, 2], [2, 6], [6, 0],
-                [0, 1], [2, 3], [4, 5], [6, 7],
-                [0, 5], [1, 3], [4, 7], [6, 2],
+                [0, 4],
+                [4, 1],
+                [1, 7],
+                [7, 3],
+                [3, 5],
+                [5, 2],
+                [2, 6],
+                [6, 0],
+                [0, 1],
+                [2, 3],
+                [4, 5],
+                [6, 7],
+                [0, 5],
+                [1, 3],
+                [4, 7],
+                [6, 2],
               ];
               return edges.map(([a, b], i) => (
                 <line
@@ -195,8 +219,19 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
                     style={{ animationDelay: `${i * 0.3}s` }}
                   />
                   <circle r="2.4" fill="oklch(0.95 0.08 86)">
-                    <animateMotion dur={`${2.2 + (i % 3) * 0.6}s`} repeatCount="indefinite" path={path} begin={`${i * 0.25}s`} />
-                    <animate attributeName="opacity" values="0;1;1;0" dur={`${2.2 + (i % 3) * 0.6}s`} repeatCount="indefinite" begin={`${i * 0.25}s`} />
+                    <animateMotion
+                      dur={`${2.2 + (i % 3) * 0.6}s`}
+                      repeatCount="indefinite"
+                      path={path}
+                      begin={`${i * 0.25}s`}
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0;1;1;0"
+                      dur={`${2.2 + (i % 3) * 0.6}s`}
+                      repeatCount="indefinite"
+                      begin={`${i * 0.25}s`}
+                    />
                   </circle>
                 </g>
               );
@@ -205,20 +240,36 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             {/* synapse pulses across inter-node edges */}
             {(() => {
               const edges: Array<[number, number]> = [
-                [0, 4], [4, 1], [1, 7], [7, 3], [3, 5], [5, 2], [2, 6], [6, 0],
+                [0, 4],
+                [4, 1],
+                [1, 7],
+                [7, 3],
+                [3, 5],
+                [5, 2],
+                [2, 6],
+                [6, 0],
               ];
               return edges.map(([a, b], i) => {
                 const path = `M${NODES[a].x} ${NODES[a].y} L ${NODES[b].x} ${NODES[b].y}`;
                 return (
                   <circle key={`sp-${i}`} r="1.6" fill="oklch(0.92 0.1 86)" opacity="0.9">
-                    <animateMotion dur={`${3 + (i % 3) * 0.5}s`} repeatCount="indefinite" path={path} begin={`${i * 0.5}s`} />
-                    <animate attributeName="opacity" values="0;0.9;0" dur={`${3 + (i % 3) * 0.5}s`} repeatCount="indefinite" begin={`${i * 0.5}s`} />
+                    <animateMotion
+                      dur={`${3 + (i % 3) * 0.5}s`}
+                      repeatCount="indefinite"
+                      path={path}
+                      begin={`${i * 0.5}s`}
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0;0.9;0"
+                      dur={`${3 + (i % 3) * 0.5}s`}
+                      repeatCount="indefinite"
+                      begin={`${i * 0.5}s`}
+                    />
                   </circle>
                 );
               });
             })()}
-
-
 
             {/* expanding rings from core */}
             {[0, 1, 2].map((i) => (
@@ -232,14 +283,41 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
                 strokeWidth="1"
                 opacity="0"
               >
-                <animate attributeName="r" from="40" to="160" dur="3s" begin={`${i * 1}s`} repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0;0.6;0" dur="3s" begin={`${i * 1}s`} repeatCount="indefinite" />
+                <animate
+                  attributeName="r"
+                  from="40"
+                  to="160"
+                  dur="3s"
+                  begin={`${i * 1}s`}
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;0.6;0"
+                  dur="3s"
+                  begin={`${i * 1}s`}
+                  repeatCount="indefinite"
+                />
               </circle>
             ))}
 
             {/* core */}
-            <circle cx="200" cy="200" r="90" fill="url(#core)" opacity="0.55" className="animate-[breathe_4s_ease-in-out_infinite]" />
-            <circle cx="200" cy="200" r="38" fill="oklch(0.16 0.01 60)" stroke="oklch(0.88 0.09 86)" strokeWidth="1" />
+            <circle
+              cx="200"
+              cy="200"
+              r="90"
+              fill="url(#core)"
+              opacity="0.55"
+              className="animate-[breathe_4s_ease-in-out_infinite]"
+            />
+            <circle
+              cx="200"
+              cy="200"
+              r="38"
+              fill="oklch(0.16 0.01 60)"
+              stroke="oklch(0.88 0.09 86)"
+              strokeWidth="1"
+            />
           </svg>
 
           {/* Vector icon nodes — each represents a category of AI work */}
@@ -255,14 +333,16 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
             >
               <div className="relative grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl glass ring-1 ring-primary/40 shadow-gold-glow transition hover:scale-110 hover:ring-primary">
                 <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" strokeWidth={1.8} />
-                <span className="pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_center,oklch(0.78_0.13_82/0.25),transparent_70%)] animate-[breathe_3s_ease-in-out_infinite]" style={{ animationDelay: `${i * 0.3}s` }} />
+                <span
+                  className="pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_center,oklch(0.78_0.13_82/0.25),transparent_70%)] animate-[breathe_3s_ease-in-out_infinite]"
+                  style={{ animationDelay: `${i * 0.3}s` }}
+                />
               </div>
               <span className="pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-background/80 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-primary opacity-0 ring-1 ring-border backdrop-blur transition-opacity group-hover:opacity-100">
                 {label}
               </span>
             </div>
           ))}
-
 
           {/* Center logo */}
           <div className="absolute inset-0 grid place-items-center">
@@ -279,15 +359,21 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
           {/* Floating prompt card */}
           <div className="absolute -left-1 top-4 hidden md:block w-[200px] rounded-xl glass p-3 ring-1 ring-border animate-[float_6s_ease-in-out_infinite]">
             <p className="text-[10px] uppercase tracking-wider text-primary mb-1">Prompt</p>
-            <p className="text-xs text-foreground/90 leading-snug">"Generate a moody cinematic portrait, golden rim light."</p>
+            <p className="text-xs text-foreground/90 leading-snug">
+              "Generate a moody cinematic portrait, golden rim light."
+            </p>
           </div>
 
           {/* Floating stream card */}
           <div className="absolute -right-1 bottom-4 hidden md:block w-[230px] rounded-xl glass p-3 ring-1 ring-border animate-[float_7s_ease-in-out_infinite_1s]">
-            <p className="text-[10px] uppercase tracking-wider text-primary mb-1.5">Inference stream</p>
+            <p className="text-[10px] uppercase tracking-wider text-primary mb-1.5">
+              Inference stream
+            </p>
             <div className="space-y-1 font-mono text-[10.5px] text-muted-foreground min-h-[78px]">
               {STREAM_LINES.slice(0, streamIdx).map((l, i) => (
-                <div key={i} className="animate-[heroSlide_0.4s_ease-out]">{l}</div>
+                <div key={i} className="animate-[heroSlide_0.4s_ease-out]">
+                  {l}
+                </div>
               ))}
               {streamIdx < STREAM_LINES.length && (
                 <span className="inline-block h-3 w-1.5 bg-primary animate-pulse" />
@@ -300,13 +386,15 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
       {/* Stats row */}
       <div className="mt-10 grid grid-cols-2 gap-4 border-t border-border/60 pt-6 md:grid-cols-4">
         {[
-          ["73", "Curated models"],
-          ["28", "Verified labs"],
-          ["<120ms", "Median latency"],
+          ["24", "SaaS products"],
+          ["9", "Automation systems"],
+          ["14", "AI models & agents"],
           ["41K", "Monthly deploys"],
         ].map(([v, l]) => (
           <div key={l}>
-            <p className="font-display text-2xl md:text-3xl font-semibold text-gold-gradient">{v}</p>
+            <p className="font-display text-2xl md:text-3xl font-semibold text-gold-gradient">
+              {v}
+            </p>
             <p className="mt-1 text-xs text-muted-foreground">{l}</p>
           </div>
         ))}
