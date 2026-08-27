@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Search, Cpu, Wand2, Image as ImageIcon, MessageSquare, Mic, Bot, Workflow, Database, Eye, Code2, Network } from "lucide-react";
-import logoAsset from "@/assets/oryntal-logo.png";
 
 const ROTATING = [
   { kicker: "Generative Intelligence", word: "Imagine." },
@@ -269,7 +268,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
           <div className="absolute inset-0 grid place-items-center">
             <div className="relative grid h-24 w-24 sm:h-28 sm:w-28 place-items-center rounded-full bg-[oklch(0.14_0.01_60)] ring-1 ring-primary/50 shadow-gold-glow animate-[breathe_4s_ease-in-out_infinite] overflow-hidden">
               <img
-                src={logoAsset}
+                src="/assets/ol.png"
                 alt="Oryntal AI Labs"
                 className="h-full w-full object-cover"
               />
