@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, BookOpen, User, Plus } from "lucide-react";
+import { Home, Package, BookOpen, User, MessageCircle } from "lucide-react";
 
 const items = [
   { to: "/", label: "Home", icon: Home },
+  { to: "/packages", label: "Packages", icon: Package },
   { to: "/blogs", label: "Blogs", icon: BookOpen },
   { to: "/profile", label: "Profile", icon: User },
 ] as const;
@@ -41,16 +42,16 @@ export function Sidebar() {
         })}
       </nav>
 
-      <button
-        type="button"
-        className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[oklch(0.86_0.09_86)] to-[oklch(0.7_0.14_78)] text-primary-foreground shadow-gold-glow transition hover:scale-105"
-        aria-label="List Model"
+      <Link
+        to="/contact"
+        className="group relative flex h-12 w-12 items-center justify-center rounded-full glass ring-1 ring-border text-muted-foreground transition hover:text-primary hover:ring-primary/40"
+        aria-label="Contact / Hire us"
       >
-        <Plus className="h-5 w-5" strokeWidth={2.5} />
+        <MessageCircle className="h-5 w-5" strokeWidth={2} />
         <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-md bg-popover px-2.5 py-1 text-xs font-medium text-popover-foreground opacity-0 shadow-lg transition group-hover:opacity-100 ring-1 ring-border z-50">
-          List Model
+          Contact / Hire us
         </span>
-      </button>
+      </Link>
     </aside>
   );
 }

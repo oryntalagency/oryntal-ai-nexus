@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { TrendingUp, Download } from "lucide-react";
 import { models, categories, labs } from "@/lib/mockData";
 import { ModelCard } from "@/components/ModelCard";
 import { HeroAI } from "@/components/HeroAI";
+import { FacetFilterBar, type PriceFilter, type SortKey } from "@/components/FacetFilterBar";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,19 +16,37 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const FACET_CATEGORIES = categories.filter((c) => c !== "All");
+
+const parseLatency = (s: string) => Number(s.replace(/[^0-9.]/g, "") || 0);
+const parseSize = (s: string) => {
+  const n = Number(s.replace(/[^0-9.]/g, "") || 0);
+  return s.includes("M") ? n / 1000 : n; // "120M" → 0.12B
+};
+
 function Home() {
-  const [active, setActive] = useState("All");
+  const [selectedCats, setSelectedCats] = useState<string[]>([]);
+  const [price, setPrice] = useState<PriceFilter>("All");
+  const [sort, setSort] = useState<SortKey>("featured");
   const [query, setQuery] = useState("");
 
-  const filtered = useMemo(
-    () =>
-      models.filter(
-        (m) =>
-          (active === "All" || m.category === active) &&
-          (query === "" || m.title.toLowerCase().includes(query.toLowerCase()))
-      ),
-    [active, query]
-  );
+  const resetFilters = () => {
+    setSelectedCats([]);
+    setPrice("All");
+    setSort("featured");
+  };
+
+  const filtered = useMemo(() => {
+    let list = models.filter(
+      (m) =>
+        (selectedCats.length === 0 || selectedCats.includes(m.category)) &&
+        (price === "All" || m.price === price) &&
+        (query === "" || m.title.toLowerCase().includes(query.toLowerCase()))
+    );
+    if (sort === "fastest") list = [...list].sort((a, b) => parseLatency(a.latency) - parseLatency(b.latency));
+    if (sort === "smallest") list = [...list].sort((a, b) => parseSize(a.size) - parseSize(b.size));
+    return list;
+  }, [selectedCats, price, sort, query]);
 
   const half = Math.ceil(filtered.length / 2);
   const first = filtered.slice(0, half);
@@ -37,27 +56,23 @@ function Home() {
     <div className="px-6 py-10 md:px-12 md:py-14 max-w-[1600px] mx-auto">
       <HeroAI query={query} setQuery={setQuery} />
 
-      {/* Categories */}
-      <div className="mt-12 -mx-2 overflow-x-auto scrollbar-hide">
-        <div className="flex gap-2 px-2 min-w-max">
-          {categories.map((c) => {
-            const isActive = c === active;
-            return (
-              <button
-                key={c}
-                onClick={() => setActive(c)}
-                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-gold-glow"
-                    : "glass text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {c}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Facet Filter Bar (Section 2) */}
+      <FacetFilterBar
+        categories={FACET_CATEGORIES}
+        selected={selectedCats}
+        onToggleCategory={(c) =>
+          setSelectedCats((prev) =>
+            prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+          )
+        }
+        price={price}
+        onPrice={setPrice}
+        sort={sort}
+        onSort={setSort}
+        count={filtered.length}
+        total={models.length}
+        onClear={resetFilters}
+      />
 
       {/* Masonry — first half */}
       <section className="mt-10 columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
@@ -115,7 +130,8 @@ function Home() {
       )}
 
       <footer className="mt-20 border-t border-border pt-8 pb-4 text-center text-xs text-muted-foreground">
-        © 2026 Oryntal AI Labs · Crafted with intent.
+        © 2026 Oryntal AI Labs · Crafted with intent.{" "}
+        <Link to="/admin" className="text-primary hover:underline">Admin</Link>
       </footer>
     </div>
   );

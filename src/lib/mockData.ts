@@ -88,6 +88,127 @@ export const models: ModelCard[] = [
 
 export const categories = ["All", "LLMs", "Computer Vision", "Voice & Audio", "Diffusion", "Edge AI"];
 
+export type AIPackage = {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  gradient: string;
+  glyph: string;
+  price: string;
+  priceNote: string;
+  features: string[];
+  badge?: string;
+};
+
+export const packages: AIPackage[] = [
+  {
+    id: "p1",
+    name: "Model Launch Kit",
+    tagline: "Ship a model, not a prototype.",
+    description:
+      "A production-ready inference endpoint for your custom model — deployed to the edge with monitoring, versioning, and docs.",
+    gradient: "from-[oklch(0.3_0.08_70)] via-[oklch(0.45_0.12_60)] to-[oklch(0.88_0.09_86)]",
+    glyph: "◉",
+    price: "From $1,900",
+    priceNote: "per model · one-time",
+    features: [
+      "Global edge inference deployment",
+      "Uptime monitoring + Slack alerts",
+      "Versioned API with documentation",
+      "30-day concierge support",
+    ],
+    badge: "Most Popular",
+  },
+  {
+    id: "p2",
+    name: "Fine-Tune Studio",
+    tagline: "Your weights, your IP, our pipeline.",
+    description:
+      "End-to-end fine-tuning on curated datasets — from LoRA experiments to a full fine-tune with evals against your base.",
+    gradient: "from-[oklch(0.2_0.03_140)] via-[oklch(0.35_0.08_80)] to-[oklch(0.85_0.1_86)]",
+    glyph: "◐",
+    price: "Custom quote",
+    priceNote: "scoped by model scale",
+    features: [
+      "Curated dataset pipeline + cleaning",
+      "LoRA experiments → full fine-tune",
+      "Evaluation suite vs. baseline",
+      "Weights delivered on request",
+    ],
+  },
+  {
+    id: "p3",
+    name: "Edge Deployment",
+    tagline: "Runs where your data lives.",
+    description:
+      "Quantized, distilled, and benchmarked builds for cameras, sensors, and on-prem boxes — no GPU required.",
+    gradient: "from-[oklch(0.22_0.04_240)] via-[oklch(0.4_0.1_60)] to-[oklch(0.9_0.08_86)]",
+    glyph: "◈",
+    price: "From $2,400",
+    priceNote: "per device class",
+    features: [
+      "Quantized ONNX / TFLite builds",
+      "Fully offline inference kit",
+      "On-device benchmark report",
+      "Over-the-air update pipeline",
+    ],
+  },
+  {
+    id: "p4",
+    name: "Voice & Audio Suite",
+    tagline: "Consent-first voice, tuned to brand.",
+    description:
+      "A production voice stack — TTS cloning, streaming playback, and responsible watermarking in one pipeline.",
+    gradient: "from-[oklch(0.18_0.02_60)] via-[oklch(0.5_0.14_82)] to-[oklch(0.3_0.05_30)]",
+    glyph: "≋",
+    price: "$3,200+",
+    priceNote: "per voice model",
+    features: [
+      "Consent-first voice cloning pipeline",
+      "Low-latency streaming TTS API",
+      "Forensic watermarking included",
+      "Per-voice scoring & tuning sessions",
+    ],
+  },
+  {
+    id: "p5",
+    name: "Sovereign Self-Host",
+    tagline: "Your infra. Your weights. Zero leakage.",
+    description:
+      "An air-gapped deployment kit for regulated environments — private containers, on-site tuning, and a dedicated ops room.",
+    gradient: "from-[oklch(0.15_0.02_60)] via-[oklch(0.32_0.08_60)] to-[oklch(0.78_0.13_82)]",
+    glyph: "✺",
+    price: "Custom quote",
+    priceNote: "enterprise engagement",
+    features: [
+      "Air-gapped install kit",
+      "Private weights containers",
+      "On-site tuning & rollout",
+      "SLA-backed 24/7 ops room",
+    ],
+    badge: "Enterprise",
+  },
+  {
+    id: "p6",
+    name: "Full-Stack AI Build",
+    tagline: "From prompt to production, together.",
+    description:
+      "We design, build, and launch your AI product — frontend, API, data, and model operations under one roof.",
+    gradient: "from-[oklch(0.25_0.05_60)] via-[oklch(0.4_0.1_60)] to-[oklch(0.9_0.09_86)]",
+    glyph: "▲",
+    price: "From $12K",
+    priceNote: "typical 6–10 week build",
+    features: [
+      "End-to-end product build",
+      "Frontend + API + data layer",
+      "Model ops, evals, and guardrails",
+      "Launch week + team handoff",
+    ],
+    badge: "Flagship",
+  },
+];
+
 export type Lab = {
   id: string;
   name: string;
