@@ -86,16 +86,15 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
           </div>
 
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.04] tracking-tight">
-            <span className="text-platinum-gradient">Deploy the Future.</span>
+            <span className="text-platinum-gradient">Build What's Next.</span>
             <br />
-            <span className="text-gold-gradient">Products, Automations, and AI Models —</span>
-            <br />
-            <span className="text-platinum-gradient">Built to Close Real Gaps.</span>
+            <span className="text-gold-gradient">
+              AI Products. Intelligent Automations. Real-World Impact.
+            </span>
           </h1>
 
           <p className="mt-5 max-w-xl text-sm sm:text-base md:text-lg text-muted-foreground">
-            A curated catalog of SaaS products, AI automations, and fine-tuned models, built by
-            Oryntal AI Labs.
+            Turning complex business gaps into intelligent systems that move businesses forward.
           </p>
 
           {/* Responsive search */}

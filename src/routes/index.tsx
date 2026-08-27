@@ -13,7 +13,7 @@ import { OfferingIcon } from "@/components/OfferingBadge";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Oryntal AI Labs — Products, Automations & AI Models" },
+      { title: "Oryntal AI Labs — Build What's Next" },
       {
         name: "description",
         content:
