@@ -2,6 +2,8 @@ import { Boxes, Workflow, Cpu, type LucideIcon } from "lucide-react";
 
 export type OfferingType = "saas" | "automation" | "model";
 
+export type ListingStatus = "live" | "beta" | "coming";
+
 export type Listing = {
   id: string;
   title: string;
@@ -21,6 +23,8 @@ export type Listing = {
   glyph: string;
   height: number;
   featured?: boolean;
+  slug?: string;
+  status?: ListingStatus;
 };
 
 export const OFFERING_LABEL: Record<OfferingType, string> = {
@@ -456,6 +460,8 @@ export type Blog = {
   gradient: string;
   height: number;
   trending: boolean;
+  cover?: string;
+  body?: string;
 };
 
 export const blogs: Blog[] = [

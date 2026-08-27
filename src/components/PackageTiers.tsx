@@ -12,7 +12,7 @@ import {
   ArrowRight,
   type LucideIcon,
 } from "lucide-react";
-import { packages } from "@/lib/mockData";
+import { useAdminStore } from "@/lib/adminStore";
 import type { AIPackage } from "@/lib/mockData";
 
 const TIER_ICONS: Record<AIPackage["tierIcon"], LucideIcon> = {
@@ -31,6 +31,7 @@ const ITEM_ICONS: Record<string, LucideIcon> = {
 };
 
 export function PackageTierCards() {
+  const { packages } = useAdminStore();
   return (
     <div className="grid gap-5 md:grid-cols-3">
       {packages.map((p) => {

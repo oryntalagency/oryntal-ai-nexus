@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { TrendingUp, ArrowUpRight, ArrowRight, Sparkles } from "lucide-react";
-import { listings, PROBLEMS, INDUSTRIES, TECHS } from "@/lib/mockData";
+import { useAdminStore } from "@/lib/adminStore";
+import { PROBLEMS, INDUSTRIES, TECHS } from "@/lib/mockData";
 import type { Listing } from "@/lib/mockData";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingDetail, VideoLightbox } from "@/components/ListingModals";
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const { listings } = useAdminStore();
   const [selectedProblems, setSelectedProblems] = useState<string[]>([]);
   const [offering, setOffering] = useState<OfferingFilter>("all");
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
@@ -58,9 +60,9 @@ function Home() {
           .includes(q);
       return problemsOk && offeringOk && industriesOk && techsOk && queryOk;
     });
-  }, [selectedProblems, offering, selectedIndustries, selectedTechs, query]);
+  }, [selectedProblems, offering, selectedIndustries, selectedTechs, query, listings]);
 
-  const featured = useMemo(() => listings.filter((l) => l.featured), []);
+  const featured = useMemo(() => listings.filter((l) => l.featured), [listings]);
 
   const openVideo = (l: Listing) => setVideoUrl(l.video ?? null);
 
