@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { ChevronDown, SlidersHorizontal, X, Boxes, Workflow, Cpu } from "lucide-react";
 import type { OfferingType } from "@/lib/mockData";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerClose,
+} from "@/components/ui/drawer";
 
 export type OfferingFilter = "all" | OfferingType;
 
@@ -38,6 +47,7 @@ export function FacetFilterBar({
   onClear,
 }: FacetFilterBarProps) {
   const [moreOpen, setMoreOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const activeCount =
     selectedProblems.length +
@@ -62,26 +72,29 @@ export function FacetFilterBar({
           <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             <SlidersHorizontal className="h-3 w-3" /> Problem solved
           </span>
-          <div className="-mx-1 overflow-x-auto scrollbar-hide px-1 pb-1">
-            <div className="flex w-max gap-2">
-              {problems.map((p) => {
-                const on = p === "All" ? allActive : selectedProblems.includes(p);
-                return (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => onToggleProblem(p)}
-                    className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-medium ring-1 transition ${
-                      on
-                        ? "bg-primary text-primary-foreground ring-primary shadow-gold-glow"
-                        : "glass text-muted-foreground ring-border hover:text-foreground hover:ring-primary/40"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                );
-              })}
+          <div className="relative -mx-1 pb-1 md:-mx-0">
+            <div className="overflow-x-auto scrollbar-hide px-1 md:px-0">
+              <div className="flex w-max gap-2">
+                {problems.map((p) => {
+                  const on = p === "All" ? allActive : selectedProblems.includes(p);
+                  return (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => onToggleProblem(p)}
+                      className={`inline-flex min-h-10 items-center whitespace-nowrap rounded-full px-3.5 py-2 text-xs font-medium ring-1 transition sm:min-h-0 sm:py-1.5 ${
+                        on
+                          ? "bg-primary text-primary-foreground ring-primary shadow-gold-glow"
+                          : "glass text-muted-foreground ring-border hover:text-foreground hover:ring-primary/40"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+            <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-surface/90 to-transparent md:hidden" />
           </div>
         </div>
 
@@ -97,7 +110,7 @@ export function FacetFilterBar({
                   key={value}
                   type="button"
                   onClick={() => onOffering(value)}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition ${
+                  className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium transition sm:min-h-0 sm:py-1.5 ${
                     offering === value
                       ? "bg-primary text-primary-foreground shadow-gold-glow"
                       : "text-muted-foreground hover:text-foreground"
@@ -145,8 +158,8 @@ export function FacetFilterBar({
             )}
           </button>
 
-          {moreOpen && (
-            <div className="mt-3 grid gap-4 md:grid-cols-2">
+          {moreOpen && !isMobile && (
+            <div className="mt-3 hidden md:grid gap-4 md:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   Industry
@@ -159,7 +172,7 @@ export function FacetFilterBar({
                         key={ind}
                         type="button"
                         onClick={() => onToggleIndustry(ind)}
-                        className={`rounded-full px-3 py-1 text-[11px] font-medium ring-1 transition ${
+                        className={`inline-flex min-h-9 items-center rounded-full px-3 py-1.5 text-[11px] font-medium ring-1 transition ${
                           on
                             ? "bg-primary text-primary-foreground ring-primary shadow-gold-glow"
                             : "glass text-muted-foreground ring-border hover:text-foreground hover:ring-primary/40"
@@ -183,7 +196,7 @@ export function FacetFilterBar({
                         key={t}
                         type="button"
                         onClick={() => onToggleTech(t)}
-                        className={`rounded-full px-3 py-1 text-[11px] font-medium ring-1 transition ${
+                        className={`inline-flex min-h-9 items-center rounded-full px-3 py-1.5 text-[11px] font-medium ring-1 transition ${
                           on
                             ? "bg-primary text-primary-foreground ring-primary shadow-gold-glow"
                             : "glass text-muted-foreground ring-border hover:text-foreground hover:ring-primary/40"
@@ -199,6 +212,74 @@ export function FacetFilterBar({
           )}
         </div>
       </div>
+
+      <Drawer
+        open={isMobile && moreOpen}
+        onOpenChange={(o) => setMoreOpen(o)}
+        shouldScaleBackground={false}
+      >
+        <DrawerContent className="border-border bg-background">
+          <DrawerHeader className="text-left">
+            <DrawerTitle className="font-display text-lg">More filters</DrawerTitle>
+            <DrawerDescription>Narrow listings by industry or tech function.</DrawerDescription>
+          </DrawerHeader>
+          <div className="max-h-[60vh] space-y-5 overflow-y-auto px-4 pb-4">
+            <div className="flex flex-col gap-2.5">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Industry
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {industries.map((ind) => {
+                  const on = selectedIndustries.includes(ind);
+                  return (
+                    <button
+                      key={ind}
+                      type="button"
+                      onClick={() => onToggleIndustry(ind)}
+                      className={`inline-flex min-h-11 items-center rounded-full px-4 py-2 text-xs font-medium ring-1 transition ${
+                        on
+                          ? "bg-primary text-primary-foreground ring-primary shadow-gold-glow"
+                          : "glass text-muted-foreground ring-border active:text-foreground"
+                      }`}
+                    >
+                      {ind}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Tech function
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {techs.map((t) => {
+                  const on = selectedTechs.includes(t);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => onToggleTech(t)}
+                      className={`inline-flex min-h-11 items-center rounded-full px-4 py-2 text-xs font-medium ring-1 transition ${
+                        on
+                          ? "bg-primary text-primary-foreground ring-primary shadow-gold-glow"
+                          : "glass text-muted-foreground ring-border active:text-foreground"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-border bg-background p-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
+            <DrawerClose className="flex min-h-12 w-full items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-gold-glow transition active:opacity-80">
+              Done
+            </DrawerClose>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </section>
   );
 }

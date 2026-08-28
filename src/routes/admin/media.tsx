@@ -73,7 +73,7 @@ function MediaPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => copyUrl(m)}
-                  className="flex-1 h-8 px-2 rounded-full text-[11px]"
+                  className="flex-1 h-10 px-2 rounded-full text-[11px] sm:h-8"
                 >
                   {copiedId === m.id ? (
                     <>
@@ -89,7 +89,7 @@ function MediaPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => adminActions.deleteMedia(m.id)}
-                  className="h-8 w-8 px-0 rounded-full hover:text-destructive"
+                  className="h-10 w-10 px-0 rounded-full hover:text-destructive sm:h-8 sm:w-8"
                   aria-label="Delete asset"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

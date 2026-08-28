@@ -15,7 +15,7 @@ export function ListingCard({ listing, onShow, onPlay }: Props) {
       target="_blank"
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
-      className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110"
+      className="pointer-events-auto inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110"
     >
       Try it <ArrowUpRight className="h-3 w-3" />
     </a>
@@ -26,7 +26,7 @@ export function ListingCard({ listing, onShow, onPlay }: Props) {
         e.stopPropagation();
         onShow(listing);
       }}
-      className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110"
+      className="pointer-events-auto inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110"
     >
       View <Eye className="h-3 w-3" />
     </button>
@@ -35,7 +35,7 @@ export function ListingCard({ listing, onShow, onPlay }: Props) {
   return (
     <article
       onClick={() => onShow(listing)}
-      className="group relative mb-5 cursor-pointer break-inside-avoid overflow-hidden rounded-2xl bg-surface ring-1 ring-border transition-all duration-300 hover:scale-[1.015] hover:ring-primary/40 hover:shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)]"
+      className="group relative mb-5 cursor-pointer break-inside-avoid overflow-hidden rounded-2xl bg-surface ring-1 ring-border transition-all duration-300 supports-[pointer:fine]:hover:scale-[1.015] supports-[pointer:fine]:hover:ring-primary/40 supports-[pointer:fine]:hover:shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)] active:scale-[0.985]"
     >
       {/* Visual anchor — image (required) or gradient fallback */}
       <div
@@ -47,7 +47,7 @@ export function ListingCard({ listing, onShow, onPlay }: Props) {
             src={listing.image}
             alt={listing.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            className="h-full w-full object-cover transition-transform duration-500 supports-[pointer:fine]:group-hover:scale-[1.04]"
           />
         ) : (
           <>
@@ -75,21 +75,21 @@ export function ListingCard({ listing, onShow, onPlay }: Props) {
               e.stopPropagation();
               onPlay(listing);
             }}
-            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:scale-105 hover:text-primary hover:ring-primary/50"
+            className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:scale-105 hover:text-primary hover:ring-primary/50 sm:h-9 sm:w-9 active:scale-95"
           >
             <Play className="h-4 w-4 fill-current" />
           </button>
         )}
 
-        {/* Hover overlay */}
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        {/* Hover overlay (fine pointer only — touch taps the card) */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition-opacity duration-300 supports-[pointer:fine]:group-hover:opacity-100">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               onShow(listing);
             }}
-            className="flex h-9 w-9 items-center justify-center rounded-full glass text-foreground transition hover:text-primary"
+            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full glass text-foreground transition hover:text-primary sm:h-9 sm:w-9"
             aria-label="Quick preview"
           >
             <Eye className="h-4 w-4" />

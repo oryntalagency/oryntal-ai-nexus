@@ -57,7 +57,7 @@ function DetailContent({ listing, onPlay }: { listing: Listing; onPlay: (l: List
   const l = listing;
   const { icon: OfferingIcon, label: offeringLabel } = OFFERING_META[l.offeringType];
   return (
-    <DialogContent className="max-h-[92vh] max-w-3xl gap-0 overflow-y-auto p-0">
+    <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-none gap-0 overflow-y-auto p-0 sm:max-w-3xl">
       {/* Full image header */}
       <div
         className={`relative h-56 w-full sm:h-72 ${l.image ? "" : "bg-gradient-to-br " + l.gradient}`}
@@ -75,7 +75,7 @@ function DetailContent({ listing, onPlay }: { listing: Listing; onPlay: (l: List
           <button
             type="button"
             onClick={() => onPlay(l)}
-            className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110"
+            className="absolute bottom-3 right-3 inline-flex min-h-10 items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110"
           >
             <Play className="h-3 w-3 fill-current" /> Watch preview
           </button>
@@ -160,9 +160,9 @@ function DetailSection({
 
 function CtaFor({ listing }: { listing: Listing }) {
   const primary =
-    "inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110";
+    "inline-flex min-h-12 items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110 sm:min-h-0";
   const secondary =
-    "inline-flex items-center gap-1.5 rounded-full glass px-5 py-2.5 text-sm font-medium ring-1 ring-border transition hover:text-foreground hover:ring-primary/40";
+    "inline-flex min-h-12 items-center gap-1.5 rounded-full glass px-5 py-2.5 text-sm font-medium ring-1 ring-border transition hover:text-foreground hover:ring-primary/40 sm:min-h-0";
 
   if (listing.offeringType === "saas" && listing.liveUrl) {
     return (

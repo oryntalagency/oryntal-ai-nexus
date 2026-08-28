@@ -45,7 +45,7 @@ export function PackageTierCards() {
         return (
           <article
             key={p.id}
-            className="group relative flex flex-col overflow-hidden rounded-2xl bg-surface ring-1 ring-border transition-all duration-300 hover:-translate-y-1 hover:ring-primary/40 hover:shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)]"
+            className="group relative flex flex-col overflow-hidden rounded-2xl bg-surface ring-1 ring-border transition-all duration-300 supports-[pointer:fine]:hover:-translate-y-1 supports-[pointer:fine]:hover:ring-primary/40 supports-[pointer:fine]:hover:shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)] active:scale-[0.99]"
           >
             {p.featured && (
               <span className="absolute right-4 top-4 z-10 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-gold-glow">
@@ -85,7 +85,7 @@ export function PackageTierCards() {
             <div className="mt-auto border-t border-border p-6 pt-5 sm:px-7">
               <Link
                 to="/contact"
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-secondary px-5 py-2.5 text-sm font-semibold transition group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-gold-glow"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-1.5 rounded-full bg-secondary px-5 py-2.5 text-sm font-semibold transition group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-gold-glow sm:min-h-0"
               >
                 {p.cta} <ArrowRight className="h-4 w-4" />
               </Link>

@@ -172,7 +172,7 @@ function PackagesPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => openEdit(p)}
-                    className="h-8 px-2.5 rounded-full"
+                    className="h-10 w-10 rounded-full px-0 sm:h-8 sm:w-auto sm:px-2.5"
                     aria-label="Edit tier"
                   >
                     <Pencil className="h-3.5 w-3.5" />
@@ -181,7 +181,7 @@ function PackagesPage() {
                     variant={deleting ? "destructive" : "outline"}
                     size="sm"
                     onClick={() => confirmDelete(p.id)}
-                    className="h-8 px-2.5 rounded-full"
+                    className="h-10 w-10 rounded-full px-0 sm:h-8 sm:w-auto sm:px-2.5"
                     aria-label={deleting ? "Confirm delete" : "Delete"}
                   >
                     {deleting ? (
@@ -199,7 +199,7 @@ function PackagesPage() {
 
       {open && (
         <Dialog open onOpenChange={(o) => !o && setOpen(false)}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-none overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>{editing ? "Edit tier" : "New tier"}</DialogTitle>
             </DialogHeader>
@@ -333,7 +333,7 @@ function PkgForm({
               <select
                 value={item.icon}
                 onChange={(e) => setItem(i, { icon: e.target.value })}
-                className="h-10 flex-1 rounded-lg glass px-3 text-xs ring-1 ring-border outline-none transition focus:ring-primary/50"
+                className="h-10 min-w-0 flex-1 rounded-lg glass px-3 text-xs ring-1 ring-border outline-none transition focus:ring-primary/50"
               >
                 {ITEM_ICON_OPTIONS.map(({ value, label }) => (
                   <option key={value} value={value}>
@@ -345,12 +345,12 @@ function PkgForm({
                 value={item.label}
                 onChange={(e) => setItem(i, { label: e.target.value })}
                 placeholder="e.g. AI Workflow Automation"
-                className="h-10 flex-[2] text-xs"
+                className="h-10 min-w-0 flex-[2] text-xs"
               />
               <button
                 type="button"
                 onClick={() => setF((p) => ({ ...p, items: p.items.filter((_, j) => j !== i) }))}
-                className="shrink-0 rounded-md p-2 text-muted-foreground transition hover:text-destructive"
+                className="shrink-0 rounded-md p-2.5 text-muted-foreground transition hover:text-destructive"
                 aria-label="Remove item"
               >
                 <Trash2 className="h-3.5 w-3.5" />

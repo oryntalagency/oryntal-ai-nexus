@@ -155,7 +155,7 @@ function Home() {
           <button
             type="button"
             onClick={resetFilters}
-            className="mt-4 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-gold-glow"
+            className="mt-4 inline-flex min-h-11 items-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-gold-glow"
           >
             Clear all filters
           </button>
@@ -179,40 +179,45 @@ function Home() {
             </span>
           </div>
 
-          <div className="-mx-2 overflow-x-auto scrollbar-hide">
-            <div className="flex gap-4 px-2 min-w-max pb-2">
-              {featured.map((l) => (
-                <button
-                  key={l.id}
-                  type="button"
-                  onClick={() => setActiveListing(l)}
-                  className="group w-[300px] shrink-0 rounded-2xl glass p-3 text-left ring-1 ring-border transition hover:ring-primary/40"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl ring-1 ring-border/60">
-                      {l.image ? (
-                        <img
-                          src={l.image}
-                          alt={l.title}
-                          loading="lazy"
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className={`h-full w-full bg-gradient-to-br ${l.gradient}`} />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <OfferingIcon type={l.offeringType} className="h-3 w-3" />
-                        <h3 className="truncate font-display text-sm font-semibold">{l.title}</h3>
+          <div className="relative -mx-2">
+            <div className="overflow-x-auto scrollbar-hide px-2 pb-2">
+              <div className="flex gap-4 min-w-max">
+                {featured.map((l) => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => setActiveListing(l)}
+                    className="group w-[300px] shrink-0 rounded-2xl glass p-3 text-left ring-1 ring-border transition hover:ring-primary/40"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl ring-1 ring-border/60">
+                        {l.image ? (
+                          <img
+                            src={l.image}
+                            alt={l.title}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className={`h-full w-full bg-gradient-to-br ${l.gradient}`} />
+                        )}
                       </div>
-                      <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{l.tagline}</p>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <OfferingIcon type={l.offeringType} className="h-3 w-3" />
+                          <h3 className="truncate font-display text-sm font-semibold">{l.title}</h3>
+                        </div>
+                        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                          {l.tagline}
+                        </p>
+                      </div>
+                      <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-primary" />
                     </div>
-                    <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-primary" />
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-background/90 to-transparent md:hidden" />
           </div>
         </section>
       )}

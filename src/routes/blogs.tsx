@@ -58,7 +58,7 @@ function Blogs() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`rounded-full px-5 py-2 text-sm font-medium transition ${
+            className={`inline-flex min-h-10 items-center rounded-full px-5 py-2.5 text-sm font-medium transition sm:min-h-0 sm:py-2 ${
               tab === t
                 ? "bg-primary text-primary-foreground shadow-gold-glow"
                 : "text-muted-foreground hover:text-foreground"
@@ -74,7 +74,7 @@ function Blogs() {
         {list.map((b) => (
           <article
             key={b.id}
-            className="group mb-5 break-inside-avoid overflow-hidden rounded-2xl bg-surface ring-1 ring-border transition hover:ring-primary/40 hover:shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_40%,transparent)]"
+            className="group mb-5 break-inside-avoid overflow-hidden rounded-2xl bg-surface ring-1 ring-border transition supports-[pointer:fine]:hover:ring-primary/40 supports-[pointer:fine]:hover:shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_40%,transparent)] active:scale-[0.99]"
           >
             {/* Cover */}
             <div
@@ -106,7 +106,7 @@ function Blogs() {
                     <p className="text-[11px] text-muted-foreground">{b.readTime}</p>
                   </div>
                 </div>
-                <button className="rounded-full bg-secondary px-3 py-1 text-[11px] font-medium hover:bg-primary hover:text-primary-foreground transition">
+                <button className="inline-flex min-h-9 items-center rounded-full bg-secondary px-3 py-1.5 text-[11px] font-medium hover:bg-primary hover:text-primary-foreground transition sm:py-1">
                   Follow
                 </button>
               </div>
@@ -120,14 +120,14 @@ function Blogs() {
               {/* Interaction bar */}
               <div className="mt-5 flex items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-4">
-                  <button className="inline-flex items-center gap-1.5 hover:text-primary transition">
+                  <button className="inline-flex min-h-10 min-w-10 items-center justify-center gap-1.5 hover:text-primary transition">
                     <Heart className="h-4 w-4" /> {b.likes}
                   </button>
-                  <button className="inline-flex items-center gap-1.5 hover:text-primary transition">
+                  <button className="inline-flex min-h-10 min-w-10 items-center justify-center gap-1.5 hover:text-primary transition">
                     <MessageCircle className="h-4 w-4" /> {b.comments}
                   </button>
                 </div>
-                <button className="hover:text-primary transition">
+                <button className="grid min-h-10 min-w-10 place-items-center hover:text-primary transition">
                   <Bookmark className="h-4 w-4" />
                 </button>
               </div>

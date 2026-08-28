@@ -150,7 +150,7 @@ function BlogPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => openEdit(p)}
-                    className="h-8 px-2.5 rounded-full"
+                    className="h-10 w-10 rounded-full px-0 sm:h-8 sm:w-auto sm:px-2.5"
                     aria-label="Edit post"
                   >
                     <Pencil className="h-3.5 w-3.5" />
@@ -159,7 +159,7 @@ function BlogPage() {
                     variant={deleting ? "destructive" : "outline"}
                     size="sm"
                     onClick={() => confirmDelete(p.id)}
-                    className="h-8 px-2.5 rounded-full"
+                    className="h-10 w-10 rounded-full px-0 sm:h-8 sm:w-auto sm:px-2.5"
                     aria-label={deleting ? "Confirm delete" : "Delete"}
                   >
                     {deleting ? (
@@ -177,7 +177,7 @@ function BlogPage() {
 
       {open && (
         <Dialog open onOpenChange={(o) => !o && setOpen(false)}>
-          <DialogContent className="max-h-[92vh] max-w-2xl overflow-y-auto">
+          <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-none overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>{editing ? "Edit post" : "New post"}</DialogTitle>
             </DialogHeader>

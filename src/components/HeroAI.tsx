@@ -106,7 +106,7 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
               placeholder="Search products, automations, models…"
               className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
-            <button className="shrink-0 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110 sm:px-4">
+            <button className="inline-flex min-h-10 shrink-0 items-center rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-gold-glow transition hover:brightness-110 sm:min-h-0 sm:px-4">
               Search
             </button>
           </div>

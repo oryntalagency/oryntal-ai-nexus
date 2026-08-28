@@ -49,10 +49,10 @@ function Profile() {
             </div>
           </div>
           <div className="flex gap-2">
-            <button className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-gold-glow">
+            <button className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-gold-glow">
               Start a project
             </button>
-            <button className="rounded-full glass px-3 py-2">
+            <button className="grid min-h-11 min-w-11 place-items-center rounded-full glass px-3 py-2">
               <Settings className="h-4 w-4" />
             </button>
           </div>

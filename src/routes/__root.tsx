@@ -116,9 +116,9 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen overflow-x-clip bg-background text-foreground">
         <Sidebar />
-        <main className="md:pl-20 min-h-screen">
+        <main className="min-h-screen pb-24 md:pb-0 md:pl-20">
           <Outlet />
         </main>
       </div>

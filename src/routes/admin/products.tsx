@@ -306,7 +306,7 @@ function ProductsPage() {
         <select
           value={offeringFilter}
           onChange={(e) => setOfferingFilter(e.target.value as "all" | OfferingType)}
-          className="h-10 rounded-full glass px-4 text-sm ring-1 ring-border outline-none transition focus:ring-primary/50"
+          className="h-10 w-full rounded-full glass px-4 text-sm ring-1 ring-border outline-none transition focus:ring-primary/50 sm:w-auto"
         >
           <option value="all">All types</option>
           {Object.entries(OFFERING_LABEL).map(([k, label]) => (
@@ -318,7 +318,7 @@ function ProductsPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as "all" | ListingStatus)}
-          className="h-10 rounded-full glass px-4 text-sm ring-1 ring-border outline-none transition focus:ring-primary/50"
+          className="h-10 w-full rounded-full glass px-4 text-sm ring-1 ring-border outline-none transition focus:ring-primary/50 sm:w-auto"
         >
           <option value="all">All statuses</option>
           <option value="live">Live</option>
@@ -380,7 +380,7 @@ function ProductsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => openEdit(l)}
-                    className="h-8 px-2.5 rounded-full"
+                    className="h-10 w-10 rounded-full px-0 sm:h-8 sm:w-auto sm:px-2.5"
                     aria-label="Edit"
                   >
                     <Pencil className="h-3.5 w-3.5" />
@@ -389,7 +389,7 @@ function ProductsPage() {
                     variant={deleting ? "destructive" : "outline"}
                     size="sm"
                     onClick={() => confirmDelete(l.id)}
-                    className="h-8 px-2.5 rounded-full"
+                    className="h-10 w-10 rounded-full px-0 sm:h-8 sm:w-auto sm:px-2.5"
                     aria-label={deleting ? "Confirm delete" : "Delete"}
                   >
                     {deleting ? <X className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5" />}
@@ -506,7 +506,7 @@ function ProductForm({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[92vh] max-w-5xl gap-0 overflow-hidden p-0">
+      <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-none gap-0 overflow-hidden p-0 sm:max-w-5xl">
         <DialogHeader className="sr-only">
           <DialogTitle>{editing ? "Edit product" : "New product"}</DialogTitle>
         </DialogHeader>
@@ -517,7 +517,7 @@ function ProductForm({
         >
           {/* LEFT — form fields */}
           <div className="space-y-8 p-6 sm:p-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="font-display text-xl font-semibold">
                   {editing ? "Edit product" : "New product"}
@@ -545,7 +545,7 @@ function ProductForm({
               </Field>
               <Field label="Slug">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-10 items-center rounded-lg bg-secondary px-3 text-xs text-muted-foreground ring-1 ring-border">
+                  <div className="flex h-10 shrink-0 items-center rounded-lg bg-secondary px-3 text-xs text-muted-foreground ring-1 ring-border">
                     /
                   </div>
                   <Input
@@ -554,7 +554,7 @@ function ProductForm({
                       setF((prev) => ({ ...prev, slug: e.target.value, slugTouched: true }))
                     }
                     placeholder="outbound-os"
-                    className="font-mono text-xs"
+                    className="min-w-0 flex-1 font-mono text-xs"
                   />
                   <Button
                     type="button"
@@ -785,7 +785,7 @@ function ProductForm({
         </form>
 
         {/* Footer actions */}
-        <div className="flex items-center justify-between gap-3 border-t border-border bg-surface px-6 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-surface px-6 py-4">
           {submitError ? (
             <p className="flex items-center gap-1.5 text-xs text-destructive">
               <AlertCircle className="h-3.5 w-3.5" /> {submitError}
@@ -793,7 +793,7 @@ function ProductForm({
           ) : (
             <span />
           )}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button variant="ghost" type="button" onClick={onClose}>
               Cancel
             </Button>
@@ -867,7 +867,7 @@ function ChipPicker({
             key={o}
             type="button"
             onClick={() => onToggle(o)}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition ${
+            className={`inline-flex min-h-9 items-center rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition ${
               on
                 ? "bg-primary/15 text-primary ring-primary/40"
                 : "glass text-muted-foreground ring-border hover:text-foreground"
@@ -911,7 +911,7 @@ function BulletEditor({
               value={item}
               onChange={(e) => setItem(i, e.target.value)}
               placeholder={placeholder}
-              className="text-xs"
+              className="min-w-0 flex-1 text-xs"
             />
             <button
               type="button"
