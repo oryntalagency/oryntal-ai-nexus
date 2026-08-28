@@ -75,6 +75,8 @@ function BlogPage() {
       trending: post.trending,
       cover: post.cover,
       body: post.body,
+      linkedinUrl: post.linkedinUrl,
+      instagramUrl: post.instagramUrl,
     };
     const res = editMode
       ? await updateBlogPost({ data: { ...payload, id: editing!.id } })

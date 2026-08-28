@@ -23,6 +23,8 @@ export type BlogDoc = {
   trending: boolean;
   cover?: string;
   body?: string;
+  linkedinUrl?: string;
+  instagramUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -48,6 +50,8 @@ function toBlogDoc(post: Blog, timestamps: { createdAt: Date; updatedAt: Date })
     trending: post.trending,
     cover: post.cover,
     body: post.body,
+    linkedinUrl: post.linkedinUrl,
+    instagramUrl: post.instagramUrl,
     createdAt: timestamps.createdAt,
     updatedAt: timestamps.updatedAt,
   });
@@ -69,6 +73,8 @@ function fromBlogDoc(doc: WithId<BlogDoc>): Blog {
     trending: doc.trending,
     cover: doc.cover,
     body: doc.body,
+    linkedinUrl: doc.linkedinUrl,
+    instagramUrl: doc.instagramUrl,
   };
 }
 

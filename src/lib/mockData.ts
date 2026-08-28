@@ -462,6 +462,8 @@ export type Blog = {
   trending: boolean;
   cover?: string;
   body?: string;
+  linkedinUrl?: string;
+  instagramUrl?: string;
 };
 
 export const blogs: Blog[] = [
