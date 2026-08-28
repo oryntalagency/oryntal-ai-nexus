@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Boxes, Workflow, Cpu, BookOpen } from "lucide-react";
-import { useAdminStore } from "@/lib/adminStore";
+import { listProducts } from "@/lib/api/products";
+import { listBlogPosts } from "@/lib/api/blog";
 import { OFFERING_META } from "@/lib/mockData";
 import { PageHeader, StatCard, StatusBadge } from "@/components/admin/admin-ui";
 
@@ -9,7 +11,17 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function Dashboard() {
-  const { listings, posts } = useAdminStore();
+  const { data: productData } = useQuery({
+    queryKey: ["products", "all"],
+    queryFn: () => listProducts({ data: {} }),
+  });
+  const listings = productData?.ok ? productData.items : [];
+
+  const { data: blogData } = useQuery({
+    queryKey: ["blog", "posts"],
+    queryFn: () => listBlogPosts(),
+  });
+  const posts = blogData?.ok ? blogData.items : [];
 
   const counts = {
     saas: listings.filter((l) => l.offeringType === "saas").length,

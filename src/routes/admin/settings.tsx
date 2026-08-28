@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Save, LogOut, ArrowLeft, KeyRound, Building2, Tag } from "lucide-react";
-import { setAdminAuthed, getPasscode, setPasscode } from "@/lib/adminSession";
+import { useMutation } from "@tanstack/react-query";
+import { Save, LogOut, ArrowLeft, Building2, Tag } from "lucide-react";
+import { adminLogout } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,22 +30,26 @@ function SettingsPage() {
   const identity = loadIdentity();
   const [name, setName] = useState(identity.name);
   const [tagline, setTagline] = useState(identity.tagline);
-  const [passcode, setPass] = useState(getPasscode());
   const [saved, setSaved] = useState(false);
+
+  const logout = useMutation({
+    mutationFn: () => adminLogout(),
+    onSuccess: () => {
+      window.location.href = "/admin";
+    },
+  });
 
   const save = () => {
     window.localStorage.setItem(
       IDENTITY_KEY,
       JSON.stringify({ name: name.trim(), tagline: tagline.trim() }),
     );
-    setPasscode(passcode.trim() && passcode.trim() !== getPasscode() ? passcode.trim() : passcode);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
   const signOut = () => {
-    setAdminAuthed(false);
-    window.location.href = "/admin";
+    logout.mutate();
   };
 
   return (
@@ -85,31 +90,18 @@ function SettingsPage() {
           </div>
         </div>
 
-        {/* Access */}
-        <div className="rounded-2xl glass p-6 ring-1 ring-border">
-          <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
-            <KeyRound className="h-4 w-4 text-primary" /> Access
-          </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            The passcode that unlocks this panel. Stored in this browser session.
-          </p>
-          <div className="mt-5 max-w-xs">
-            <Label className="text-xs font-semibold uppercase tracking-wide">Passcode</Label>
-            <Input
-              value={passcode}
-              onChange={(e) => setPass(e.target.value)}
-              className="mt-1.5 font-mono"
-            />
-          </div>
-        </div>
-
         {/* Actions */}
         <div className="flex flex-wrap items-center gap-3">
           <Button onClick={save} className="rounded-full shadow-gold-glow">
             <Save className="h-4 w-4" /> {saved ? "Saved" : "Save changes"}
           </Button>
-          <Button variant="outline" onClick={signOut} className="rounded-full">
-            <LogOut className="h-4 w-4" /> Sign out
+          <Button
+            variant="outline"
+            onClick={signOut}
+            disabled={logout.isPending}
+            className="rounded-full"
+          >
+            <LogOut className="h-4 w-4" /> {logout.isPending ? "Signing out…" : "Sign out"}
           </Button>
           <Link
             to="/"
@@ -120,9 +112,8 @@ function SettingsPage() {
         </div>
 
         <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <Tag className="h-3 w-3" /> Auth is client-side for now — wire a real provider when the
-          backend lands, then delete{" "}
-          <code className="rounded bg-secondary px-1 font-mono">adminSession.ts</code>.
+          <Tag className="h-3 w-3" /> Signed-in publisher session, issued by the server. Sign out
+          clears the session cookie.
         </p>
       </div>
     </div>

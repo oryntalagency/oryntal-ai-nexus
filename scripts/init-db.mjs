@@ -115,6 +115,11 @@ const tagsValidator = {
 const productsValidator = {
   $jsonSchema: {
     bsonType: "object",
+    // The app persists several UI-only fields next to the core ones
+    // (tagline, creator, price, gradient, glyph, height, featured), so the
+    // validator must tolerate extra fields. They are also declared below for
+    // type safety.
+    additionalProperties: true,
     required: [
       "title",
       "slug",
@@ -169,6 +174,16 @@ const productsValidator = {
         description: "'status' must be one of: Live, Beta, Coming soon.",
       },
       cta_url: { ...url("cta_url"), description: "'cta_url' must be a URL string." },
+      tagline: { bsonType: "string", description: "'tagline' must be a string." },
+      creator: { bsonType: "string", description: "'creator' must be a string." },
+      price: {
+        enum: ["Free", "Premium"],
+        description: "'price' must be Free or Premium.",
+      },
+      gradient: { bsonType: "string", description: "'gradient' must be a string." },
+      glyph: { bsonType: "string", description: "'glyph' must be a string." },
+      height: { bsonType: "int", description: "'height' must be an integer (in px)." },
+      featured: { bsonType: "bool", description: "'featured' must be a boolean." },
       createdAt: dateField("createdAt"),
       updatedAt: dateField("updatedAt"),
     },

@@ -1,5 +1,9 @@
 import { MongoClient, type Db } from "mongodb";
 
+import { ensureEnvForServer } from "./env.server";
+
+ensureEnvForServer();
+
 declare global {
   var __mongoClient: MongoClient | undefined;
 }

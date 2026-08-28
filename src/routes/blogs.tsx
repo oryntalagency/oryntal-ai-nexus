@@ -1,13 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Heart, MessageCircle, Bookmark, PenLine } from "lucide-react";
-import { blogs } from "@/lib/mockData";
+import { listBlogPosts } from "@/lib/api/blog";
 
 export const Route = createFileRoute("/blogs")({
   head: () => ({
     meta: [
       { title: "Community Thoughts — Oryntal AI Labs" },
-      { name: "description", content: "Essays, field notes, and ideas from the Oryntal community of AI builders." },
+      {
+        name: "description",
+        content: "Essays, field notes, and ideas from the Oryntal community of AI builders.",
+      },
     ],
   }),
   component: Blogs,
@@ -16,9 +20,18 @@ export const Route = createFileRoute("/blogs")({
 function Blogs() {
   const [tab, setTab] = useState<"trending" | "latest">("trending");
 
+  const { data } = useQuery({
+    queryKey: ["blog", "posts"],
+    queryFn: () => listBlogPosts(),
+  });
+  const posts = useMemo(() => (data?.ok ? data.items : []), [data]);
+
   const list = useMemo(
-    () => (tab === "trending" ? blogs.filter((b) => b.trending).concat(blogs.filter((b) => !b.trending)) : [...blogs].reverse()),
-    [tab]
+    () =>
+      tab === "trending"
+        ? posts.filter((b) => b.trending).concat(posts.filter((b) => !b.trending))
+        : [...posts].reverse(),
+    [tab, posts],
   );
 
   return (
@@ -71,7 +84,10 @@ function Blogs() {
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,transparent_40%,oklch(0.1_0_0/0.6))]" />
               <div className="absolute bottom-4 left-4 right-4 flex flex-wrap gap-1.5">
                 {b.tags.map((t) => (
-                  <span key={t} className="rounded-full glass px-2 py-0.5 text-[10px] font-medium text-foreground/90">
+                  <span
+                    key={t}
+                    className="rounded-full glass px-2 py-0.5 text-[10px] font-medium text-foreground/90"
+                  >
                     {t}
                   </span>
                 ))}

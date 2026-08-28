@@ -12,7 +12,8 @@ import {
   ArrowRight,
   type LucideIcon,
 } from "lucide-react";
-import { useAdminStore } from "@/lib/adminStore";
+import { useQuery } from "@tanstack/react-query";
+import { listPackages } from "@/lib/api/packages";
 import type { AIPackage } from "@/lib/mockData";
 
 const TIER_ICONS: Record<AIPackage["tierIcon"], LucideIcon> = {
@@ -31,7 +32,12 @@ const ITEM_ICONS: Record<string, LucideIcon> = {
 };
 
 export function PackageTierCards() {
-  const { packages } = useAdminStore();
+  const { data, isPending } = useQuery({
+    queryKey: ["packages"],
+    queryFn: () => listPackages(),
+  });
+  const packages = data?.ok ? data.items : [];
+  if (isPending || packages.length === 0) return null;
   return (
     <div className="grid gap-5 md:grid-cols-3">
       {packages.map((p) => {

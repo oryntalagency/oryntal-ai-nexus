@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, BookOpen, AlertCircle } from "lucide-react";
-import { adminActions, useAdminStore } from "@/lib/adminStore";
+import { createBlogPost, deleteBlogPost, listBlogPosts, updateBlogPost } from "@/lib/api/blog";
+import { uploadMedia } from "@/lib/api/media";
 import type { Blog } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,10 +36,18 @@ function initialsOf(name: string): string {
 }
 
 function BlogPage() {
-  const { posts } = useAdminStore();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Blog | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const { data } = useQuery({
+    queryKey: ["blog", "posts"],
+    queryFn: () => listBlogPosts(),
+  });
+  const posts = data?.ok ? data.items : [];
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["blog"] });
 
   const openCreate = () => {
     setEditing(null);
@@ -48,13 +58,39 @@ function BlogPage() {
     setOpen(true);
   };
 
-  const confirmDelete = (id: string) => {
-    if (deletingId === id) {
-      adminActions.deletePost(id);
-      setDeletingId(null);
-    } else {
+  const editMode = editing !== null;
+
+  const savePost = async (post: Blog) => {
+    const payload = {
+      title: post.title,
+      hook: post.hook,
+      author: post.author,
+      initials: post.initials,
+      readTime: post.readTime,
+      tags: post.tags,
+      likes: post.likes,
+      comments: post.comments,
+      gradient: post.gradient,
+      height: post.height,
+      trending: post.trending,
+      cover: post.cover,
+      body: post.body,
+    };
+    const res = editMode
+      ? await updateBlogPost({ data: { ...payload, id: editing!.id } })
+      : await createBlogPost({ data: payload });
+    if (res.ok) await invalidate();
+    return res.ok;
+  };
+
+  const confirmDelete = async (id: string) => {
+    if (deletingId !== id) {
       setDeletingId(id);
+      return;
     }
+    const res = await deleteBlogPost({ data: { id } });
+    if (res.ok) await invalidate();
+    setDeletingId(null);
   };
 
   return (
@@ -145,14 +181,7 @@ function BlogPage() {
             <DialogHeader>
               <DialogTitle>{editing ? "Edit post" : "New post"}</DialogTitle>
             </DialogHeader>
-            <PostForm
-              initial={editing}
-              onClose={() => setOpen(false)}
-              onSave={(post) => {
-                adminActions.upsertPost(post);
-                setOpen(false);
-              }}
-            />
+            <PostForm initial={editing} onClose={() => setOpen(false)} onSave={savePost} />
           </DialogContent>
         </Dialog>
       )}
@@ -167,7 +196,7 @@ function PostForm({
 }: {
   initial: Blog | null;
   onClose: () => void;
-  onSave: (post: Blog) => void;
+  onSave: (post: Blog) => Promise<boolean>;
 }) {
   const [f, setF] = useState<Blog>(
     initial ?? {
@@ -187,7 +216,10 @@ function PostForm({
   );
   const [tagsInput, setTagsInput] = useState(f.tags.join(", "));
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
   const [coverLoading, setCoverLoading] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const set = <K extends keyof Blog>(key: K, value: Blog[K]) =>
     setF((prev) => ({ ...prev, [key]: value }));
@@ -200,28 +232,56 @@ function PostForm({
   const onCoverUpload = async (file: File | undefined) => {
     if (!file) return;
     setCoverLoading(true);
-    const reader = new FileReader();
-    reader.onload = () => setF((prev) => ({ ...prev, cover: String(reader.result) }));
-    reader.onerror = () => setCoverLoading(false);
-    reader.onloadend = () => setCoverLoading(false);
-    reader.readAsDataURL(file);
+    setCoverError(null);
+    try {
+      const reader = new FileReader();
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+      const res = await uploadMedia({
+        data: {
+          name: file.name,
+          kind: "image",
+          dataBase64: dataUrl.split(",")[1] ?? dataUrl,
+        },
+      });
+      if (res.ok) {
+        setF((prev) => ({ ...prev, cover: res.url }));
+      } else {
+        setCoverError(res.error ?? "Upload failed.");
+      }
+    } catch {
+      setCoverError("Upload failed.");
+    } finally {
+      setCoverLoading(false);
+    }
   };
 
   const valid = f.title.trim().length > 0 && f.hook.trim().length > 0;
 
-  const submit = () => {
+  const submit = async () => {
     const next: Record<string, string> = {};
     if (!f.title.trim()) next.title = "Title is required.";
     if (!f.hook.trim()) next.hook = "A one-line hook is required.";
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    onSave({
+    setSaving(true);
+    setSaveError(null);
+    const ok = await onSave({
       ...f,
       tags: tagsInput
         .split(",")
         .map((t) => t.trim())
         .filter(Boolean),
     });
+    setSaving(false);
+    if (ok) {
+      onClose();
+    } else {
+      setSaveError("Could not save the post.");
+    }
   };
 
   return (
@@ -303,10 +363,15 @@ function PostForm({
             )}
             {coverLoading && (
               <div className="absolute inset-0 grid place-items-center bg-black/40 text-xs text-muted-foreground">
-                Loading…
+                Uploading…
               </div>
             )}
           </div>
+          {coverError && (
+            <p className="flex items-center gap-1 text-[11px] text-destructive">
+              <AlertCircle className="h-3 w-3" /> {coverError}
+            </p>
+          )}
           <div className="flex gap-2">
             <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground ring-1 ring-border transition hover:text-foreground">
               <Plus className="h-3 w-3" /> {f.cover ? "Replace" : "Upload"}
@@ -370,13 +435,17 @@ function PostForm({
         <Button variant="ghost" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={submit} disabled={!valid} className="rounded-full">
-          Save post
+        <Button onClick={submit} disabled={!valid || saving} className="rounded-full">
+          {saving ? "Saving…" : "Save post"}
         </Button>
       </div>
+      {saveError && (
+        <p className="flex items-center gap-1 text-[11px] text-destructive">
+          <AlertCircle className="h-3 w-3" /> {saveError}
+        </p>
+      )}
       <p className="text-[11px] text-muted-foreground">
-        Posts keep working on the public blogs page regardless of edits here — updates are staged
-        in-memory until the backend lands.
+        Posts are saved to the database and publish to the public blogs page immediately.
       </p>
     </div>
   );

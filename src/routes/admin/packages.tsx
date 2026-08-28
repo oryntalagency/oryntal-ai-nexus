@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
   Pencil,
@@ -14,7 +15,7 @@ import {
   Database,
   Users,
 } from "lucide-react";
-import { adminActions, useAdminStore } from "@/lib/adminStore";
+import { createPackage, deletePackage, listPackages, updatePackage } from "@/lib/api/packages";
 import type { AIPackage } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,10 +59,18 @@ function emptyPkg(): AIPackage {
 }
 
 function PackagesPage() {
-  const { packages } = useAdminStore();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<AIPackage | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const { data } = useQuery({
+    queryKey: ["packages", "all"],
+    queryFn: () => listPackages(),
+  });
+  const packages = data?.ok ? data.items : [];
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["packages"] });
 
   const openCreate = () => {
     setEditing(null);
@@ -72,13 +81,46 @@ function PackagesPage() {
     setOpen(true);
   };
 
-  const confirmDelete = (id: string) => {
-    if (deletingId === id) {
-      adminActions.deletePackage(id);
-      setDeletingId(null);
-    } else {
-      setDeletingId(id);
+  const savePackage = async (p: AIPackage) => {
+    if (editing) {
+      const res = await updatePackage({
+        data: {
+          id: p.id,
+          name: p.name,
+          tierIcon: p.tierIcon,
+          tagline: p.tagline,
+          positioning: p.positioning,
+          items: p.items,
+          cta: p.cta,
+          featured: p.featured ?? false,
+        },
+      });
+      if (res.ok) await invalidate();
+      return res.ok;
     }
+    const res = await createPackage({
+      data: {
+        name: p.name,
+        tierIcon: p.tierIcon,
+        tagline: p.tagline,
+        positioning: p.positioning,
+        items: p.items,
+        cta: p.cta,
+        featured: p.featured ?? false,
+      },
+    });
+    if (res.ok) await invalidate();
+    return res.ok;
+  };
+
+  const confirmDelete = async (id: string) => {
+    if (deletingId !== id) {
+      setDeletingId(id);
+      return;
+    }
+    const res = await deletePackage({ data: { id } });
+    if (res.ok) await invalidate();
+    setDeletingId(null);
   };
 
   return (
@@ -164,10 +206,8 @@ function PackagesPage() {
             <PkgForm
               initial={editing ?? emptyPkg()}
               onClose={() => setOpen(false)}
-              onSave={(p) => {
-                adminActions.upsertPackage(p);
-                setOpen(false);
-              }}
+              onSave={savePackage}
+              isEdit={!!editing}
             />
           </DialogContent>
         </Dialog>
@@ -180,12 +220,16 @@ function PkgForm({
   initial,
   onClose,
   onSave,
+  isEdit,
 }: {
   initial: AIPackage;
   onClose: () => void;
-  onSave: (p: AIPackage) => void;
+  onSave: (p: AIPackage) => Promise<boolean>;
+  isEdit: boolean;
 }) {
   const [f, setF] = useState<AIPackage>(initial);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const set = <K extends keyof AIPackage>(key: K, value: AIPackage[K]) =>
     setF((prev) => ({ ...prev, [key]: value }));
@@ -197,11 +241,11 @@ function PkgForm({
     });
   };
 
-  const valid = f.name.trim().length > 0;
+  const valid = f.name.trim().length > 0 && f.items.some((it) => it.label.trim());
 
-  const submit = () => {
+  const submit = async () => {
     if (!valid) return;
-    onSave({
+    const cleaned: AIPackage = {
       ...f,
       name: f.name.trim(),
       tagline: f.tagline.trim(),
@@ -209,7 +253,16 @@ function PkgForm({
       items: f.items
         .filter((it) => it.label.trim())
         .map((it) => ({ icon: it.icon, label: it.label.trim() })),
-    });
+    };
+    setSaving(true);
+    setError(null);
+    const ok = await onSave(cleaned);
+    setSaving(false);
+    if (ok) {
+      onClose();
+    } else {
+      setError("Could not save the tier. Check the name is unique.");
+    }
   };
 
   return (
@@ -330,13 +383,17 @@ function PkgForm({
       {!valid && f.name.trim() === "" && (
         <p className="text-xs text-destructive">A tier name is required.</p>
       )}
+      {f.name.trim() !== "" && !f.items.some((it) => it.label.trim()) && (
+        <p className="text-xs text-destructive">Add at least one managed item.</p>
+      )}
+      {error && <p className="text-xs text-destructive">{error}</p>}
 
       <div className="flex items-center justify-end gap-2 pt-2">
         <Button variant="ghost" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={submit} disabled={!valid} className="rounded-full">
-          Save tier
+        <Button onClick={submit} disabled={!valid || saving} className="rounded-full">
+          {saving ? "Saving…" : "Save tier"}
         </Button>
       </div>
     </div>

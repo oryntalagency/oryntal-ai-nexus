@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { TrendingUp, ArrowUpRight, ArrowRight, Sparkles } from "lucide-react";
-import { useAdminStore } from "@/lib/adminStore";
 import { PROBLEMS, INDUSTRIES, TECHS } from "@/lib/mockData";
 import type { Listing } from "@/lib/mockData";
+import { listProducts } from "@/lib/api/products";
+import { listTags } from "@/lib/api/tags";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingDetail, VideoLightbox } from "@/components/ListingModals";
 import { PackageTierCards } from "@/components/PackageTiers";
@@ -26,7 +28,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { listings } = useAdminStore();
   const [selectedProblems, setSelectedProblems] = useState<string[]>([]);
   const [offering, setOffering] = useState<OfferingFilter>("all");
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
@@ -42,27 +43,60 @@ function Home() {
     setSelectedTechs([]);
   };
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return listings.filter((l) => {
-      const problemsOk =
-        selectedProblems.length === 0 || l.problems.some((p) => selectedProblems.includes(p));
-      const offeringOk = offering === "all" || l.offeringType === offering;
-      const industriesOk =
-        selectedIndustries.length === 0 ||
-        l.industries.some((ind) => selectedIndustries.includes(ind));
-      const techsOk = selectedTechs.length === 0 || l.techs.some((t) => selectedTechs.includes(t));
-      const queryOk =
-        q === "" ||
-        [l.title, l.tagline, l.creator, ...l.problems, ...l.industries, ...l.techs]
-          .join(" ")
-          .toLowerCase()
-          .includes(q);
-      return problemsOk && offeringOk && industriesOk && techsOk && queryOk;
-    });
-  }, [selectedProblems, offering, selectedIndustries, selectedTechs, query, listings]);
+  const { data, isFetching } = useQuery({
+    queryKey: ["listings", selectedProblems, offering, selectedIndustries, selectedTechs, query],
+    queryFn: () =>
+      listProducts({
+        data: {
+          problems: selectedProblems,
+          offering,
+          industries: selectedIndustries,
+          techs: selectedTechs,
+          query: query.trim() || undefined,
+        },
+      }),
+  });
+  const listings = data?.ok ? data.items : [];
 
-  const featured = useMemo(() => listings.filter((l) => l.featured), [listings]);
+  const { data: featuredData } = useQuery({
+    queryKey: ["listings", "featured"],
+    queryFn: () => listProducts({ data: {} }),
+  });
+  const featured = useMemo(
+    () => (featuredData?.ok ? featuredData.items.filter((l) => l.featured) : []),
+    [featuredData],
+  );
+
+  const { data: tagData } = useQuery({
+    queryKey: ["tags"],
+    queryFn: () => listTags({ data: {} }),
+  });
+  const tagItems = useMemo(() => {
+    const all = tagData && tagData.ok ? tagData.items : [];
+    return all.map((t) => t.facet).length > 0 ? all : [];
+  }, [tagData]);
+
+  const problemsOptions = useMemo(
+    () =>
+      tagItems.length > 0
+        ? tagItems.filter((t) => t.facet === "problem").map((t) => t.label)
+        : [...PROBLEMS],
+    [tagItems],
+  );
+  const industriesOptions = useMemo(
+    () =>
+      tagItems.length > 0
+        ? tagItems.filter((t) => t.facet === "industry").map((t) => t.label)
+        : [...INDUSTRIES],
+    [tagItems],
+  );
+  const techsOptions = useMemo(
+    () =>
+      tagItems.length > 0
+        ? tagItems.filter((t) => t.facet === "tech").map((t) => t.label)
+        : [...TECHS],
+    [tagItems],
+  );
 
   const openVideo = (l: Listing) => setVideoUrl(l.video ?? null);
 
@@ -72,7 +106,7 @@ function Home() {
 
       {/* Facet Filter Bar */}
       <FacetFilterBar
-        problems={[...PROBLEMS]}
+        problems={problemsOptions}
         selectedProblems={selectedProblems}
         onToggleProblem={(p) => {
           if (p === "All") {
@@ -85,29 +119,33 @@ function Home() {
         }}
         offering={offering}
         onOffering={setOffering}
-        industries={[...INDUSTRIES]}
+        industries={industriesOptions}
         selectedIndustries={selectedIndustries}
         onToggleIndustry={(ind) =>
           setSelectedIndustries((prev) =>
             prev.includes(ind) ? prev.filter((x) => x !== ind) : [...prev, ind],
           )
         }
-        techs={[...TECHS]}
+        techs={techsOptions}
         selectedTechs={selectedTechs}
         onToggleTech={(t) =>
           setSelectedTechs((prev) =>
             prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t],
           )
         }
-        count={filtered.length}
-        total={listings.length}
+        count={listings.length}
+        total={featuredData?.ok ? featuredData.items.length : listings.length}
         onClear={resetFilters}
       />
 
       {/* Masonry grid */}
-      {filtered.length > 0 ? (
+      {isFetching && listings.length === 0 ? (
+        <div className="mt-10 rounded-2xl glass p-12 text-center ring-1 ring-border">
+          <p className="font-display text-lg font-semibold">Loading the catalog…</p>
+        </div>
+      ) : listings.length > 0 ? (
         <section className="mt-10 columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
-          {filtered.map((l) => (
+          {listings.map((l) => (
             <ListingCard key={l.id} listing={l} onShow={setActiveListing} onPlay={openVideo} />
           ))}
         </section>

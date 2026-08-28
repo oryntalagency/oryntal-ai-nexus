@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
   Pencil,
@@ -13,8 +14,11 @@ import {
   Eye,
   X,
 } from "lucide-react";
-import { adminActions, useAdminStore } from "@/lib/adminStore";
-import { INDUSTRIES, OFFERING_LABEL, OFFERING_META, PROBLEMS, TECHS } from "@/lib/mockData";
+import { useAdminStore } from "@/lib/adminStore";
+import { createProduct, deleteProduct, listProducts, updateProduct } from "@/lib/api/products";
+import { listTags } from "@/lib/api/tags";
+import { uploadMedia } from "@/lib/api/media";
+import { OFFERING_LABEL, OFFERING_META, PROBLEMS, INDUSTRIES, TECHS } from "@/lib/mockData";
 import type { Listing, ListingStatus, OfferingType } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +52,17 @@ function readFileAsDataUrl(file: File): Promise<string> {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+function dataUrlToBase64(dataUrl: string): string {
+  const comma = dataUrl.indexOf(",");
+  return comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+}
+
+function dataUrlToExtension(dataUrl: string): string {
+  const m = /^data:([^;]+);/.exec(dataUrl);
+  if (!m) return "bin";
+  return (m[1].split("/")[1] ?? "bin").split("+")[0] || "bin";
 }
 
 type FormState = {
@@ -146,13 +161,86 @@ function formToListing(f: FormState, editing: Listing | null): Listing {
 }
 
 function ProductsPage() {
-  const { listings, media } = useAdminStore();
+  const queryClient = useQueryClient();
+  const { media } = useAdminStore();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Listing | null>(null);
   const [query, setQuery] = useState("");
   const [offeringFilter, setOfferingFilter] = useState<"all" | OfferingType>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | ListingStatus>("all");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const { data } = useQuery({
+    queryKey: ["products", "all"],
+    queryFn: () => listProducts({ data: {} }),
+  });
+  const listings = data?.ok ? data.items : [];
+
+  const invalidateListings = () => queryClient.invalidateQueries({ queryKey: ["products"] });
+
+  const saveListing = async (listing: Listing, editing: Listing | null) => {
+    const res = editing
+      ? await updateProduct({
+          data: {
+            id: editing.id,
+            title: listing.title,
+            slug: listing.slug,
+            tagline: listing.tagline,
+            creator: listing.creator,
+            offeringType: listing.offeringType,
+            problems: listing.problems,
+            industries: listing.industries,
+            techs: listing.techs,
+            problemPoints: listing.problemPoints,
+            advantagePoints: listing.advantagePoints,
+            image: listing.image,
+            video: listing.video,
+            liveUrl: listing.liveUrl,
+            price: listing.price,
+            gradient: listing.gradient,
+            glyph: listing.glyph,
+            height: listing.height,
+            featured: listing.featured,
+            status: listing.status ?? "live",
+          },
+        })
+      : await createProduct({
+          data: {
+            title: listing.title,
+            slug: listing.slug,
+            tagline: listing.tagline,
+            creator: listing.creator,
+            offeringType: listing.offeringType,
+            problems: listing.problems,
+            industries: listing.industries,
+            techs: listing.techs,
+            problemPoints: listing.problemPoints,
+            advantagePoints: listing.advantagePoints,
+            image: listing.image,
+            video: listing.video,
+            liveUrl: listing.liveUrl,
+            price: listing.price,
+            gradient: listing.gradient,
+            glyph: listing.glyph,
+            height: listing.height,
+            featured: listing.featured,
+            status: listing.status ?? "live",
+          },
+        });
+    if (res.ok) {
+      await invalidateListings();
+      return { ok: true as const };
+    }
+    return { ok: false as const, error: res.error ?? "Could not save the product." };
+  };
+
+  const deleteOne = async (id: string) => {
+    const res = await deleteProduct({ data: { id } });
+    if (res.ok) {
+      await invalidateListings();
+    }
+    return res.ok;
+  };
 
   useEffect(() => {
     if (!deletingId) return;
@@ -179,7 +267,7 @@ function ProductsPage() {
 
   const confirmDelete = (id: string) => {
     if (deletingId === id) {
-      adminActions.deleteListing(id);
+      void deleteOne(id);
       setDeletingId(null);
     } else {
       setDeletingId(id);
@@ -318,10 +406,7 @@ function ProductsPage() {
           editing={editing}
           mediaImages={media.filter((m) => m.kind === "image").map((m) => m.url)}
           onClose={() => setOpen(false)}
-          onSave={(listing) => {
-            adminActions.upsertListing(listing);
-            setOpen(false);
-          }}
+          onSave={saveListing}
         />
       )}
     </div>
@@ -337,12 +422,35 @@ function ProductForm({
   editing: Listing | null;
   mediaImages: string[];
   onClose: () => void;
-  onSave: (listing: Listing) => void;
+  onSave: (listing: Listing, editing: Listing | null) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const [f, setF] = useState<FormState>(editing ? formFromListing(editing) : emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [detail, setDetail] = useState<Listing | null>(null);
   const [play, setPlay] = useState<Listing | null>(null);
+
+  const { data: tagData } = useQuery({
+    queryKey: ["tags"],
+    queryFn: () => listTags({ data: {} }),
+  });
+  const tagItems = tagData?.ok ? tagData.items : [];
+  const problemOptions =
+    tagItems.length > 0
+      ? tagItems
+          .filter((t) => t.facet === "problem")
+          .map((t) => t.label)
+          .filter((p) => p !== "All")
+      : PROBLEMS.filter((p) => p !== "All");
+  const industryOptions =
+    tagItems.length > 0
+      ? tagItems.filter((t) => t.facet === "industry").map((t) => t.label)
+      : [...INDUSTRIES];
+  const techOptions =
+    tagItems.length > 0
+      ? tagItems.filter((t) => t.facet === "tech").map((t) => t.label)
+      : [...TECHS];
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setF((prev) => ({ ...prev, [key]: value }));
@@ -379,10 +487,18 @@ function ProductForm({
     return Object.keys(next).length === 0;
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    onSave(formToListing(f, editing ?? null));
+    setSaving(true);
+    setSubmitError(null);
+    const result = await onSave(formToListing(f, editing ?? null), editing ?? null);
+    setSaving(false);
+    if (result.ok) {
+      onClose();
+    } else {
+      setSubmitError(result.error ?? "Could not save the product.");
+    }
   };
 
   const selectCls =
@@ -533,21 +649,21 @@ function ProductForm({
                 hint="Pick every problem this offering directly addresses."
               >
                 <ChipPicker
-                  options={PROBLEMS.filter((p) => p !== "All")}
+                  options={problemOptions}
                   selected={f.problems}
                   onToggle={(p) => set("problems", toggle(f.problems, p))}
                 />
               </Field>
               <Field label="Industries" hint="Optional — helps buyers find it faster.">
                 <ChipPicker
-                  options={[...INDUSTRIES]}
+                  options={industryOptions}
                   selected={f.industries}
                   onToggle={(p) => set("industries", toggle(f.industries, p))}
                 />
               </Field>
               <Field label="Tech stack" hint="Optional.">
                 <ChipPicker
-                  options={[...TECHS]}
+                  options={techOptions}
                   selected={f.techs}
                   onToggle={(p) => set("techs", toggle(f.techs, p))}
                 />
@@ -670,12 +786,26 @@ function ProductForm({
 
         {/* Footer actions */}
         <div className="flex items-center justify-between gap-3 border-t border-border bg-surface px-6 py-4">
-          <Button variant="ghost" type="button" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={submit} className="rounded-full shadow-gold-glow">
-            {editing ? "Save changes" : "Publish product"}
-          </Button>
+          {submitError ? (
+            <p className="flex items-center gap-1.5 text-xs text-destructive">
+              <AlertCircle className="h-3.5 w-3.5" /> {submitError}
+            </p>
+          ) : (
+            <span />
+          )}
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={submit}
+              disabled={saving}
+              className="rounded-full shadow-gold-glow"
+            >
+              {saving ? "Saving…" : editing ? "Save changes" : "Publish product"}
+            </Button>
+          </div>
         </div>
       </DialogContent>
 
@@ -815,6 +945,33 @@ function Dropzone({
   onChange: (url: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const onFile = async (file: File) => {
+    const dataUrl = await readFileAsDataUrl(file);
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const res = await uploadMedia({
+        data: {
+          name: file.name,
+          kind,
+          dataBase64: dataUrlToBase64(dataUrl),
+        },
+      });
+      if (res.ok) {
+        onChange(res.url);
+      } else {
+        setUploadError(res.error ?? "Upload failed.");
+      }
+    } catch {
+      setUploadError("Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div>
       <input
@@ -822,10 +979,10 @@ function Dropzone({
         type="file"
         accept={kind === "image" ? "image/*" : "video/*"}
         className="hidden"
-        onChange={async (e) => {
+        onChange={(e) => {
           const file = e.target.files?.[0];
-          if (!file) return;
-          onChange(await readFileAsDataUrl(file));
+          e.target.value = "";
+          if (file) void onFile(file);
         }}
       />
       {value ? (
@@ -856,13 +1013,21 @@ function Dropzone({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-black/10 px-4 py-8 text-muted-foreground transition hover:border-primary/50 hover:text-foreground"
+          disabled={uploading}
+          className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-black/10 px-4 py-8 text-muted-foreground transition hover:border-primary/50 hover:text-foreground disabled:cursor-wait disabled:opacity-60"
         >
           {kind === "image" ? <ImagePlus className="h-6 w-6" /> : <Upload className="h-6 w-6" />}
           <span className="text-xs font-medium">
-            Click to upload {kind === "image" ? "an image" : "a video"}
+            {uploading
+              ? "Uploading…"
+              : `Click to upload ${kind === "image" ? "an image" : "a video"}`}
           </span>
         </button>
+      )}
+      {uploadError && (
+        <p className="mt-1 flex items-center gap-1 text-[11px] text-destructive">
+          <AlertCircle className="h-3 w-3" /> {uploadError}
+        </p>
       )}
     </div>
   );

@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Lock, ArrowLeft, ShieldCheck, KeyRound } from "lucide-react";
-import { isAdminAuthed, setAdminAuthed, verifyPasscode } from "@/lib/adminSession";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Lock, ArrowLeft, ShieldCheck, Mail, KeyRound } from "lucide-react";
+import { adminLogin, getAdminSession } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -18,23 +19,37 @@ export const Route = createFileRoute("/admin")({
 function AdminShell() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const authed = mounted && isAdminAuthed();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "session"],
+    queryFn: () => getAdminSession(),
+    staleTime: 5 * 60 * 1000,
+  });
+  const authed = mounted && !!data?.ok;
 
+  if (!mounted || isLoading) return null;
   return <div className="min-h-screen">{authed ? <Outlet /> : <AdminLogin />}</div>;
 }
 
 function AdminLogin() {
-  const [pin, setPin] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const queryClient = useQueryClient();
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (verifyPasscode(pin.trim())) {
-      setAdminAuthed(true);
-      setError(null);
+    setBusy(true);
+    setError(null);
+    const res = await adminLogin({ data: { email, password } });
+    setBusy(false);
+    if (res.ok) {
+      queryClient.setQueryData(["admin", "session"], { ok: true as const, admin: res.admin });
+      setEmail("");
+      setPassword("");
     } else {
-      setError("That passcode doesn't match.");
-      setPin("");
+      setError(res.error ?? "Login failed.");
+      setPassword("");
     }
   };
 
@@ -57,24 +72,38 @@ function AdminLogin() {
             </p>
             <h1 className="mt-4 font-display text-2xl font-semibold">Admin access</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Enter the passcode to open the publisher panel.
+              Sign in with your publisher account to open the panel.
             </p>
 
             <form onSubmit={submit} className="mt-6 space-y-4">
               <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  type="password"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  placeholder="Passcode"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
                   autoFocus
                   className="rounded-full pl-10"
                 />
               </div>
+              <div className="relative">
+                <KeyRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="rounded-full pl-10"
+                />
+              </div>
               {error && <p className="text-xs text-destructive">{error}</p>}
-              <Button type="submit" className="w-full rounded-full shadow-gold-glow">
-                Unlock panel
+              <Button
+                type="submit"
+                disabled={busy}
+                className="w-full rounded-full shadow-gold-glow"
+              >
+                {busy ? "Signing in…" : "Unlock panel"}
               </Button>
             </form>
 
@@ -87,7 +116,7 @@ function AdminLogin() {
           </div>
         </div>
         <p className="mt-4 text-center text-[11px] text-muted-foreground">
-          Client-side gate for now — swap for real auth when the backend lands.
+          Server-authenticated session — cookies, not client storage.
         </p>
       </div>
     </div>
