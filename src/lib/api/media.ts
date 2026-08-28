@@ -12,7 +12,7 @@ import { uploadObject } from "../db/storage.server";
 const MAX_BYTES = 25 * 1024 * 1024; // 25 MB cap
 
 export const uploadMedia = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     z.object({
       name: z.string().min(1),
       kind: z.enum(["image", "video"]),

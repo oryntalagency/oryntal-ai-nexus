@@ -57,7 +57,7 @@ export const listBlogPosts = createServerFn({ method: "GET" }).handler(async () 
 });
 
 export const createBlogPost = createServerFn({ method: "POST" })
-  .validator(postInput)
+  .inputValidator(postInput)
   .handler(async ({ data }) => {
     const admin = await currentAdmin();
     if (!admin) return { ok: false as const, error: "You must be signed in as an admin." };
@@ -71,7 +71,7 @@ export const createBlogPost = createServerFn({ method: "POST" })
   });
 
 export const updateBlogPost = createServerFn({ method: "POST" })
-  .validator(postInput.extend({ id: z.string().min(1) }))
+  .inputValidator(postInput.extend({ id: z.string().min(1) }))
   .handler(async ({ data }) => {
     const admin = await currentAdmin();
     if (!admin) return { ok: false as const, error: "You must be signed in as an admin." };
@@ -87,7 +87,7 @@ export const updateBlogPost = createServerFn({ method: "POST" })
   });
 
 export const deleteBlogPost = createServerFn({ method: "POST" })
-  .validator(z.object({ id: z.string().min(1) }))
+  .inputValidator(z.object({ id: z.string().min(1) }))
   .handler(async ({ data }) => {
     const admin = await currentAdmin();
     if (!admin) return { ok: false as const, error: "You must be signed in as an admin." };

@@ -7,7 +7,7 @@ import { currentAdmin, loginAdmin as loginAdminRecord, logoutAdmin } from "../db
 // route; admins are created via scripts/create-admin.mjs only.
 
 export const adminLogin = createServerFn({ method: "POST" })
-  .validator(z.object({ email: z.string().min(1), password: z.string().min(1) }))
+  .inputValidator(z.object({ email: z.string().min(1), password: z.string().min(1) }))
   .handler(async ({ data }) => {
     try {
       return await loginAdminRecord({ email: data.email, password: data.password });

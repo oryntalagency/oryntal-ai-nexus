@@ -8,7 +8,7 @@ import type { TagSummary } from "../db/tags.server";
 // chip pickers so both always use the exact labels stored on documents.
 
 export const listTags = createServerFn({ method: "GET" })
-  .validator(z.object({ facet: z.enum(["problem", "industry", "tech"]).optional() }))
+  .inputValidator(z.object({ facet: z.enum(["problem", "industry", "tech"]).optional() }))
   .handler(async ({ data }) => {
     try {
       const items = await listTagRecords(data.facet);

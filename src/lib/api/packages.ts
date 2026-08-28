@@ -44,7 +44,7 @@ export const listPackages = createServerFn({ method: "GET" }).handler(async () =
 });
 
 export const createPackage = createServerFn({ method: "POST" })
-  .validator(packageInput)
+  .inputValidator(packageInput)
   .handler(async ({ data }) => {
     const admin = await currentAdmin();
     if (!admin) return { ok: false as const, error: "You must be signed in as an admin." };
@@ -58,7 +58,7 @@ export const createPackage = createServerFn({ method: "POST" })
   });
 
 export const updatePackage = createServerFn({ method: "POST" })
-  .validator(packageInput.extend({ id: z.string().min(1) }))
+  .inputValidator(packageInput.extend({ id: z.string().min(1) }))
   .handler(async ({ data }) => {
     const admin = await currentAdmin();
     if (!admin) return { ok: false as const, error: "You must be signed in as an admin." };
@@ -74,7 +74,7 @@ export const updatePackage = createServerFn({ method: "POST" })
   });
 
 export const deletePackage = createServerFn({ method: "POST" })
-  .validator(z.object({ id: z.string().min(1) }))
+  .inputValidator(z.object({ id: z.string().min(1) }))
   .handler(async ({ data }) => {
     const admin = await currentAdmin();
     if (!admin) return { ok: false as const, error: "You must be signed in as an admin." };

@@ -17,7 +17,7 @@ const offeringFilter = z.enum(["saas", "automation", "model", "all"]);
 const statusFilter = z.enum(["live", "beta", "coming", "all"]);
 
 export const listProducts = createServerFn({ method: "GET" })
-  .validator(
+  .inputValidator(
     z.object({
       problems: z.array(z.string()).optional(),
       offering: offeringFilter.optional(),
@@ -45,7 +45,7 @@ export const listProducts = createServerFn({ method: "GET" })
   });
 
 export const createProduct = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     z.object({
       title: z.string().min(1),
       slug: z.string().optional(),
@@ -107,7 +107,7 @@ export const createProduct = createServerFn({ method: "POST" })
   });
 
 export const updateProduct = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     z.object({
       id: z.string().min(1),
       title: z.string().min(1),
@@ -171,7 +171,7 @@ export const updateProduct = createServerFn({ method: "POST" })
   });
 
 export const deleteProduct = createServerFn({ method: "POST" })
-  .validator(z.object({ id: z.string().min(1) }))
+  .inputValidator(z.object({ id: z.string().min(1) }))
   .handler(async ({ data }) => {
     const admin = await currentAdmin();
     if (!admin) {
