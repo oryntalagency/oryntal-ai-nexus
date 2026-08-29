@@ -3,13 +3,12 @@ import { z } from "zod";
 
 import { currentAdmin } from "../db/admins.server";
 import { uploadObject } from "../db/storage.server";
+import { uploadLimitError, UPLOAD_LIMITS } from "../upload-limits";
 
 // Media upload. Admin-only. The client sends file bytes (base64) here, the
-// storage layer persists them through the configured provider (or the local
-// dev fallback), and the handler returns the public URL. Only that URL is ever
-// written onto Mongo documents — never the binary payload.
-
-const MAX_BYTES = 25 * 1024 * 1024; // 25 MB cap
+// storage layer persists them to Vercel Blob, and the handler returns the
+// public URL. Only that URL is ever written onto Mongo documents — never the
+// binary payload.
 
 export const uploadMedia = createServerFn({ method: "POST" })
   .inputValidator(
@@ -31,8 +30,9 @@ export const uploadMedia = createServerFn({ method: "POST" })
       if (buffer.byteLength === 0) {
         return { ok: false as const, error: "The uploaded file was empty." };
       }
-      if (buffer.byteLength > MAX_BYTES) {
-        return { ok: false as const, error: "The file exceeds the 25 MB upload limit." };
+      const limit = UPLOAD_LIMITS[data.kind];
+      if (buffer.byteLength > limit.bytes) {
+        return { ok: false as const, error: uploadLimitError(data.kind) };
       }
 
       const stored = await uploadObject({

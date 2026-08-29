@@ -20,6 +20,7 @@ import { createProduct, deleteProduct, listProducts, updateProduct } from "@/lib
 import { listTags } from "@/lib/api/tags";
 import { uploadMedia } from "@/lib/api/media";
 import { FEATURED_CAP, OFFERING_LABEL, OFFERING_META } from "@/lib/mockData";
+import { uploadLimitError, UPLOAD_LIMITS } from "@/lib/upload-limits";
 import type { Listing, ListingStatus, OfferingType } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -979,6 +980,11 @@ function Dropzone({
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const onFile = async (file: File) => {
+    const limit = UPLOAD_LIMITS[kind];
+    if (file.size > limit.bytes) {
+      setUploadError(uploadLimitError(kind));
+      return;
+    }
     const dataUrl = await readFileAsDataUrl(file);
     setUploading(true);
     setUploadError(null);

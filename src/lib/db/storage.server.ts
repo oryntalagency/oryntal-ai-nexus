@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import { extname, join, resolve } from "node:path";
+import { extname } from "node:path";
+
+import { put } from "@vercel/blob";
 
 import { ensureEnvForServer } from "../env.server";
 
@@ -8,21 +9,20 @@ ensureEnvForServer();
 
 // Media storage abstraction. The client never sends raw bytes straight into a
 // Mongo document — the admin upload handlers call into this module, which
-// hands back a public URL, and only that URL is stored on the document.
+// hands back the public URL from Vercel Blob, and only that URL is stored on
+// the document.
+//
+// Uploads go straight to Vercel Blob via put() — never to the local
+// filesystem, which does not exist on Vercel's read-only serverless runtime.
+// The returned URL (https://*.public.blob.vercel-storage.com/...) is what the
+// admin saves into the image / video / cover fields. The administrator must
+// have created a Blob store and set BLOB_READ_WRITE_TOKEN (Vercel injects it
+// into serverless functions automatically once the store is linked).
 //
 // Format handling: the upload's MIME type is resolved from the file (client
 // `file.type`, falling back to the file extension), validated against an
-// allowlist that includes image/webp and video/webm, and passed to the
-// provider as the content-type so format-aware providers route webp/webm
-// uploads correctly instead of rejecting ambiguous bytes.
-//
-// Wiring order:
-//   1. If STORAGE_UPLOAD_ENDPOINT (+ optional STORAGE_API_KEY) is set, the file
-//      bytes are POSTed to the provider endpoint, which must answer with
-//      JSON `{ "url": "https://…" }`.
-//   2. Otherwise (local dev, no provider configured yet) the file is written
-//      under `public/uploads/` so Vite serves it statically — the returned URL
-//      is `/uploads/<name>`.
+// allowlist that includes image/webp and video/webm, and passed as the
+// content-type so Blob serves each file with the correct Content-Type.
 
 export type StoredObject = { url: string; name: string; size: number };
 
@@ -85,42 +85,27 @@ export async function uploadObject(options: {
   mime?: string;
   buffer: Uint8Array;
 }): Promise<StoredObject> {
-  ensureEnvForServer();
   const mime = resolveUploadMime(options.kind, options.mime, options.name);
-  const endpoint = process.env.STORAGE_UPLOAD_ENDPOINT;
+  const ext = extname(options.name).toLowerCase() || MIME_TO_EXTENSION[mime] || ".bin";
+  const base = sanitizeName(options.name.slice(0, options.name.length - ext.length));
+  const pathname = `uploads/${options.kind}s/${base}-${randomUUID().slice(0, 8)}${ext}`;
 
-  if (endpoint) {
-    const apiKey = process.env.STORAGE_API_KEY;
-    const payload = new Uint8Array(new ArrayBuffer(options.buffer.byteLength));
-    payload.set(options.buffer);
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "content-type": mime,
-        ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
-      },
-      body: payload,
+  try {
+    const body = new Blob([options.buffer as unknown as BlobPart], { type: mime });
+    const blob = await put(pathname, body, {
+      access: "public",
+      contentType: mime,
+      addRandomSuffix: false,
+      cacheControlMaxAge: 31536000,
     });
-    if (!response.ok) {
-      const detail = (await response.text().catch(() => "")).replace(/\s+/g, " ").slice(0, 200);
+    return { url: blob.url, name: blob.pathname, size: options.buffer.byteLength };
+  } catch (error) {
+    console.error("[storage][blob]", error);
+    if (String(error instanceof Error ? error.message : error).includes("BLOB_READ_WRITE_TOKEN")) {
       throw new Error(
-        detail
-          ? `Storage provider rejected the upload (HTTP ${response.status}): ${detail}`
-          : `Storage provider rejected the upload (HTTP ${response.status}).`,
+        "Uploads are not configured yet — the Vercel Blob store is missing (no BLOB_READ_WRITE_TOKEN).",
       );
     }
-    const result = (await response.json().catch(() => ({}))) as { url?: string };
-    if (!result.url) {
-      throw new Error("Storage provider accepted the upload but did not return a URL.");
-    }
-    return { url: result.url, name: options.name, size: options.buffer.byteLength };
+    throw new Error("Upload failed — Vercel Blob rejected the file.");
   }
-
-  const extension = extname(options.name) || MIME_TO_EXTENSION[mime] || ".bin";
-  const base = sanitizeName(options.name.slice(0, options.name.length - extension.length));
-  const stored = `${base}-${randomUUID().slice(0, 8)}${extension}`;
-  const directory = resolve(process.cwd(), "public", "uploads");
-  await mkdir(directory, { recursive: true });
-  await writeFile(join(directory, stored), options.buffer);
-  return { url: `/uploads/${stored}`, name: stored, size: options.buffer.byteLength };
 }
