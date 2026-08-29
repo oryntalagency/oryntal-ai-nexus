@@ -246,6 +246,7 @@ function PostForm({
         data: {
           name: file.name,
           kind: "image",
+          mime: file.type,
           dataBase64: dataUrl.split(",")[1] ?? dataUrl,
         },
       });

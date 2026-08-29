@@ -987,6 +987,7 @@ function Dropzone({
         data: {
           name: file.name,
           kind,
+          mime: file.type,
           dataBase64: dataUrlToBase64(dataUrl),
         },
       });

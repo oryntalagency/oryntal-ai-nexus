@@ -16,6 +16,7 @@ export const uploadMedia = createServerFn({ method: "POST" })
     z.object({
       name: z.string().min(1),
       kind: z.enum(["image", "video"]),
+      mime: z.string().optional(),
       dataBase64: z.string().min(1),
     }),
   )
@@ -37,12 +38,14 @@ export const uploadMedia = createServerFn({ method: "POST" })
       const stored = await uploadObject({
         name: data.name,
         kind: data.kind,
+        mime: data.mime,
         buffer: new Uint8Array(buffer),
       });
       return { ok: true as const, url: stored.url, name: stored.name, size: stored.size };
     } catch (error) {
       console.error("[media][upload]", error);
-      return { ok: false as const, error: "Upload failed." };
+      const message = error instanceof Error ? error.message.trim() : "";
+      return { ok: false as const, error: message || "Upload failed." };
     }
   });
 
