@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Eye,
   X,
+  Loader2,
 } from "lucide-react";
 import { useAdminStore } from "@/lib/adminStore";
 import { createProduct, deleteProduct, listProducts, updateProduct } from "@/lib/api/products";
@@ -479,6 +480,10 @@ function ProductForm({
     if (!f.title.trim()) next.title = "Title is required.";
     if (!f.image) next.image = "An image is required.";
     if (f.problems.length === 0) next.problems = "Pick at least one problem you solve.";
+    if (f.problemPoints.filter((p) => p.trim()).length === 0)
+      next.problemPoints = "Add at least one problem point.";
+    if (f.advantagePoints.filter((p) => p.trim()).length === 0)
+      next.advantagePoints = "Add at least one advantage point.";
     if (!loomValid) next.loomUrl = "Must be a loom.com link, e.g. https://loom.com/share/…";
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -503,14 +508,14 @@ function ProductForm({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-none gap-0 overflow-hidden p-0 sm:max-w-5xl">
+      <DialogContent className="flex max-h-[92vh] w-[calc(100vw-2rem)] max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-5xl">
         <DialogHeader className="sr-only">
           <DialogTitle>{editing ? "Edit product" : "New product"}</DialogTitle>
         </DialogHeader>
 
         <form
           onSubmit={submit}
-          className="grid lg:grid-cols-[1fr_320px] overflow-y-auto max-h-[92vh]"
+          className="grid min-h-0 flex-1 overflow-y-auto lg:grid-cols-[1fr_320px]"
         >
           {/* LEFT — form fields */}
           <div className="space-y-8 p-6 sm:p-8">
@@ -687,12 +692,14 @@ function ProductForm({
                 items={f.problemPoints}
                 onChange={(items) => set("problemPoints", items)}
                 placeholder="e.g. Manually stitching 6 tools to move a lead"
+                error={errors.problemPoints}
               />
               <BulletEditor
                 title="Advantage points"
                 items={f.advantagePoints}
                 onChange={(items) => set("advantagePoints", items)}
                 placeholder="e.g. One dashboard, zero spreadsheet"
+                error={errors.advantagePoints}
               />
             </section>
 
@@ -777,7 +784,7 @@ function ProductForm({
 
           {/* RIGHT — live preview */}
           <div className="border-t lg:border-t-0 lg:border-l border-border bg-black/20">
-            <div className="sticky top-0 max-h-[92vh] overflow-y-auto p-6">
+            <div className="sticky top-0 max-h-full overflow-y-auto p-6">
               <p className="mb-4 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 <Eye className="h-3.5 w-3.5 text-primary" /> Card preview
               </p>
@@ -792,7 +799,7 @@ function ProductForm({
         </form>
 
         {/* Footer actions */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-surface px-6 py-4">
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-border bg-surface px-6 py-4">
           {submitError ? (
             <p className="flex items-center gap-1.5 text-xs text-destructive">
               <AlertCircle className="h-3.5 w-3.5" /> {submitError}
@@ -810,7 +817,16 @@ function ProductForm({
               disabled={saving}
               className="rounded-full shadow-gold-glow"
             >
-              {saving ? "Saving…" : editing ? "Save changes" : "Publish product"}
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  Saving…
+                </>
+              ) : editing ? (
+                "Save Changes"
+              ) : (
+                "Publish"
+              )}
             </Button>
           </div>
         </div>
@@ -894,11 +910,13 @@ function BulletEditor({
   items,
   onChange,
   placeholder,
+  error,
 }: {
   title: string;
   items: string[];
   onChange: (items: string[]) => void;
   placeholder: string;
+  error?: string;
 }) {
   const setItem = (i: number, v: string) => {
     const next = [...items];
@@ -906,7 +924,7 @@ function BulletEditor({
     onChange(next);
   };
   return (
-    <div className="rounded-xl glass p-4 ring-1 ring-border">
+    <div className={`rounded-xl glass p-4 ring-1 ${error ? "ring-destructive/60" : "ring-border"}`}>
       <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
       </p>
@@ -938,6 +956,11 @@ function BulletEditor({
           <Plus className="h-3 w-3" /> Add point
         </button>
       </div>
+      {error && (
+        <p className="mt-3 flex items-center gap-1.5 text-xs text-destructive">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {error}
+        </p>
+      )}
     </div>
   );
 }
