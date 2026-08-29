@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Mail, CheckCircle2, ArrowRight, MessageCircle } from "lucide-react";
+import { Mail, CheckCircle2, ArrowRight, MessageCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { sendContact } from "@/lib/api/contact";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -22,6 +23,8 @@ export const Route = createFileRoute("/contact")({
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
 
   const canSend = useMemo(
@@ -53,10 +56,10 @@ function Contact() {
 
           <div className="mt-8 space-y-3">
             <a
-              href="mailto:hello@oryntal.ai"
+              href="mailto:support.oryntal@agency.org.in"
               className="inline-flex items-center gap-2 rounded-full glass px-4 py-2.5 text-sm ring-1 ring-border transition hover:text-primary hover:ring-primary/40"
             >
-              <Mail className="h-4 w-4" /> hello@oryntal.ai
+              <Mail className="h-4 w-4" /> support.oryntal@agency.org.in
             </a>
           </div>
 
@@ -110,9 +113,31 @@ function Contact() {
             </div>
           ) : (
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                setSent(true);
+                setSendError(null);
+                setSending(true);
+                try {
+                  const result = await sendContact({
+                    data: {
+                      name: form.name,
+                      email: form.email,
+                      subject: form.subject,
+                      message: form.message,
+                    },
+                  });
+                  if (!result.ok) {
+                    setSendError(result.error);
+                    return;
+                  }
+                  setSent(true);
+                } catch {
+                  setSendError(
+                    "We couldn't send your message right now. Please try again or email us directly.",
+                  );
+                } finally {
+                  setSending(false);
+                }
               }}
               className="space-y-5"
             >
@@ -156,15 +181,29 @@ function Contact() {
                   placeholder="What are we building?"
                 />
               </div>
+              {sendError && (
+                <p className="rounded-xl bg-destructive/10 px-3 py-2 text-center text-[12px] text-destructive-foreground ring-1 ring-destructive/30">
+                  {sendError}
+                </p>
+              )}
               <Button
                 type="submit"
-                disabled={!canSend}
+                disabled={!canSend || sending}
                 className="w-full h-11 rounded-full text-sm font-semibold shadow-gold-glow"
               >
-                Send message <ArrowRight className="h-4 w-4" />
+                {sending ? (
+                  <>
+                    Sending… <Loader2 className="h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    Send message <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </Button>
               <p className="text-center text-[11px] text-muted-foreground">
-                Prefer email? Write to <span className="text-primary">hello@oryntal.ai</span>
+                Prefer email? Write to{" "}
+                <span className="text-primary">support.oryntal@agency.org.in</span>
               </p>
             </form>
           )}
