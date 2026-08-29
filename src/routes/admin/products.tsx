@@ -18,7 +18,7 @@ import { useAdminStore } from "@/lib/adminStore";
 import { createProduct, deleteProduct, listProducts, updateProduct } from "@/lib/api/products";
 import { listTags } from "@/lib/api/tags";
 import { uploadMedia } from "@/lib/api/media";
-import { OFFERING_LABEL, OFFERING_META } from "@/lib/mockData";
+import { FEATURED_CAP, OFFERING_LABEL, OFFERING_META } from "@/lib/mockData";
 import type { Listing, ListingStatus, OfferingType } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -175,6 +175,7 @@ function ProductsPage() {
     queryFn: () => listProducts({ data: {} }),
   });
   const listings = data?.ok ? data.items : [];
+  const featuredCount = listings.filter((l) => l.featured).length;
 
   const invalidateListings = () => queryClient.invalidateQueries({ queryKey: ["products"] });
 
@@ -405,6 +406,7 @@ function ProductsPage() {
         <ProductForm
           editing={editing}
           mediaImages={media.filter((m) => m.kind === "image").map((m) => m.url)}
+          featuredCount={featuredCount}
           onClose={() => setOpen(false)}
           onSave={saveListing}
         />
@@ -416,11 +418,13 @@ function ProductsPage() {
 function ProductForm({
   editing,
   mediaImages,
+  featuredCount,
   onClose,
   onSave,
 }: {
   editing: Listing | null;
   mediaImages: string[];
+  featuredCount: number;
   onClose: () => void;
   onSave: (listing: Listing, editing: Listing | null) => Promise<{ ok: boolean; error?: string }>;
 }) {
@@ -466,6 +470,9 @@ function ProductForm({
     });
 
   const loomValid = !f.loomUrl.trim() || LOOM_RE.test(f.loomUrl.trim());
+
+  const alreadyFeatured = featuredCount - (editing?.featured ? 1 : 0);
+  const showFeaturedWarning = f.featured && alreadyFeatured >= FEATURED_CAP;
 
   const validate = (): boolean => {
     const next: Record<string, string> = {};
@@ -615,15 +622,25 @@ function ProductForm({
                     placeholder="https://…  (Try it / View target)"
                   />
                 </Field>
-                <div className="flex items-center gap-3">
-                  <Switch
-                    id="featured"
-                    checked={f.featured}
-                    onCheckedChange={(v) => set("featured", v)}
-                  />
-                  <Label htmlFor="featured" className="text-sm">
-                    Feature on public homepage
-                  </Label>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      id="featured"
+                      checked={f.featured}
+                      onCheckedChange={(v) => set("featured", v)}
+                    />
+                    <Label htmlFor="featured" className="text-sm">
+                      Featured on Home
+                    </Label>
+                  </div>
+                  {showFeaturedWarning && (
+                    <p className="flex items-center gap-1.5 text-[11px] text-amber-400/90">
+                      <AlertCircle className="h-3 w-3 shrink-0" />
+                      {alreadyFeatured} product{alreadyFeatured === 1 ? "" : "s"} already featured —
+                      the homepage shows the {FEATURED_CAP} most recently updated. Consider
+                      unfeaturing one.
+                    </p>
+                  )}
                 </div>
               </div>
             </section>

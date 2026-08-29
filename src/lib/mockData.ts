@@ -33,6 +33,8 @@ export const OFFERING_LABEL: Record<OfferingType, string> = {
   model: "AI Model or Agent",
 };
 
+export const FEATURED_CAP = 6;
+
 export const OFFERING_META: Record<OfferingType, { icon: LucideIcon; label: string }> = {
   saas: { icon: Boxes, label: OFFERING_LABEL.saas },
   automation: { icon: Workflow, label: OFFERING_LABEL.automation },

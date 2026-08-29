@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { TrendingUp, ArrowUpRight, ArrowRight, Sparkles } from "lucide-react";
+import { FEATURED_CAP } from "@/lib/mockData";
 import type { Listing } from "@/lib/mockData";
 import { listProducts } from "@/lib/api/products";
 import { listTags } from "@/lib/api/tags";
@@ -59,10 +60,10 @@ function Home() {
 
   const { data: featuredData } = useQuery({
     queryKey: ["listings", "featured"],
-    queryFn: () => listProducts({ data: {} }),
+    queryFn: () => listProducts({ data: { featured: true } }),
   });
   const featured = useMemo(
-    () => (featuredData?.ok ? featuredData.items.filter((l) => l.featured) : []),
+    () => (featuredData?.ok ? featuredData.items.slice(0, FEATURED_CAP) : []),
     [featuredData],
   );
 

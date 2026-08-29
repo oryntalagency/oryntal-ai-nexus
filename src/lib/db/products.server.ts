@@ -46,6 +46,7 @@ export type ProductFilterInput = {
   industries?: string[];
   techs?: string[];
   status?: ListingStatus | "all";
+  featured?: boolean;
   query?: string;
 };
 
@@ -133,6 +134,7 @@ export async function listProducts(input: ProductFilterInput = {}): Promise<List
   if (industries.length > 0) filter.industry_tags = { $in: industries };
   if (techs.length > 0) filter.tech_tags = { $in: techs };
   if (input.status && input.status !== "all") filter.status = STATUS_TO_DB[input.status];
+  if (input.featured === true) filter.featured = true;
 
   const q = (input.query ?? "").trim().toLowerCase();
   if (q) {

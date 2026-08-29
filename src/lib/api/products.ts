@@ -24,6 +24,7 @@ export const listProducts = createServerFn({ method: "GET" })
       industries: z.array(z.string()).optional(),
       techs: z.array(z.string()).optional(),
       status: statusFilter.optional(),
+      featured: z.boolean().optional(),
       query: z.string().optional(),
     }),
   )
@@ -35,6 +36,7 @@ export const listProducts = createServerFn({ method: "GET" })
         industries: data.industries,
         techs: data.techs,
         status: data.status === "all" ? undefined : data.status,
+        featured: data.featured,
         query: data.query,
       });
       return { ok: true as const, items };
