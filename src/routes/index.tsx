@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { TrendingUp, ArrowUpRight, ArrowRight, Sparkles } from "lucide-react";
-import { PROBLEMS, INDUSTRIES, TECHS } from "@/lib/mockData";
 import type { Listing } from "@/lib/mockData";
 import { listProducts } from "@/lib/api/products";
 import { listTags } from "@/lib/api/tags";
@@ -71,30 +70,21 @@ function Home() {
     queryKey: ["tags"],
     queryFn: () => listTags({ data: {} }),
   });
-  const tagItems = useMemo(() => {
-    const all = tagData && tagData.ok ? tagData.items : [];
-    return all.map((t) => t.facet).length > 0 ? all : [];
-  }, [tagData]);
+  const tagItems = useMemo(() => (tagData && tagData.ok ? tagData.items : []), [tagData]);
 
   const problemsOptions = useMemo(
-    () =>
-      tagItems.length > 0
-        ? tagItems.filter((t) => t.facet === "problem").map((t) => t.label)
-        : [...PROBLEMS],
+    () => [
+      "All",
+      ...tagItems.filter((t) => t.facet === "problem" && t.label !== "All").map((t) => t.label),
+    ],
     [tagItems],
   );
   const industriesOptions = useMemo(
-    () =>
-      tagItems.length > 0
-        ? tagItems.filter((t) => t.facet === "industry").map((t) => t.label)
-        : [...INDUSTRIES],
+    () => tagItems.filter((t) => t.facet === "industry").map((t) => t.label),
     [tagItems],
   );
   const techsOptions = useMemo(
-    () =>
-      tagItems.length > 0
-        ? tagItems.filter((t) => t.facet === "tech").map((t) => t.label)
-        : [...TECHS],
+    () => tagItems.filter((t) => t.facet === "tech").map((t) => t.label),
     [tagItems],
   );
 

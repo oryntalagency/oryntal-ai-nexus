@@ -18,7 +18,7 @@ import { useAdminStore } from "@/lib/adminStore";
 import { createProduct, deleteProduct, listProducts, updateProduct } from "@/lib/api/products";
 import { listTags } from "@/lib/api/tags";
 import { uploadMedia } from "@/lib/api/media";
-import { OFFERING_LABEL, OFFERING_META, PROBLEMS, INDUSTRIES, TECHS } from "@/lib/mockData";
+import { OFFERING_LABEL, OFFERING_META } from "@/lib/mockData";
 import type { Listing, ListingStatus, OfferingType } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -436,21 +436,11 @@ function ProductForm({
     queryFn: () => listTags({ data: {} }),
   });
   const tagItems = tagData?.ok ? tagData.items : [];
-  const problemOptions =
-    tagItems.length > 0
-      ? tagItems
-          .filter((t) => t.facet === "problem")
-          .map((t) => t.label)
-          .filter((p) => p !== "All")
-      : PROBLEMS.filter((p) => p !== "All");
-  const industryOptions =
-    tagItems.length > 0
-      ? tagItems.filter((t) => t.facet === "industry").map((t) => t.label)
-      : [...INDUSTRIES];
-  const techOptions =
-    tagItems.length > 0
-      ? tagItems.filter((t) => t.facet === "tech").map((t) => t.label)
-      : [...TECHS];
+  const problemOptions = tagItems
+    .filter((t) => t.facet === "problem" && t.label !== "All")
+    .map((t) => t.label);
+  const industryOptions = tagItems.filter((t) => t.facet === "industry").map((t) => t.label);
+  const techOptions = tagItems.filter((t) => t.facet === "tech").map((t) => t.label);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setF((prev) => ({ ...prev, [key]: value }));
