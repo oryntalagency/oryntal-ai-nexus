@@ -40,6 +40,12 @@ export type ProductDoc = {
   featured?: boolean;
 };
 
+export type ProductStats = {
+  saas: number;
+  automation: number;
+  model: number;
+};
+
 export type ProductFilterInput = {
   problems?: string[];
   offering?: OfferingType | "all";
@@ -154,6 +160,32 @@ export async function listProducts(input: ProductFilterInput = {}): Promise<List
 
   const docs = await cursor.toArray();
   return docs.map((doc) => fromProductDoc(doc));
+}
+
+export async function getProductStats(): Promise<ProductStats> {
+  const db = await getDb();
+  const products = db.collection<ProductDoc>("products");
+
+  const live = STATUS_TO_DB.live;
+  const pipeline = [
+    { $match: { status: live } },
+    {
+      $group: {
+        _id: "$offering_type",
+        count: { $sum: 1 },
+      },
+    },
+  ];
+
+  const rows = await products.aggregate<{ _id: string; count: number }>(pipeline).toArray();
+  const byType: Record<string, number> = {};
+  for (const row of rows) byType[row._id] = row.count;
+
+  return {
+    saas: byType[OFFERING_TYPE_TO_DB.saas] ?? 0,
+    automation: byType[OFFERING_TYPE_TO_DB.automation] ?? 0,
+    model: byType[OFFERING_TYPE_TO_DB.model] ?? 0,
+  };
 }
 
 export async function createProduct(listing: Listing): Promise<Listing> {

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { productStats } from "@/lib/api/products";
 import {
   Search,
   Cpu,
@@ -49,6 +51,12 @@ const NODES: Array<{ x: number; y: number; icon: typeof Bot; label: string }> = 
 export function HeroAI({ query, setQuery }: HeroAIProps) {
   const [idx, setIdx] = useState(0);
   const [streamIdx, setStreamIdx] = useState(0);
+
+  const { data: statsData } = useQuery({
+    queryKey: ["products", "stats"],
+    queryFn: () => productStats(),
+  });
+  const stats = statsData?.ok ? statsData.stats : { saas: 0, automation: 0, model: 0 };
 
   useEffect(() => {
     const t = setInterval(() => setIdx((i) => (i + 1) % ROTATING.length), 2600);
@@ -385,18 +393,27 @@ export function HeroAI({ query, setQuery }: HeroAIProps) {
       {/* Stats row */}
       <div className="mt-10 grid grid-cols-2 gap-4 border-t border-border/60 pt-6 md:grid-cols-4">
         {[
-          ["24", "SaaS products"],
-          ["9", "Automation systems"],
-          ["14", "AI models & agents"],
-          ["41K", "Monthly deploys"],
-        ].map(([v, l]) => (
-          <div key={l}>
-            <p className="font-display text-2xl md:text-3xl font-semibold text-gold-gradient">
-              {v}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">{l}</p>
-          </div>
-        ))}
+          { value: stats.saas, label: "SaaS Product" },
+          { value: stats.automation, label: "AI Automation" },
+          { value: stats.model, label: "AI Models & Agents" },
+        ]
+          .filter((t) => t.value > 0)
+          .map((t) => (
+            <div key={t.label}>
+              <p className="font-display text-2xl md:text-3xl font-semibold text-gold-gradient">
+                {t.value}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{t.label}</p>
+            </div>
+          ))}
+        <div>
+          <p className="font-display text-xl md:text-2xl font-semibold leading-tight text-gold-gradient">
+            Built From Real Gaps
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Every product starts with a market problem, not a trend
+          </p>
+        </div>
       </div>
     </section>
   );

@@ -5,9 +5,11 @@ import { currentAdmin } from "../db/admins.server";
 import {
   createProduct as createProductRecord,
   deleteProduct as deleteProductRecord,
+  getProductStats as getProductStatsRecord,
   listProducts as listProductRecords,
   updateProduct as updateProductRecord,
 } from "../db/products.server";
+import type { ProductStats } from "../db/products.server";
 import type { Listing } from "../mockData";
 
 // Products API. The public read path is a GET server fn; every write path is
@@ -45,6 +47,16 @@ export const listProducts = createServerFn({ method: "GET" })
       return { ok: false as const, error: "Failed to load products." };
     }
   });
+
+export const productStats = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    const stats = await getProductStatsRecord();
+    return { ok: true as const, stats };
+  } catch (error) {
+    console.error("[products][stats]", error);
+    return { ok: false as const, stats: { saas: 0, automation: 0, model: 0 } as ProductStats };
+  }
+});
 
 export const createProduct = createServerFn({ method: "POST" })
   .inputValidator(
