@@ -3,7 +3,7 @@ import {
   Home,
   Package,
   BookOpen,
-  User,
+  Info,
   MessageCircle,
   LayoutDashboard,
   AppWindow,
@@ -16,7 +16,7 @@ const items = [
   { to: "/", label: "Home", icon: Home },
   { to: "/packages", label: "Packages", icon: Package },
   { to: "/blogs", label: "Blogs", icon: BookOpen },
-  { to: "/profile", label: "Profile", icon: User },
+  { to: "/about", label: "About", icon: Info },
 ] as const;
 
 const adminItems = [

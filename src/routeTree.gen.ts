@@ -10,11 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BlogsRouteImport } from './routes/blogs'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PackagesRouteImport } from './routes/packages'
-import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminBlogRouteImport } from './routes/admin/blog'
 import { Route as AdminMediaRouteImport } from './routes/admin/media'
@@ -25,6 +25,11 @@ import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -45,11 +50,6 @@ const ContactRoute = ContactRouteImport.update({
 const PackagesRoute = PackagesRouteImport.update({
   id: '/packages',
   path: '/packages',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -85,11 +85,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
   '/packages': typeof PackagesRoute
-  '/profile': typeof ProfileRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
@@ -99,10 +99,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
   '/packages': typeof PackagesRoute
-  '/profile': typeof ProfileRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
@@ -113,11 +113,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
   '/packages': typeof PackagesRoute
-  '/profile': typeof ProfileRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
@@ -129,11 +129,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/admin'
     | '/blogs'
     | '/contact'
     | '/packages'
-    | '/profile'
     | '/admin/blog'
     | '/admin/media'
     | '/admin/packages'
@@ -143,10 +143,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/blogs'
     | '/contact'
     | '/packages'
-    | '/profile'
     | '/admin/blog'
     | '/admin/media'
     | '/admin/packages'
@@ -156,11 +156,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/admin'
     | '/blogs'
     | '/contact'
     | '/packages'
-    | '/profile'
     | '/admin/blog'
     | '/admin/media'
     | '/admin/packages'
@@ -171,11 +171,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   BlogsRoute: typeof BlogsRoute
   ContactRoute: typeof ContactRoute
   PackagesRoute: typeof PackagesRoute
-  ProfileRoute: typeof ProfileRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -185,6 +185,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -213,13 +220,6 @@ declare module '@tanstack/react-router' {
       path: '/packages'
       fullPath: '/packages'
       preLoaderRoute: typeof PackagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -289,11 +289,11 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   BlogsRoute: BlogsRoute,
   ContactRoute: ContactRoute,
   PackagesRoute: PackagesRoute,
-  ProfileRoute: ProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
