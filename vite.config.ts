@@ -4,7 +4,7 @@
 //     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
-import { cpSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import type { Plugin } from "vite";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
@@ -71,20 +71,6 @@ function copyPackageTree(serverDir: string, rootName: string) {
 // "Node.js crypto module is required" error on Node.
 const MONGO_EXTERNAL = ["mongodb", "bson", "mongodb-connection-string-url", "@mongodb-js/saslprep"];
 
-// Installed version of each external package (read from node_modules), used to
-// declare them in the serverless function manifest.
-const MONGO_EXTERNAL_VERSIONS: Record<string, string> = Object.fromEntries(
-  MONGO_EXTERNAL.map((name) => {
-    try {
-      const pkgJsonPath = join(resolve(process.cwd(), "node_modules"), name, "package.json");
-      const v = JSON.parse(readFileSync(pkgJsonPath, "utf8")).version as string;
-      return [name, `^${v}`];
-    } catch {
-      return [name, "*"];
-    }
-  }),
-);
-
 function externalizeMongoInSsr(): Plugin {
   return {
     name: "externalize-mongodb",
@@ -123,33 +109,30 @@ export default defineConfig({
     // deps) as node_modules inside the serverless function so the runtime
     // `import "mongodb"` can resolve them. Nitro's nft tracer does not trace
     // deps reached only through dynamic SSR chunks, so we copy the dependency
-    // tree ourselves in the `compiled` hook below.
-    hooks: {
-      compiled(nitro) {
-        const serverDir = nitro.options.output.serverDir;
-        for (const pkg of MONGO_EXTERNAL) {
-          copyPackageTree(serverDir, pkg);
-        }
-        // Declare the shipped deps in the function manifest so Vercel installs
-        // any further transitive deps if a fresh install is ever triggered.
-        const pkgJsonPath = join(serverDir, "node_modules", "package.json");
-        if (existsSync(pkgJsonPath)) {
-          try {
-            const manifest = JSON.parse(readFileSync(pkgJsonPath, "utf8")) as {
-              dependencies?: Record<string, string>;
-            };
-            manifest.dependencies ??= {};
+    // tree ourselves.
+    //
+    // IMPORTANT: This MUST be done via a nitro module that registers the hook
+    // programmatically (nitro.hooks.hook(...)), NOT via the top-level
+    // `nitro.hooks` config object. The vercel preset registers its own
+    // `compiled` hook (which generates Vercel's Build Output API config.json
+    // and .vc-config.json). Nitro's config loading deep-merges per-event hooks
+    // by key, so declaring `hooks: { compiled }` here would REPLACE the
+    // preset's handler and prevent config.json from ever being written.
+    // Registering with `nitro.hooks.hook("compiled", ...)` instead APPENDS our
+    // handler alongside the preset's, so both run.
+    modules: [
+      {
+        name: "ship-mongodb-node-modules",
+        setup(nitro) {
+          nitro.hooks.hook("compiled", (buildNitro) => {
+            const serverDir = buildNitro.options.output.serverDir;
             for (const pkg of MONGO_EXTERNAL) {
-              manifest.dependencies[pkg] = MONGO_EXTERNAL_VERSIONS[pkg] ?? "*";
+              copyPackageTree(serverDir, pkg);
             }
-            manifest.dependencies["mongodb"] = MONGO_EXTERNAL_VERSIONS["mongodb"] ?? "*";
-            writeFileSync(pkgJsonPath, JSON.stringify(manifest, null, 2));
-          } catch (err) {
-            console.error("[mongodb-ship] could not update function package.json", err);
-          }
-        }
+          });
+        },
       },
-    },
+    ],
   },
   environments: {
     ssr: {
