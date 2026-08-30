@@ -220,9 +220,10 @@ function Home() {
             <p className="mb-2 inline-flex items-center gap-1.5 rounded-full glass px-3 py-1 text-[11px] text-muted-foreground ring-1 ring-border">
               <Sparkles className="h-3 w-3 text-primary" /> Packages
             </p>
-            <h2 className="font-display text-2xl font-semibold">Engagements, not price tiers.</h2>
+            <h2 className="font-display text-2xl font-semibold">Future states, per industry.</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              We manage the build, the automation, and the iteration — you keep the outcomes.
+              One edition per niche — a vision of your business after working with the lab, not a
+              menu of deliverables.
             </p>
           </div>
           <Link

@@ -11,7 +11,11 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { MongoClient } from "mongodb";
 
-const OFFERING_TO_DB = { saas: "SaaS Product", automation: "AI Automation", model: "AI Model/Agent" };
+const OFFERING_TO_DB = {
+  saas: "SaaS Product",
+  automation: "AI Automation",
+  model: "AI Model/Agent",
+};
 const STATUS_TO_DB = { live: "Live", beta: "Beta", coming: "Coming soon" };
 
 function loadEnvFile() {
@@ -362,50 +366,45 @@ const LISTINGS = [
 
 const PACKAGES = [
   {
-    name: "Foundation",
-    tierIcon: "layers",
-    tagline: "One tight system, automated and running.",
-    positioning:
-      "We ship a single automation or small tool that removes a recurring headache — wired into your real workflows, not a demo.",
-    items: [
-      { icon: "workflow", label: "AI Workflow Automation" },
-      { icon: "dev", label: "Custom SaaS Development" },
-      { icon: "support", label: "Ongoing Support & Iteration" },
+    name: "E-Commerce",
+    slug: "e-commerce",
+    tagline: "Where Browsers Become Buyers, Automatically",
+    icon: "shopping-cart",
+    vision_points: [
+      "[Paste exact copy — E-Commerce vision point 1]",
+      "[Paste exact copy — E-Commerce vision point 2]",
+      "[Paste exact copy — E-Commerce vision point 3]",
+      "[Paste exact copy — E-Commerce vision point 4]",
     ],
-    cta: "Talk to us",
   },
   {
-    name: "Growth",
-    tierIcon: "briefcase",
-    tagline: "Scale every repeatable part of the business.",
-    positioning:
-      "A monthly partner engagement — automations, dashboards, and fine-tuned models compounding across your teams, month over month.",
-    items: [
-      { icon: "workflow", label: "AI Workflow Automation" },
-      { icon: "dev", label: "Custom SaaS Development" },
-      { icon: "fine", label: "Model Fine-Tuning & Deployment" },
-      { icon: "data", label: "Data Pipeline & Integration" },
-      { icon: "support", label: "Ongoing Support & Iteration" },
+    name: "Solar Energy",
+    slug: "solar-energy",
+    tagline: "[Paste exact copy — Solar Energy tagline]",
+    icon: "sun",
+    vision_points: [
+      "[Paste exact copy — Solar Energy vision point 1]",
+      "[Paste exact copy — Solar Energy vision point 2]",
+      "[Paste exact copy — Solar Energy vision point 3]",
+      "[Paste exact copy — Solar Energy vision point 4]",
     ],
-    cta: "Start a project",
-    featured: true,
   },
   {
-    name: "Full-Stack AI Team",
-    tierIcon: "rocket",
-    tagline: "A dedicated product squad, embedded with you.",
-    positioning:
-      "Product strategy, design, build, and operations under one roof — from first sketch to launch week, with your team the whole way.",
-    items: [
-      { icon: "squad", label: "Dedicated AI Product Squad" },
-      { icon: "dev", label: "Custom SaaS Development" },
-      { icon: "fine", label: "Model Fine-Tuning & Deployment" },
-      { icon: "data", label: "Data Pipeline & Integration" },
-      { icon: "support", label: "Ongoing Support & Iteration" },
+    name: "EdTech",
+    slug: "edtech",
+    tagline: "[Paste exact copy — EdTech tagline]",
+    icon: "graduation-cap",
+    vision_points: [
+      "[Paste exact copy — EdTech vision point 1]",
+      "[Paste exact copy — EdTech vision point 2]",
+      "[Paste exact copy — EdTech vision point 3]",
+      "[Paste exact copy — EdTech vision point 4]",
     ],
-    cta: "Start a project",
   },
 ];
+
+// Legacy slugs from the old service-tier packages; removed when re-seeding.
+const LEGACY_PACKAGE_SLUGS = ["foundation", "growth", "full-stack-ai-team"];
 
 const BLOGS = [
   {
@@ -516,22 +515,36 @@ async function main() {
     for (const p of PACKAGES) {
       const doc = {
         name: p.name,
-        slug: kebab(p.name),
+        slug: p.slug ?? kebab(p.name),
         tagline: p.tagline,
-        icon: p.tierIcon,
-        managed_items: p.items,
-        positioning: p.positioning,
-        cta: p.cta,
-        featured: p.featured ?? false,
+        icon: p.icon,
+        vision_points: p.vision_points,
         createdAt: now,
         updatedAt: now,
       };
       for (const key of Object.keys(doc)) {
         if (doc[key] === undefined) delete doc[key];
       }
-      await db
-        .collection("packages")
-        .updateOne({ slug: doc.slug }, { $set: doc }, { upsert: true });
+      // The `packages` schema changed from service tiers to niche editions, so
+      // drop every legacy field that no longer exists and purge the old tiers.
+      await db.collection("packages").updateOne(
+        { slug: doc.slug },
+        {
+          $set: doc,
+          $unset: {
+            managed_items: "",
+            positioning: "",
+            cta: "",
+            featured: "",
+            tierIcon: "",
+            items: "",
+          },
+        },
+        { upsert: true },
+      );
+    }
+    if (LEGACY_PACKAGE_SLUGS.length > 0) {
+      await db.collection("packages").deleteMany({ slug: { $in: LEGACY_PACKAGE_SLUGS } });
     }
     console.log(`Packages seeded: ${PACKAGES.length}`);
 
@@ -557,9 +570,7 @@ async function main() {
       for (const key of Object.keys(doc)) {
         if (doc[key] === undefined) delete doc[key];
       }
-      await db
-        .collection("blogPosts")
-        .updateOne({ id: doc.id }, { $set: doc }, { upsert: true });
+      await db.collection("blogPosts").updateOne({ id: doc.id }, { $set: doc }, { upsert: true });
     }
     console.log(`Blog posts seeded: ${BLOGS.length}`);
 

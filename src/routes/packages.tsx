@@ -9,7 +9,7 @@ export const Route = createFileRoute("/packages")({
       {
         name: "description",
         content:
-          "Engagement tiers from Oryntal AI Labs — automation, SaaS builds, fine-tuning, and ongoing iteration under one roof.",
+          "Niche editions from Oryntal AI Labs — a future-state vision for your industry, scaled once it's yours.",
       },
     ],
   }),
@@ -41,15 +41,15 @@ function Packages() {
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="mb-3 inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-[11px] sm:text-xs text-muted-foreground ring-1 ring-border">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Packages · engagement tiers
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Packages · niche editions
           </p>
           <h1 className="font-display text-4xl md:text-6xl font-semibold tracking-tight">
             <span className="text-platinum-gradient">Oryntal</span>{" "}
             <span className="text-gold-gradient">Packages</span>
           </h1>
           <p className="mt-3 max-w-xl text-muted-foreground">
-            Three ways to work with the lab — from one tight automation to a full product squad.
-            Fixed scope, no pricing games.
+            One edition per industry — a vision of your business after working with the lab, not a
+            menu of deliverables. Fixed scope, no pricing games.
           </p>
         </div>
         <Link
@@ -90,7 +90,7 @@ function Packages() {
         <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="font-display text-2xl md:text-3xl font-semibold">
-              Not sure which package fits?
+              Not sure which niche fits?
             </h2>
             <p className="mt-2 max-w-lg text-sm text-muted-foreground">
               Tell us what you're shipping and we'll scope the right engagement — no obligations, no

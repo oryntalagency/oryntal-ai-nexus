@@ -191,30 +191,28 @@ const productsValidator = {
 };
 
 // ---- packages -------------------------------------------------------------
-// Deliberately no price field.
+// One package per industry niche. Fields are outcome-framed vision copy, so
+// the schema matches that: name, tagline, icon token, and a list of vision
+// points. Deliberately no price field.
 const packagesValidator = {
   $jsonSchema: {
     bsonType: "object",
-    required: ["name", "slug", "tagline", "icon", "managed_items"],
+    required: ["name", "slug", "tagline", "icon", "vision_points"],
     additionalProperties: true,
     properties: {
       _id: { bsonType: "objectId" },
-      name: { bsonType: "string", description: "'name' must be a string." },
-      slug: { bsonType: "string", description: "'slug' must be a string." },
-      tagline: { bsonType: "string", description: "'tagline' must be a string." },
-      icon: { bsonType: "string", description: "'icon' must be a Lucide icon name string." },
-      managed_items: {
+      name: { bsonType: "string", description: "'name' must be the niche/industry name." },
+      slug: { bsonType: "string", description: "'slug' must be a unique string." },
+      tagline: { bsonType: "string", description: "'tagline' must be the vision-style hook." },
+      icon: {
+        bsonType: "string",
+        description: "'icon' must be a Lucide icon token (e.g. 'shopping-cart', 'sun').",
+      },
+      vision_points: {
         bsonType: "array",
-        minItems: 1,
-        items: {
-          bsonType: "object",
-          required: ["icon", "label"],
-          properties: {
-            icon: { bsonType: "string", description: "item 'icon' must be a string." },
-            label: { bsonType: "string", description: "item 'label' must be a string." },
-          },
-        },
-        description: "'managed_items' must be an array of { icon, label } objects.",
+        minItems: 4,
+        items: { bsonType: "string" },
+        description: "'vision_points' must be an array of at least 4 outcome-framed strings.",
       },
       createdAt: dateField("createdAt"),
       updatedAt: dateField("updatedAt"),

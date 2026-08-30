@@ -12,24 +12,19 @@ import type { AIPackage } from "../mockData";
 
 const packageInput = z.object({
   name: z.string().min(1),
-  tierIcon: z.enum(["layers", "briefcase", "rocket"]),
-  tagline: z.string().optional(),
-  positioning: z.string().optional(),
-  items: z.array(z.object({ icon: z.string(), label: z.string() })).min(1),
-  cta: z.string().optional(),
-  featured: z.boolean().optional(),
+  tagline: z.string().min(1),
+  icon: z.string().min(1),
+  vision_points: z.array(z.string().min(1)).min(4),
 });
 
 function toAIPackage(data: z.infer<typeof packageInput>, id: string): AIPackage {
   return {
     id,
     name: data.name,
-    tierIcon: data.tierIcon,
-    tagline: data.tagline ?? "",
-    positioning: data.positioning ?? "",
-    items: data.items,
-    cta: data.cta ?? "Talk to us",
-    featured: data.featured ?? false,
+    tagline: data.tagline,
+    icon: data.icon,
+    vision_points: data.vision_points,
+    slug: "",
   };
 }
 

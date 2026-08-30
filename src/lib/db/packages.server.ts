@@ -2,56 +2,45 @@ import { ObjectId, type WithId } from "mongodb";
 
 import { getDb } from "../mongodb";
 import type { AIPackage } from "../mockData";
-import { kebab, omitUndefined } from "./shared.server";
+import { kebab } from "./shared.server";
 
-// Repository for the `packages` collection.
+// Repository for the `packages` collection. Each row is one niche edition —
+// a vision-style pitch for what the client's business looks like after working
+// with Oryntal, never a list of specific deliverables.
 
 export type PackageDoc = {
   name: string;
   slug: string;
   tagline: string;
   icon: string;
-  managed_items: Array<{ icon: string; label: string }>;
-  positioning?: string;
-  cta?: string;
-  featured?: boolean;
+  vision_points: string[];
   createdAt: Date;
   updatedAt: Date;
 };
-
-const TIER_ICONS = ["layers", "briefcase", "rocket"] as const;
 
 function toPackageDoc(
   pkg: AIPackage,
   timestamps: { createdAt: Date; updatedAt: Date },
 ): PackageDoc {
-  return omitUndefined({
+  return {
     name: pkg.name,
     slug: kebab(pkg.name),
     tagline: pkg.tagline,
-    icon: pkg.tierIcon,
-    managed_items: pkg.items,
-    positioning: pkg.positioning,
-    cta: pkg.cta,
-    featured: pkg.featured,
+    icon: pkg.icon,
+    vision_points: pkg.vision_points,
     createdAt: timestamps.createdAt,
     updatedAt: timestamps.updatedAt,
-  });
+  };
 }
 
 function fromPackageDoc(doc: WithId<PackageDoc>): AIPackage {
-  const tierIcon = (TIER_ICONS as readonly string[]).includes(doc.icon)
-    ? (doc.icon as AIPackage["tierIcon"])
-    : "briefcase";
   return {
     id: doc._id.toString(),
     name: doc.name,
-    tierIcon,
     tagline: doc.tagline,
-    positioning: doc.positioning ?? "",
-    items: doc.managed_items ?? [],
-    cta: doc.cta ?? "Talk to us",
-    featured: doc.featured ?? false,
+    icon: doc.icon,
+    vision_points: doc.vision_points ?? [],
+    slug: doc.slug,
   };
 }
 
@@ -59,8 +48,8 @@ export async function listPackages(): Promise<AIPackage[]> {
   const db = await getDb();
   const docs = await db
     .collection<PackageDoc>("packages")
-    .find({})
-    .sort({ featured: -1, createdAt: 1 })
+    .find({ vision_points: { $exists: true, $type: "array" } })
+    .sort({ createdAt: 1 })
     .toArray();
   return docs.map((doc) => fromPackageDoc(doc));
 }

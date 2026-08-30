@@ -1,4 +1,38 @@
-import { Boxes, Workflow, Cpu, type LucideIcon } from "lucide-react";
+import {
+  BadgeDollarSign,
+  Bot,
+  Boxes,
+  Briefcase,
+  Building2,
+  Car,
+  ChefHat,
+  Clapperboard,
+  Cpu,
+  Dog,
+  Dumbbell,
+  Factory,
+  GraduationCap,
+  HardHat,
+  HeartPulse,
+  Home,
+  Hotel,
+  Landmark,
+  Palette,
+  PawPrint,
+  Plane,
+  Rocket,
+  Scale,
+  Scissors,
+  ShoppingCart,
+  Stethoscope,
+  Store,
+  Sun,
+  Truck,
+  Utensils,
+  Workflow,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 
 export type OfferingType = "saas" | "automation" | "model";
 
@@ -392,61 +426,118 @@ export const listings: Listing[] = [
 export type AIPackage = {
   id: string;
   name: string;
-  tierIcon: "layers" | "briefcase" | "rocket";
   tagline: string;
-  positioning: string;
-  items: Array<{ icon: string; label: string }>;
-  cta: string;
-  featured?: boolean;
+  icon: string;
+  vision_points: string[];
+  slug: string;
 };
+
+// Icon tokens map to Lucide icons. The token string is what's persisted on the
+// `packages` collection; keep every picker option here so the admin form and the
+// public cards always agree.
+export const NICHE_ICONS: Record<string, LucideIcon> = {
+  "shopping-cart": ShoppingCart,
+  store: Store,
+  sun: Sun,
+  "graduation-cap": GraduationCap,
+  stethoscope: Stethoscope,
+  home: Home,
+  "building-2": Building2,
+  truck: Truck,
+  scale: Scale,
+  utensils: Utensils,
+  "chef-hat": ChefHat,
+  hotel: Hotel,
+  dumbbell: Dumbbell,
+  "heart-pulse": HeartPulse,
+  dog: Dog,
+  "paw-print": PawPrint,
+  briefcase: Briefcase,
+  factory: Factory,
+  landmark: Landmark,
+  "badge-dollar-sign": BadgeDollarSign,
+  clapperboard: Clapperboard,
+  palette: Palette,
+  scissors: Scissors,
+  plane: Plane,
+  car: Car,
+  wrench: Wrench,
+  "hard-hat": HardHat,
+  rocket: Rocket,
+  bot: Bot,
+};
+
+export const NICHE_ICON_OPTIONS: { value: string; label: string; icon: LucideIcon }[] = [
+  { value: "shopping-cart", label: "E-Commerce / Retail", icon: ShoppingCart },
+  { value: "store", label: "Storefront / Retail", icon: Store },
+  { value: "sun", label: "Solar / Renewable", icon: Sun },
+  { value: "graduation-cap", label: "EdTech / Learning", icon: GraduationCap },
+  { value: "stethoscope", label: "Healthcare", icon: Stethoscope },
+  { value: "home", label: "Real Estate", icon: Home },
+  { value: "building-2", label: "Commercial Property", icon: Building2 },
+  { value: "truck", label: "Logistics / Transport", icon: Truck },
+  { value: "scale", label: "Legal", icon: Scale },
+  { value: "utensils", label: "Restaurants", icon: Utensils },
+  { value: "chef-hat", label: "Hospitality / F&B", icon: ChefHat },
+  { value: "hotel", label: "Hotels / Travel", icon: Hotel },
+  { value: "dumbbell", label: "Fitness", icon: Dumbbell },
+  { value: "heart-pulse", label: "Wellness / Health", icon: HeartPulse },
+  { value: "dog", label: "Pet Care", icon: Dog },
+  { value: "paw-print", label: "Pets / Veterinary", icon: PawPrint },
+  { value: "briefcase", label: "Agencies / Consulting", icon: Briefcase },
+  { value: "factory", label: "Manufacturing", icon: Factory },
+  { value: "landmark", label: "Finance / Banking", icon: Landmark },
+  { value: "badge-dollar-sign", label: "Financial Services", icon: BadgeDollarSign },
+  { value: "clapperboard", label: "Media / Creators", icon: Clapperboard },
+  { value: "palette", label: "Design / Creative", icon: Palette },
+  { value: "scissors", label: "Salon / Beauty", icon: Scissors },
+  { value: "plane", label: "Travel / Aviation", icon: Plane },
+  { value: "car", label: "Automotive", icon: Car },
+  { value: "wrench", label: "Trades / Repair", icon: Wrench },
+  { value: "hard-hat", label: "Construction", icon: HardHat },
+  { value: "rocket", label: "SaaS / Tech", icon: Rocket },
+  { value: "bot", label: "General AI", icon: Bot },
+];
 
 export const packages: AIPackage[] = [
   {
-    id: "p1",
-    name: "Foundation",
-    tierIcon: "layers",
-    tagline: "One tight system, automated and running.",
-    positioning:
-      "We ship a single automation or small tool that removes a recurring headache — wired into your real workflows, not a demo.",
-    items: [
-      { icon: "workflow", label: "AI Workflow Automation" },
-      { icon: "dev", label: "Custom SaaS Development" },
-      { icon: "support", label: "Ongoing Support & Iteration" },
+    id: "pkg-ecommerce",
+    name: "E-Commerce",
+    tagline: "Where Browsers Become Buyers, Automatically",
+    icon: "shopping-cart",
+    slug: "e-commerce",
+    vision_points: [
+      "[Paste exact copy — E-Commerce vision point 1]",
+      "[Paste exact copy — E-Commerce vision point 2]",
+      "[Paste exact copy — E-Commerce vision point 3]",
+      "[Paste exact copy — E-Commerce vision point 4]",
     ],
-    cta: "Talk to us",
   },
   {
-    id: "p2",
-    name: "Growth",
-    tierIcon: "briefcase",
-    tagline: "Scale every repeatable part of the business.",
-    positioning:
-      "A monthly partner engagement — automations, dashboards, and fine-tuned models compounding across your teams, month over month.",
-    items: [
-      { icon: "workflow", label: "AI Workflow Automation" },
-      { icon: "dev", label: "Custom SaaS Development" },
-      { icon: "fine", label: "Model Fine-Tuning & Deployment" },
-      { icon: "data", label: "Data Pipeline & Integration" },
-      { icon: "support", label: "Ongoing Support & Iteration" },
+    id: "pkg-solar",
+    name: "Solar Energy",
+    tagline: "[Paste exact copy — Solar Energy tagline]",
+    icon: "sun",
+    slug: "solar-energy",
+    vision_points: [
+      "[Paste exact copy — Solar Energy vision point 1]",
+      "[Paste exact copy — Solar Energy vision point 2]",
+      "[Paste exact copy — Solar Energy vision point 3]",
+      "[Paste exact copy — Solar Energy vision point 4]",
     ],
-    cta: "Start a project",
-    featured: true,
   },
   {
-    id: "p3",
-    name: "Full-Stack AI Team",
-    tierIcon: "rocket",
-    tagline: "A dedicated product squad, embedded with you.",
-    positioning:
-      "Product strategy, design, build, and operations under one roof — from first sketch to launch week, with your team the whole way.",
-    items: [
-      { icon: "squad", label: "Dedicated AI Product Squad" },
-      { icon: "dev", label: "Custom SaaS Development" },
-      { icon: "fine", label: "Model Fine-Tuning & Deployment" },
-      { icon: "data", label: "Data Pipeline & Integration" },
-      { icon: "support", label: "Ongoing Support & Iteration" },
+    id: "pkg-edtech",
+    name: "EdTech",
+    tagline: "[Paste exact copy — EdTech tagline]",
+    icon: "graduation-cap",
+    slug: "edtech",
+    vision_points: [
+      "[Paste exact copy — EdTech vision point 1]",
+      "[Paste exact copy — EdTech vision point 2]",
+      "[Paste exact copy — EdTech vision point 3]",
+      "[Paste exact copy — EdTech vision point 4]",
     ],
-    cta: "Start a project",
   },
 ];
 
