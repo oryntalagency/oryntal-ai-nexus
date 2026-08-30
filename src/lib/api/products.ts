@@ -73,6 +73,7 @@ export const createProduct = createServerFn({ method: "POST" })
       advantagePoints: z.array(z.string()),
       image: z.string(),
       video: z.string().optional(),
+      loomUrl: z.string().optional(),
       liveUrl: z.string().optional(),
       price: z.enum(["Free", "Premium"]),
       gradient: z.string().optional(),
@@ -102,6 +103,7 @@ export const createProduct = createServerFn({ method: "POST" })
         advantagePoints: data.advantagePoints,
         image: data.image,
         video: data.video,
+        loomUrl: data.loomUrl,
         liveUrl: data.liveUrl,
         price: data.price,
         gradient:
@@ -136,6 +138,7 @@ export const updateProduct = createServerFn({ method: "POST" })
       advantagePoints: z.array(z.string()),
       image: z.string(),
       video: z.string().optional(),
+      loomUrl: z.string().optional(),
       liveUrl: z.string().optional(),
       price: z.enum(["Free", "Premium"]),
       gradient: z.string().optional(),
@@ -165,6 +168,7 @@ export const updateProduct = createServerFn({ method: "POST" })
         advantagePoints: data.advantagePoints,
         image: data.image,
         video: data.video,
+        loomUrl: data.loomUrl,
         liveUrl: data.liveUrl,
         price: data.price,
         gradient:

@@ -60,7 +60,6 @@ function toProductDoc(
   listing: Listing,
   timestamps: { createdAt: Date; updatedAt: Date },
 ): ProductDoc {
-  const video = listing.video;
   return omitUndefined({
     title: listing.title,
     slug: listing.slug ?? kebabFromTitle(listing.title),
@@ -71,8 +70,8 @@ function toProductDoc(
     problem_points: listing.problemPoints,
     advantage_points: listing.advantagePoints,
     image: listing.image,
-    video,
-    loom_url: video && video.includes("loom.com") ? video : undefined,
+    video: listing.video,
+    loom_url: listing.loomUrl,
     cta_url: listing.liveUrl,
     status: STATUS_TO_DB[listing.status ?? "live"],
     createdAt: timestamps.createdAt,
@@ -112,6 +111,7 @@ function fromProductDoc(doc: WithId<ProductDoc>): Listing {
     advantagePoints: doc.advantage_points ?? [],
     image: doc.image,
     video: doc.video,
+    loomUrl: doc.loom_url,
     liveUrl: doc.cta_url,
     price: doc.price ?? "Free",
     gradient:

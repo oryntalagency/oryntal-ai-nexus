@@ -80,6 +80,16 @@ function DetailContent({ listing, onPlay }: { listing: Listing; onPlay: (l: List
             <Play className="h-3 w-3 fill-current" /> Watch preview
           </button>
         )}
+        {l.loomUrl?.trim() && (
+          <a
+            href={l.loomUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${l.video ? "absolute right-3 bottom-16" : "absolute bottom-3 right-3"} inline-flex min-h-10 items-center gap-1.5 rounded-full glass px-3.5 py-1.5 text-xs font-semibold text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/50`}
+          >
+            <ArrowUpRight className="h-3 w-3" /> Check Loom Video
+          </a>
+        )}
       </div>
 
       <div className="p-6 sm:p-8">

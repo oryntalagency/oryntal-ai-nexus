@@ -17,6 +17,7 @@ export type Listing = {
   advantagePoints: string[];
   image: string;
   video?: string;
+  loomUrl?: string;
   liveUrl?: string;
   price: "Free" | "Premium";
   gradient: string;
