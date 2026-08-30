@@ -52,21 +52,21 @@ function PackagesPage() {
     setOpen(true);
   };
 
-  const savePackage = async (p: AIPackage) => {
+  const savePackage = async (p: AIPackage): Promise<{ ok: boolean; error?: string }> => {
     const data = {
       name: p.name,
       tagline: p.tagline,
       icon: p.icon,
       vision_points: p.vision_points,
     };
-    if (editing) {
-      const res = await updatePackage({ data: { id: p.id, ...data } });
-      if (res.ok) await invalidate();
-      return res.ok;
+    const res = editing
+      ? await updatePackage({ data: { id: p.id, ...data } })
+      : await createPackage({ data });
+    if (res.ok) {
+      await invalidate();
+      return { ok: true as const };
     }
-    const res = await createPackage({ data });
-    if (res.ok) await invalidate();
-    return res.ok;
+    return { ok: false as const, error: res.error ?? "Could not save the niche." };
   };
 
   const confirmDelete = async (id: string) => {
@@ -179,7 +179,7 @@ function PkgForm({
 }: {
   initial: AIPackage;
   onClose: () => void;
-  onSave: (p: AIPackage) => Promise<boolean>;
+  onSave: (p: AIPackage) => Promise<{ ok: boolean; error?: string }>;
   isEdit: boolean;
 }) {
   const [f, setF] = useState<AIPackage>(initial);
@@ -203,12 +203,12 @@ function PkgForm({
     };
     setSaving(true);
     setError(null);
-    const ok = await onSave(cleaned);
+    const result = await onSave(cleaned);
     setSaving(false);
-    if (ok) {
+    if (result.ok) {
       onClose();
     } else {
-      setError("Could not save the niche. Check the name is unique.");
+      setError(result.error ?? "Could not save the niche.");
     }
   };
 

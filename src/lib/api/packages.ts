@@ -28,6 +28,18 @@ function toAIPackage(data: z.infer<typeof packageInput>, id: string): AIPackage 
   };
 }
 
+function packageWriteError(error: unknown): string {
+  const err = error as { code?: number; codeName?: string; message?: string; errmsg?: string };
+  const detail = err?.message ?? err?.errmsg;
+  if (err?.code === 11000 || err?.codeName === "DuplicateKey") {
+    return "A niche with this name already exists. Try a different name.";
+  }
+  // 121 = Document failed validation (e.g. a stale collection validator). Keep
+  // the real server detail so admin isn't told to blame the name when it isn't.
+  const prefix = "Could not save the package.";
+  return detail ? `${prefix} ${detail}` : prefix;
+}
+
 export const listPackages = createServerFn({ method: "GET" }).handler(async () => {
   try {
     const items = await listPackageRecords();
@@ -48,7 +60,7 @@ export const createPackage = createServerFn({ method: "POST" })
       return { ok: true as const, item };
     } catch (error) {
       console.error("[packages][create]", error);
-      return { ok: false as const, error: "Could not save the package." };
+      return { ok: false as const, error: packageWriteError(error) };
     }
   });
 
@@ -64,7 +76,7 @@ export const updatePackage = createServerFn({ method: "POST" })
       return { ok: true as const, item };
     } catch (error) {
       console.error("[packages][update]", error);
-      return { ok: false as const, error: "Could not save the package." };
+      return { ok: false as const, error: packageWriteError(error) };
     }
   });
 
