@@ -57,6 +57,7 @@ function MediaPage() {
                   fit="cover"
                   muted
                   playsInline
+                  showFullscreenButton={false}
                   className="h-full w-full"
                 />
               )}

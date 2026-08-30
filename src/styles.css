@@ -162,3 +162,27 @@
     top: 6% !important;
   }
 }
+
+/* Fullscreen — the WRAPPER (video + watermark overlay together) holds the fullscreen
+   element, so the moving watermark stays visible and keeps animating. Fill the
+   viewport edge-to-edge (drop rounded corners / aspect-ratio letterboxing). */
+.watermark-video-wrapper:fullscreen,
+.watermark-video-wrapper:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+}
+.watermark-video-wrapper:fullscreen video,
+.watermark-video-wrapper:-webkit-full-screen video {
+  height: 100%;
+}
+/* Chromium/WebKit native fullscreen button only expands the <video> element and would
+   leave the watermark behind — hide it; the wrapper-based toggle button is shown
+   instead. (Firefox's native button can't be styled away; a fullscreenchange handler
+   retargets it up to the wrapper.) */
+.watermark-video-wrapper video::-webkit-media-controls-fullscreen-button {
+  display: none !important;
+}
