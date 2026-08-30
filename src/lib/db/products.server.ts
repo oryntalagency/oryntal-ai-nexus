@@ -71,7 +71,7 @@ function toProductDoc(
     advantage_points: listing.advantagePoints,
     image: listing.image,
     video: listing.video,
-    loom_url: listing.loomUrl,
+    loom_url: listing.loomUrl ?? (isLoomUrl(listing.video) ? listing.video : undefined),
     cta_url: listing.liveUrl,
     status: STATUS_TO_DB[listing.status ?? "live"],
     createdAt: timestamps.createdAt,
@@ -84,6 +84,10 @@ function toProductDoc(
     height: listing.height,
     featured: listing.featured,
   });
+}
+
+function isLoomUrl(url: string | undefined): boolean {
+  return !!url && /loom\.com/.test(url);
 }
 
 function kebabFromTitle(title: string): string {
