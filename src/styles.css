@@ -139,3 +139,26 @@
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
+
+/* Moving video watermark — slowly drifts around the player on a diagonal loop so it
+   can't be cropped out by trimming the corner. Percentages are relative to the
+   player box; the badge self-centers with translate(-50%,-50%). */
+@keyframes watermark-drift {
+  0%   { left: 5%;  top: 6%; }
+  22%  { left: 74%; top: 76%; }
+  44%  { left: 78%; top: 8%; }
+  66%  { left: 14%; top: 82%; }
+  88%  { left: 34%; top: 26%; }
+  100% { left: 5%;  top: 6%; }
+}
+.animate-watermark-drift {
+  animation: watermark-drift 20s linear infinite;
+  will-change: left, top;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-watermark-drift {
+    animation: none;
+    left: 5% !important;
+    top: 6% !important;
+  }
+}

@@ -11,6 +11,11 @@ import {
 import type { Listing } from "@/lib/mockData";
 import { OFFERING_META } from "@/lib/mockData";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { WatermarkedVideoPlayer } from "@/components/WatermarkedVideoPlayer";
+
+function isDirectVideoFile(url: string): boolean {
+  return /\.(mp4|webm|mov|m4v)([?#]|$)/i.test(url);
+}
 
 function embedUrl(url: string): string {
   if (url.includes("loom.com")) {
@@ -22,16 +27,27 @@ function embedUrl(url: string): string {
 }
 
 export function VideoLightbox({ url, onClose }: { url: string | null; onClose: () => void }) {
+  const isFile = url ? isDirectVideoFile(url) : false;
   return (
     <Dialog open={!!url} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-[min(1100px,94vw)] border-0 bg-black/95 p-2 sm:p-3">
-        <iframe
-          src={url ? embedUrl(url) : ""}
-          title="Preview"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowFullScreen
-          className="aspect-video w-full rounded-lg bg-black"
-        />
+        {isFile ? (
+          <WatermarkedVideoPlayer
+            src={url ?? undefined}
+            controls
+            autoPlay
+            playsInline
+            className="aspect-video w-full rounded-lg bg-black"
+          />
+        ) : (
+          <iframe
+            src={url ? embedUrl(url) : ""}
+            title="Preview"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            className="aspect-video w-full rounded-lg bg-black"
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -99,13 +115,22 @@ function DetailContent({ listing, onPlay }: { listing: Listing; onPlay: (l: List
 
         {l.video && (
           <div className="mt-6 aspect-video overflow-hidden rounded-xl ring-1 ring-border">
-            <iframe
-              src={embedUrl(l.video)}
-              title={`${l.title} preview`}
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              className="h-full w-full"
-            />
+            {isDirectVideoFile(l.video) ? (
+              <WatermarkedVideoPlayer
+                src={l.video}
+                controls
+                playsInline
+                className="h-full w-full"
+              />
+            ) : (
+              <iframe
+                src={embedUrl(l.video)}
+                title={`${l.title} preview`}
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+                className="h-full w-full"
+              />
+            )}
           </div>
         )}
 

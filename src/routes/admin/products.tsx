@@ -31,6 +31,7 @@ import { PageHeader, StatusBadge } from "@/components/admin/admin-ui";
 import { BulletEditor } from "@/components/admin/BulletEditor";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingDetail, VideoLightbox } from "@/components/ListingModals";
+import { WatermarkedVideoPlayer } from "@/components/WatermarkedVideoPlayer";
 
 export const Route = createFileRoute("/admin/products")({
   component: ProductsPage,
@@ -971,7 +972,7 @@ function Dropzone({
           {kind === "image" ? (
             <img src={value} alt="Cover" className="h-40 w-full object-cover" />
           ) : (
-            <video src={value} controls className="h-40 w-full bg-black object-contain" />
+            <WatermarkedVideoPlayer src={value} controls className="h-40 w-full bg-black" />
           )}
           <div className="absolute right-2 top-2 flex gap-2">
             <button

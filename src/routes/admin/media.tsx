@@ -4,6 +4,7 @@ import { Copy, Check, Trash2, ImageIcon, Video } from "lucide-react";
 import { adminActions, useAdminStore } from "@/lib/adminStore";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/admin/admin-ui";
+import { WatermarkedVideoPlayer } from "@/components/WatermarkedVideoPlayer";
 
 export const Route = createFileRoute("/admin/media")({
   component: MediaPage,
@@ -51,7 +52,13 @@ function MediaPage() {
               {m.kind === "image" ? (
                 <img src={m.url} alt={m.name} className="h-full w-full object-cover" />
               ) : (
-                <video src={m.url} className="h-full w-full object-cover" muted playsInline />
+                <WatermarkedVideoPlayer
+                  src={m.url}
+                  fit="cover"
+                  muted
+                  playsInline
+                  className="h-full w-full"
+                />
               )}
               <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full glass px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground ring-1 ring-border">
                 {m.kind === "image" ? (
