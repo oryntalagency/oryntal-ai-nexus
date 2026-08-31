@@ -117,6 +117,12 @@ function fromPackageDoc(doc: WithId<PackageDoc>): AIPackage {
   };
 }
 
+export async function getPackageBySlug(slug: string): Promise<AIPackage | null> {
+  const db = await getDb();
+  const doc = await db.collection<PackageDoc>("packages").findOne({ slug });
+  return doc ? fromPackageDoc({ ...doc, _id: doc._id }) : null;
+}
+
 export async function listPackages(): Promise<AIPackage[]> {
   const db = await getDb();
   const docs = await db

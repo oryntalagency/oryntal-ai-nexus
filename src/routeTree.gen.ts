@@ -21,6 +21,8 @@ import { Route as AdminMediaRouteImport } from './routes/admin/media'
 import { Route as AdminPackagesRouteImport } from './routes/admin/packages'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as PackagesIndexRouteImport } from './routes/packages/index'
+import { Route as PackagesSlugRouteImport } from './routes/packages/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +84,16 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const PackagesIndexRoute = PackagesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PackagesRoute,
+} as any)
+const PackagesSlugRoute = PackagesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => PackagesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,26 +101,29 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
-  '/packages': typeof PackagesRoute
+  '/packages': typeof PackagesRouteWithChildren
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/packages/': typeof PackagesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
-  '/packages': typeof PackagesRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/packages': typeof PackagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,13 +132,15 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
-  '/packages': typeof PackagesRoute
+  '/packages': typeof PackagesRouteWithChildren
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/packages/': typeof PackagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,20 +156,23 @@ export interface FileRouteTypes {
     | '/admin/packages'
     | '/admin/products'
     | '/admin/settings'
+    | '/packages/$slug'
     | '/admin/'
+    | '/packages/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/blogs'
     | '/contact'
-    | '/packages'
     | '/admin/blog'
     | '/admin/media'
     | '/admin/packages'
     | '/admin/products'
     | '/admin/settings'
+    | '/packages/$slug'
     | '/admin'
+    | '/packages'
   id:
     | '__root__'
     | '/'
@@ -166,7 +186,9 @@ export interface FileRouteTypes {
     | '/admin/packages'
     | '/admin/products'
     | '/admin/settings'
+    | '/packages/$slug'
     | '/admin/'
+    | '/packages/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -175,7 +197,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   BlogsRoute: typeof BlogsRoute
   ContactRoute: typeof ContactRoute
-  PackagesRoute: typeof PackagesRoute
+  PackagesRoute: typeof PackagesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -264,6 +286,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/packages/': {
+      id: '/packages/'
+      path: '/'
+      fullPath: '/packages/'
+      preLoaderRoute: typeof PackagesIndexRouteImport
+      parentRoute: typeof PackagesRoute
+    }
+    '/packages/$slug': {
+      id: '/packages/$slug'
+      path: '/$slug'
+      fullPath: '/packages/$slug'
+      preLoaderRoute: typeof PackagesSlugRouteImport
+      parentRoute: typeof PackagesRoute
+    }
   }
 }
 
@@ -287,13 +323,27 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface PackagesRouteChildren {
+  PackagesSlugRoute: typeof PackagesSlugRoute
+  PackagesIndexRoute: typeof PackagesIndexRoute
+}
+
+const PackagesRouteChildren: PackagesRouteChildren = {
+  PackagesSlugRoute: PackagesSlugRoute,
+  PackagesIndexRoute: PackagesIndexRoute,
+}
+
+const PackagesRouteWithChildren = PackagesRoute._addFileChildren(
+  PackagesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   BlogsRoute: BlogsRoute,
   ContactRoute: ContactRoute,
-  PackagesRoute: PackagesRoute,
+  PackagesRoute: PackagesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

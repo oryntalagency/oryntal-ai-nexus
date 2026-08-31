@@ -1,8 +1,58 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Share2, Sparkles } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { listPackages } from "@/lib/api/packages";
 import { NICHE_ICONS } from "@/lib/mockData";
+import type { AIPackage } from "@/lib/mockData";
+
+function buildShareUrl(pkg: AIPackage): string {
+  return `https://oryntal-ai-labs.vercel.app/packages/${pkg.slug}`;
+}
+
+async function sharePackage(pkg: AIPackage): Promise<void> {
+  const url = buildShareUrl(pkg);
+  const title = `Oryntal AI Labs — ${pkg.name}`;
+  const text = pkg.tagline;
+
+  if (typeof navigator !== "undefined" && navigator.share) {
+    try {
+      await navigator.share({ title, text, url });
+      return;
+    } catch {
+      // user cancelled or the native sheet isn't available — fall through to copy
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(url);
+    toast("Link copied", {
+      description: "This package's link is now on your clipboard.",
+    });
+  } catch {
+    toast("Couldn't copy", {
+      description: "Copy this link manually: " + url,
+    });
+  }
+}
+
+function ShareButton({ pkg }: { pkg: AIPackage }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void sharePackage(pkg);
+      }}
+      aria-label={`Share ${pkg.name} package`}
+      title="Share this package"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/40 active:scale-95"
+    >
+      <Share2 className="h-4 w-4" />
+    </button>
+  );
+}
 
 export function PackageTierCards() {
   const { data, isPending } = useQuery({
@@ -24,8 +74,11 @@ export function PackageTierCards() {
             className="group relative flex flex-col overflow-hidden rounded-2xl bg-surface ring-1 ring-border transition-all duration-300 supports-[pointer:fine]:hover:-translate-y-1 supports-[pointer:fine]:hover:ring-primary/40 supports-[pointer:fine]:hover:shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)] active:scale-[0.99]"
           >
             <div className="p-6 sm:p-7">
-              <div className="grid h-12 w-12 place-items-center rounded-xl glass ring-1 ring-border text-primary">
-                <Icon className="h-5 w-5" strokeWidth={1.8} />
+              <div className="flex items-start justify-between gap-3">
+                <div className="grid h-12 w-12 place-items-center rounded-xl glass ring-1 ring-border text-primary">
+                  <Icon className="h-5 w-5" strokeWidth={1.8} />
+                </div>
+                <ShareButton pkg={p} />
               </div>
 
               <h3 className="mt-5 font-display text-xl font-semibold">{p.name}</h3>

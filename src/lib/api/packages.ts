@@ -5,6 +5,7 @@ import { currentAdmin } from "../db/admins.server";
 import {
   createPackage as createPackageRecord,
   deletePackage as deletePackageRecord,
+  getPackageBySlug as getPackageBySlugRecord,
   listPackages as listPackageRecords,
   updatePackage as updatePackageRecord,
 } from "../db/packages.server";
@@ -49,6 +50,19 @@ export const listPackages = createServerFn({ method: "GET" }).handler(async () =
     return { ok: false as const, error: "Failed to load packages." };
   }
 });
+
+export const getPackageBySlug = createServerFn({ method: "GET" })
+  .validator((slug: string) => slug)
+  .handler(async ({ data: slug }) => {
+    try {
+      const item = await getPackageBySlugRecord(slug);
+      if (!item) return { ok: false as const, error: "Package not found." };
+      return { ok: true as const, item };
+    } catch (error) {
+      console.error("[packages][getBySlug]", error);
+      return { ok: false as const, error: "Failed to load package." };
+    }
+  });
 
 export const createPackage = createServerFn({ method: "POST" })
   .inputValidator(packageInput)

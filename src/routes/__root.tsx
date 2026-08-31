@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Sidebar } from "@/components/Sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -121,6 +122,7 @@ function RootComponent() {
         <main className="min-h-screen pb-24 md:pb-0 md:pl-20">
           <Outlet />
         </main>
+        <Toaster />
       </div>
     </QueryClientProvider>
   );
