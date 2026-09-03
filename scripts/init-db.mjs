@@ -191,13 +191,13 @@ const productsValidator = {
 };
 
 // ---- packages -------------------------------------------------------------
-// One package per industry niche. Fields are outcome-framed vision copy, so
-// the schema matches that: name, tagline, icon token, and a list of vision
-// points. Deliberately no price field.
+// One package per industry niche. Fields are outcome-framed vision copy on the
+// front (name, tagline, vision_points) and the concrete deliverables behind it
+// on the back (delivery_points). Deliberately no price field.
 const packagesValidator = {
   $jsonSchema: {
     bsonType: "object",
-    required: ["name", "slug", "tagline", "icon", "vision_points"],
+    required: ["name", "slug", "tagline", "icon", "vision_points", "delivery_points"],
     additionalProperties: true,
     properties: {
       _id: { bsonType: "objectId" },
@@ -213,6 +213,12 @@ const packagesValidator = {
         minItems: 4,
         items: { bsonType: "string" },
         description: "'vision_points' must be an array of at least 4 outcome-framed strings.",
+      },
+      delivery_points: {
+        bsonType: "array",
+        minItems: 1,
+        items: { bsonType: "string" },
+        description: "'delivery_points' must be an array of at least 1 deliverable string.",
       },
       createdAt: dateField("createdAt"),
       updatedAt: dateField("updatedAt"),

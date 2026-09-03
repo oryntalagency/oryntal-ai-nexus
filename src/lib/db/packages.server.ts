@@ -19,6 +19,7 @@ export type PackageDoc = {
   tagline: string;
   icon: string;
   vision_points: string[];
+  delivery_points: string[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -26,7 +27,7 @@ export type PackageDoc = {
 const PACKAGES_VALIDATOR = {
   $jsonSchema: {
     bsonType: "object",
-    required: ["name", "slug", "tagline", "icon", "vision_points"],
+    required: ["name", "slug", "tagline", "icon", "vision_points", "delivery_points"],
     additionalProperties: true,
     properties: {
       _id: { bsonType: "objectId" },
@@ -42,6 +43,12 @@ const PACKAGES_VALIDATOR = {
         minItems: 4,
         items: { bsonType: "string" },
         description: "'vision_points' must be an array of at least 4 outcome-framed strings.",
+      },
+      delivery_points: {
+        bsonType: "array",
+        minItems: 1,
+        items: { bsonType: "string" },
+        description: "'delivery_points' must be an array of at least 1 deliverable string.",
       },
       createdAt: { bsonType: "date", description: "'createdAt' must be a date." },
       updatedAt: { bsonType: "date", description: "'updatedAt' must be a date." },
@@ -101,6 +108,7 @@ function toPackageDoc(
     tagline: pkg.tagline,
     icon: pkg.icon,
     vision_points: pkg.vision_points,
+    delivery_points: pkg.delivery_points,
     createdAt: timestamps.createdAt,
     updatedAt: timestamps.updatedAt,
   };
@@ -113,6 +121,7 @@ function fromPackageDoc(doc: WithId<PackageDoc>): AIPackage {
     tagline: doc.tagline,
     icon: doc.icon,
     vision_points: doc.vision_points ?? [],
+    delivery_points: doc.delivery_points ?? [],
     slug: doc.slug,
   };
 }

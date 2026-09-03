@@ -25,6 +25,7 @@ function emptyPkg(): AIPackage {
     tagline: "",
     icon: "shopping-cart",
     vision_points: ["", "", "", ""],
+    delivery_points: [""],
     slug: "",
   };
 }
@@ -58,6 +59,7 @@ function PackagesPage() {
       tagline: p.tagline,
       icon: p.icon,
       vision_points: p.vision_points,
+      delivery_points: p.delivery_points,
     };
     const res = editing
       ? await updatePackage({ data: { id: p.id, ...data } })
@@ -106,6 +108,7 @@ function PackagesPage() {
             const deleting = deletingId === p.id;
             const Icon = NICHE_ICONS[p.icon] ?? Sparkles;
             const filled = p.vision_points.filter((v) => v.trim()).length;
+            const deliveryFilled = (p.delivery_points ?? []).filter((v) => v.trim()).length;
             return (
               <div key={p.id} className="flex flex-wrap items-center gap-3 px-5 py-4">
                 <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/30">
@@ -119,7 +122,8 @@ function PackagesPage() {
                     </span>
                   </div>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {p.tagline} · {filled} point{filled === 1 ? "" : "s"}
+                    {p.tagline} · {filled} vision point{filled === 1 ? "" : "s"} · {deliveryFilled}{" "}
+                    deliverable{deliveryFilled === 1 ? "" : "s"}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -190,7 +194,9 @@ function PkgForm({
     setF((prev) => ({ ...prev, [key]: value }));
 
   const filledCount = f.vision_points.filter((v) => v.trim()).length;
-  const valid = f.name.trim().length > 0 && filledCount >= MIN_VISION_POINTS;
+  const deliveryFilledCount = f.delivery_points.filter((v) => v.trim()).length;
+  const valid =
+    f.name.trim().length > 0 && filledCount >= MIN_VISION_POINTS && deliveryFilledCount >= 1;
 
   const submit = async () => {
     if (!valid) return;
@@ -199,6 +205,7 @@ function PkgForm({
       name: f.name.trim(),
       tagline: f.tagline.trim(),
       vision_points: f.vision_points.map((v) => v.trim()).filter(Boolean),
+      delivery_points: f.delivery_points.map((v) => v.trim()).filter(Boolean),
       slug: f.slug,
     };
     setSaving(true);
@@ -266,6 +273,20 @@ function PkgForm({
           error={
             f.name.trim() !== "" && filledCount < MIN_VISION_POINTS
               ? `Add at least ${MIN_VISION_POINTS} vision points to describe the outcome.`
+              : undefined
+          }
+        />
+      </div>
+
+      <div>
+        <BulletEditor
+          title="What we build (back of card)"
+          items={f.delivery_points}
+          onChange={(items) => set("delivery_points", items)}
+          placeholder="e.g. Automated cart-recovery email and SMS sequence"
+          error={
+            f.name.trim() !== "" && deliveryFilledCount < 1
+              ? "Add at least one point describing what Oryntal actually builds."
               : undefined
           }
         />

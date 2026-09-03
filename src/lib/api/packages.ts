@@ -16,6 +16,7 @@ const packageInput = z.object({
   tagline: z.string().min(1),
   icon: z.string().min(1),
   vision_points: z.array(z.string().min(1)).min(4),
+  delivery_points: z.array(z.string().min(1)).min(1),
 });
 
 function toAIPackage(data: z.infer<typeof packageInput>, id: string): AIPackage {
@@ -25,6 +26,7 @@ function toAIPackage(data: z.infer<typeof packageInput>, id: string): AIPackage 
     tagline: data.tagline,
     icon: data.icon,
     vision_points: data.vision_points,
+    delivery_points: data.delivery_points,
     slug: "",
   };
 }

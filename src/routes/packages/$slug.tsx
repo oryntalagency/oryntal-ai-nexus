@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Home, Share2, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, ArrowRight, Home, RotateCw, Share2, Sparkles, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { getPackageBySlug } from "@/lib/api/packages";
 import { NICHE_ICONS, type AIPackage } from "@/lib/mockData";
@@ -82,6 +83,7 @@ function WatermarkWordmark() {
 
 function PackageDetail() {
   const { pkg, notFound } = Route.useLoaderData() as PackageLoaderData;
+  const [flipped, setFlipped] = useState(false);
 
   const shareLink = pkg ? `https://oryntal-ai-labs.vercel.app/packages/${pkg.slug}` : "";
 
@@ -128,6 +130,7 @@ function PackageDetail() {
 
   const Icon = NICHE_ICONS[pkg.icon] ?? Sparkles;
   const points = pkg.vision_points ?? [];
+  const delivery = pkg.delivery_points ?? [];
 
   return (
     <div className="relative min-h-screen overflow-hidden px-6 py-10 md:px-12 md:py-14">
@@ -148,56 +151,134 @@ function PackageDetail() {
           </span>
         </Link>
 
-        {/* Package card */}
-        <article className="mt-8 rounded-2xl bg-surface ring-1 ring-border shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)]">
-          <div className="p-8 sm:p-10">
-            <div className="flex items-start justify-between gap-4">
-              <div className="grid h-14 w-14 place-items-center rounded-xl glass ring-1 ring-border text-primary">
-                <Icon className="h-6 w-6" strokeWidth={1.8} />
+        {/* Flip card */}
+        <div className="mt-8 [perspective:1600px]">
+          <div
+            className={`grid transition-transform duration-500 [transform-style:preserve-3d] ${
+              flipped ? "[transform:rotateY(180deg)]" : ""
+            }`}
+          >
+            {/* FRONT */}
+            <article className="rounded-2xl bg-surface ring-1 ring-border shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)] [backface-visibility:hidden] [grid-area:1/1]">
+              <div className="p-8 sm:p-10">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="grid h-14 w-14 place-items-center rounded-xl glass ring-1 ring-border text-primary">
+                    <Icon className="h-6 w-6" strokeWidth={1.8} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFlipped((f) => !f)}
+                      aria-label={`See what Oryntal builds for ${pkg.name}`}
+                      aria-pressed={flipped}
+                      title="What do we actually build?"
+                      className="inline-flex h-11 w-11 touch-manipulation items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/40 active:scale-95 sm:h-9 sm:w-9"
+                    >
+                      <RotateCw className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleShare}
+                      aria-label="Share this package"
+                      title="Share this package"
+                      className="inline-flex h-11 w-11 touch-manipulation items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/40 active:scale-95 sm:h-9 sm:w-9"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <h1 className="mt-6 font-display text-3xl font-semibold tracking-tight md:text-4xl">
+                  {pkg.name}
+                </h1>
+                <p className="mt-2 font-display text-lg font-semibold leading-snug text-primary md:text-xl">
+                  {pkg.tagline}
+                </p>
+
+                <ul className="mt-7 space-y-4">
+                  {points.map((point, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-[15px] font-medium leading-[1.7] text-foreground/90"
+                    >
+                      <span className="mt-[8px] h-1.5 w-1.5 shrink-0 rotate-45 bg-primary/80" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <button
-                type="button"
-                onClick={handleShare}
-                aria-label="Share this package"
-                title="Share this package"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/40 active:scale-95"
-              >
-                <Share2 className="h-4 w-4" />
-              </button>
-            </div>
 
-            <h1 className="mt-6 font-display text-3xl font-semibold tracking-tight md:text-4xl">
-              {pkg.name}
-            </h1>
-            <p className="mt-2 font-display text-lg font-semibold leading-snug text-primary md:text-xl">
-              {pkg.tagline}
-            </p>
-
-            <ul className="mt-7 space-y-4">
-              {points.map((point, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-3 text-[15px] font-medium leading-[1.7] text-foreground/90"
+              <div className="border-t border-border p-8 pt-6 sm:px-10">
+                <Link
+                  to="/contact"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-1.5 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-gold-glow transition hover:scale-[1.02] active:scale-[0.99]"
                 >
-                  <span className="mt-[8px] h-1.5 w-1.5 shrink-0 rotate-45 bg-primary/80" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </div>
+                  See This for Your Business <ArrowRight className="h-4 w-4" />
+                </Link>
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                  One edition per industry — brought to you by Oryntal AI Labs.
+                </p>
+              </div>
+            </article>
 
-          <div className="border-t border-border p-8 pt-6 sm:px-10">
-            <Link
-              to="/contact"
-              className="inline-flex min-h-12 w-full items-center justify-center gap-1.5 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-gold-glow transition hover:scale-[1.02] active:scale-[0.99]"
-            >
-              See This for Your Business <ArrowRight className="h-4 w-4" />
-            </Link>
-            <p className="mt-3 text-center text-xs text-muted-foreground">
-              One edition per industry — brought to you by Oryntal AI Labs.
-            </p>
+            {/* BACK */}
+            <div className="overflow-hidden rounded-2xl bg-surface ring-1 ring-border shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--gold)_45%,transparent)] [backface-visibility:hidden] [grid-area:1/1] [transform:rotateY(180deg)]">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden opacity-[0.05]"
+              >
+                <span className="rotate-[-28deg] whitespace-nowrap font-display text-5xl font-bold uppercase leading-none tracking-tight text-primary">
+                  Oryntal AI Labs · {pkg.name}
+                </span>
+              </div>
+              <div className="relative flex h-full flex-col p-8 sm:p-10">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="grid h-14 w-14 place-items-center rounded-xl glass ring-1 ring-border text-primary">
+                    <Wrench className="h-6 w-6" strokeWidth={1.8} />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFlipped(false)}
+                    aria-label="Flip back to the vision"
+                    title="Back to the vision"
+                    className="inline-flex h-11 w-11 touch-manipulation items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/40 active:scale-95 sm:h-9 sm:w-9"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  Behind the vision
+                </p>
+                <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight md:text-3xl">
+                  What We Build
+                </h2>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  The real deliverables that make the {pkg.name} vision happen.
+                </p>
+
+                <ul className="mt-6 space-y-4">
+                  {delivery.map((point, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-[15px] font-medium leading-[1.6] text-foreground/80"
+                    >
+                      <span className="mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-auto pt-8">
+                  <p className="text-xs text-muted-foreground">
+                    Packaged &amp; delivered by{" "}
+                    <span className="font-semibold text-primary">Oryntal AI Labs</span>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        </article>
+        </div>
 
         <div className="mt-10 text-center">
           <Link
