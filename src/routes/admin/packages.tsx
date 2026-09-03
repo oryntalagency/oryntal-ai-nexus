@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PageHeader } from "@/components/admin/admin-ui";
 import { BulletEditor } from "@/components/admin/BulletEditor";
+import { DeliveryPointEditor } from "@/components/admin/DeliveryPointEditor";
 
 export const Route = createFileRoute("/admin/packages")({
   component: PackagesPage,
@@ -25,7 +26,7 @@ function emptyPkg(): AIPackage {
     tagline: "",
     icon: "shopping-cart",
     vision_points: ["", "", "", ""],
-    delivery_points: [""],
+    delivery_points: [{ label: "", explanation: "" }],
     slug: "",
   };
 }
@@ -108,7 +109,9 @@ function PackagesPage() {
             const deleting = deletingId === p.id;
             const Icon = NICHE_ICONS[p.icon] ?? Sparkles;
             const filled = p.vision_points.filter((v) => v.trim()).length;
-            const deliveryFilled = (p.delivery_points ?? []).filter((v) => v.trim()).length;
+            const deliveryFilled = (p.delivery_points ?? []).filter(
+              (d) => d.label.trim() || d.explanation.trim(),
+            ).length;
             return (
               <div key={p.id} className="flex flex-wrap items-center gap-3 px-5 py-4">
                 <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/30">
@@ -194,7 +197,9 @@ function PkgForm({
     setF((prev) => ({ ...prev, [key]: value }));
 
   const filledCount = f.vision_points.filter((v) => v.trim()).length;
-  const deliveryFilledCount = f.delivery_points.filter((v) => v.trim()).length;
+  const deliveryFilledCount = f.delivery_points.filter(
+    (d) => (d.label?.trim() ?? "") || (d.explanation?.trim() ?? ""),
+  ).length;
   const valid =
     f.name.trim().length > 0 && filledCount >= MIN_VISION_POINTS && deliveryFilledCount >= 1;
 
@@ -205,7 +210,12 @@ function PkgForm({
       name: f.name.trim(),
       tagline: f.tagline.trim(),
       vision_points: f.vision_points.map((v) => v.trim()).filter(Boolean),
-      delivery_points: f.delivery_points.map((v) => v.trim()).filter(Boolean),
+      delivery_points: f.delivery_points
+        .map((d) => ({
+          label: (d.label ?? "").trim(),
+          explanation: (d.explanation ?? "").trim(),
+        }))
+        .filter((d) => d.label || d.explanation),
       slug: f.slug,
     };
     setSaving(true);
@@ -279,11 +289,12 @@ function PkgForm({
       </div>
 
       <div>
-        <BulletEditor
+        <DeliveryPointEditor
           title="What we build (back of card)"
           items={f.delivery_points}
           onChange={(items) => set("delivery_points", items)}
-          placeholder="e.g. Automated cart-recovery email and SMS sequence"
+          labelPlaceholder="Short label, e.g. Cart Recovery Automation"
+          explanationPlaceholder="Full explanation — e.g. Automated email and SMS sequence that triggers when a cart sits idle, with timed follow-ups to win the sale back."
           error={
             f.name.trim() !== "" && deliveryFilledCount < 1
               ? "Add at least one point describing what Oryntal actually builds."

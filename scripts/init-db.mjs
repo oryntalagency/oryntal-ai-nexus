@@ -217,8 +217,19 @@ const packagesValidator = {
       delivery_points: {
         bsonType: "array",
         minItems: 1,
-        items: { bsonType: "string" },
-        description: "'delivery_points' must be an array of at least 1 deliverable string.",
+        items: {
+          bsonType: "object",
+          required: ["label", "explanation"],
+          additionalProperties: false,
+          properties: {
+            label: { bsonType: "string", description: "'label' must be a short deliverable name." },
+            explanation: {
+              bsonType: "string",
+              description: "'explanation' must be the fuller deliverable description.",
+            },
+          },
+        },
+        description: "'delivery_points' must be an array of at least 1 {label, explanation} object.",
       },
       createdAt: dateField("createdAt"),
       updatedAt: dateField("updatedAt"),

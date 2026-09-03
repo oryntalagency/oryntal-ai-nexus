@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { listPackages } from "@/lib/api/packages";
 import { NICHE_ICONS } from "@/lib/mockData";
 import type { AIPackage } from "@/lib/mockData";
+import { DeliveryAccordion } from "@/components/DeliveryAccordion";
 
 function buildShareUrl(pkg: AIPackage): string {
   return `https://oryntal-ai-labs.vercel.app/packages/${pkg.slug}`;
@@ -161,17 +162,9 @@ function FlipPackageCard({ pkg }: { pkg: AIPackage }) {
               The real deliverables that make the {pkg.name} vision happen.
             </p>
 
-            <ul className="mt-4 space-y-3">
-              {delivery.map((point, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-2.5 text-[14px] font-medium leading-[1.6] text-foreground/80"
-                >
-                  <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70" />
-                  {point}
-                </li>
-              ))}
-            </ul>
+            <div className="mt-4">
+              <DeliveryAccordion items={delivery} />
+            </div>
           </div>
 
           <div className="relative border-t border-border px-6 py-4 sm:px-7">

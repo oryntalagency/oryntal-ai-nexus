@@ -377,11 +377,36 @@ const PACKAGES = [
       "Low-stock, restock, and review requests handled the moment they happen.",
     ],
     delivery_points: [
-      "Automated cart-recovery email and SMS sequence, triggered in real time.",
-      "AI product-description generator that drafts and updates every listing.",
-      "Personalized on-site recommendation engine based on browsing behaviour.",
-      "Automated order, shipping, and delivery confirmation flows with review requests.",
-      "A unified dashboard so you can watch every workflow fire and where it lands.",
+      {
+        label: "Cart Recovery Automation",
+        explanation:
+          "Automated email, SMS, and WhatsApp sequences that trigger the moment a cart sits idle, with a timed follow-up flow that gently wins the sale back.",
+      },
+      {
+        label: "AI Product Descriptions",
+        explanation:
+          "A generator that drafts and keeps every product listing fresh, turning raw specs into persuasive copy across the whole catalogue in minutes.",
+      },
+      {
+        label: "Personalized Recommendations",
+        explanation:
+          "An on-site engine that surfaces the right next product for each shopper based on browsing and purchase behaviour, lifting average order value.",
+      },
+      {
+        label: "Order Confirmation Flows",
+        explanation:
+          "Automated order, shipping, and delivery updates paired with smart review requests, so every customer knows where their order is without asking.",
+      },
+      {
+        label: "Unified Ops Dashboard",
+        explanation:
+          "A single view of every live workflow — what fired, what converted, and where revenue came from — so you steer the store rather than chase it.",
+      },
+      {
+        label: "Customer Win-Back Campaigns",
+        explanation:
+          "Automated win-back offers and re-engagement emails for customers who went quiet, bringing dormant buyers back into the funnel.",
+      },
     ],
   },
   {
@@ -396,11 +421,31 @@ const PACKAGES = [
       "Referrals keep flowing with a follow-up system that never forgets a customer.",
     ],
     delivery_points: [
-      "AI lead qualification and instant-response chatbot for incoming inquiries.",
-      "Automated quotation builder that pulls roof dimensions and system sizing into a proposal.",
-      "End-to-end project tracker linking quote, deposit, permit, install, and inspection stages.",
-      "Automated customer follow-up, referral, and review-request sequences after install.",
-      "A reporting dashboard showing leads, closing rates, and active installs in one place.",
+      {
+        label: "Instant Lead Response",
+        explanation:
+          "An AI qualification assistant that replies to every inquiry instantly, capturing the essentials and booking a slot for your team while the lead is still warm.",
+      },
+      {
+        label: "Automated Quotation Builder",
+        explanation:
+          "Pulls roof dimensions, system sizing, and package options into a professional proposal in hours, so quotes go out before a competitor can undercut you.",
+      },
+      {
+        label: "End-to-End Project Tracker",
+        explanation:
+          "Links quote, deposit, permit, install, and inspection stages in one place, so no project gets lost between five spreadsheets or group chats.",
+      },
+      {
+        label: "Post-Install Follow-Up",
+        explanation:
+          "Automated thank-you, referral, and review-request sequences run after every install, turning happy customers into a steady stream of new leads.",
+      },
+      {
+        label: "Sales & Install Dashboard",
+        explanation:
+          "A reporting view of leads, close rates, and active installations so you always know exactly where the business stands.",
+      },
     ],
   },
   {
@@ -415,11 +460,31 @@ const PACKAGES = [
       "Students stay engaged because follow-ups arrive right when they stall.",
     ],
     delivery_points: [
-      "Adaptive learning engine that paces content to each student's progress.",
-      "AI course assistant that answers student questions around the clock.",
-      "Automated enrolment, onboarding, and course-access provisioning workflow.",
-      "Automated engagement nudges when a learner stalls or a module is due.",
-      "Analytics dashboard tracking completion, drop-off, and mastery per course.",
+      {
+        label: "Adaptive Learning Engine",
+        explanation:
+          "Paces course content to each student's progress and mastery, so fast learners move ahead and everyone else gets the right next step.",
+      },
+      {
+        label: "AI Course Assistant",
+        explanation:
+          "Answers student questions around the clock, so nobody stalls waiting for office hours and course creators stop retyping the same reply.",
+      },
+      {
+        label: "Auto-Enrolment Workflow",
+        explanation:
+          "Handles sign-up, onboarding, and course-access provisioning automatically — even a 2am enrollee is in and learning by morning.",
+      },
+      {
+        label: "Engagement Nudges",
+        explanation:
+          "Automated reminders that catch a learner right when they stall or a module falls due, keeping completion rates up without manual chasing.",
+      },
+      {
+        label: "Course Analytics Dashboard",
+        explanation:
+          "Tracks completion, drop-off, and per-module mastery so you can see what works and fix what quietly loses students.",
+      },
     ],
   },
   {
@@ -434,11 +499,31 @@ const PACKAGES = [
       "Past clients feel remembered, so they refer again without being asked.",
     ],
     delivery_points: [
-      "AI lead-capture and instant-response assistant for listing inquiries.",
-      "Automated buyer outreach and showroom-scheduling workflow per fresh lead.",
-      "AI listing copy generator with automated syndication across portals.",
-      "Automated transaction tracker for offers, deposits, documents, and closing dates.",
-      "Automated evergreen CRM follow-ups for past clients, anniversaries, and referrals.",
+      {
+        label: "Instant Listing Assistant",
+        explanation:
+          "Captures and replies to every listing inquiry immediately, then queues the lead for a call while they're still engaged.",
+      },
+      {
+        label: "Buyer Outreach & Scheduling",
+        explanation:
+          "Automatically segments new leads, sends the right listings, and books viewings — no follow-up email forgotten between showings.",
+      },
+      {
+        label: "AI Listing Copy & Syndication",
+        explanation:
+          "Generates sharp, compliant listing descriptions and pushes them across portals in one go instead of a dozen manual uploads.",
+      },
+      {
+        label: "Transaction Tracker",
+        explanation:
+          "Keeps offers, deposits, documents, and closing dates in one place so nothing slips past and every deal stays on schedule.",
+      },
+      {
+        label: "Evergreen Client Follow-Up",
+        explanation:
+          "Quiet anniversary, referral, and past-client touchpoints that run forever, keeping you top of mind without nagging.",
+      },
     ],
   },
   {
@@ -453,11 +538,31 @@ const PACKAGES = [
       "Follow-ups land at the right moment, so no one slips through the cracks.",
     ],
     delivery_points: [
-      "Automated appointment booking, rescheduling, and reminder (email/SMS) flow.",
-      "Digital intake forms with AI pre-fill from a patient's answers and history.",
-      "Unified patient-communication inbox that keeps intake, labs, and follow-ups in order.",
-      "Automated post-visit follow-up, prescription-refill, and review-request sequences.",
-      "Reporting dashboard for no-shows, capacity, and patient satisfaction at a glance.",
+      {
+        label: "Smart Appointment Booking",
+        explanation:
+          "Handles booking, rescheduling, and reminders by email or SMS so no slot is missed and no patient is forgotten.",
+      },
+      {
+        label: "Digital Intake & Pre-Fill",
+        explanation:
+          "Collects paperwork online with AI pre-filling from a patient's answers and history, so intake is done before they walk in.",
+      },
+      {
+        label: "Unified Patient Inbox",
+        explanation:
+          "Keeps intake, labs, and follow-ups in one ordered thread instead of providers juggling three different inboxes.",
+      },
+      {
+        label: "Automated Aftercare",
+        explanation:
+          "Post-visit check-ins, prescription refills, and review requests fire at the right moment, so nobody slips through the cracks.",
+      },
+      {
+        label: "Practice Health Dashboard",
+        explanation:
+          "A clear view of no-shows, capacity, and patient satisfaction so you can spot problems early and keep care on track.",
+      },
     ],
   },
   {
@@ -472,11 +577,31 @@ const PACKAGES = [
       "Happy stays turn into five-star reviews without a begging email.",
     ],
     delivery_points: [
-      "AI booking assistant that answers rates, availability, and policy questions instantly.",
-      "Automated pre-arrival check-in, directions, and amenity emails.",
-      "Automated waitlist and no-show backfill that rebooks cancelled rooms fast.",
-      "Automated post-stay review-request and return-guest offer sequences.",
-      "Reservation and occupancy dashboard tracking bookings, revenue, and reviews.",
+      {
+        label: "Instant Booking Assistant",
+        explanation:
+          "Answers rates, availability, and policy questions the moment they land, so no inquiry cools off waiting for a reply.",
+      },
+      {
+        label: "Pre-Arrival Guest Emails",
+        explanation:
+          "Sends check-in details, directions, and amenity info automatically before guests even pack, cutting front-desk questions.",
+      },
+      {
+        label: "Waitlist & No-Show Backfill",
+        explanation:
+          "Automatically rebooks cancelled rooms from a waitlist fast, so a last-minute no-show never costs you a full night.",
+      },
+      {
+        label: "Post-Stay Reviews & Returns",
+        explanation:
+          "Requests reviews and sends return-guest offers at the right moment, turning happy stays into repeat bookings.",
+      },
+      {
+        label: "Occupancy & Revenue Dashboard",
+        explanation:
+          "Tracks bookings, revenue, and reviews in one place so you can price and market with confidence.",
+      },
     ],
   },
   {
@@ -491,11 +616,31 @@ const PACKAGES = [
       "Aftercare and product tips arrive right when they matter most.",
     ],
     delivery_points: [
-      "Online booking and automated appointment reminders (email/SMS) for every service.",
-      "Automated rebooking and no-show waitlist that fills cancelled slots instantly.",
-      "Client profile with service history and automatically suggested next visits.",
-      "Automated aftercare, product-upsell, and review-request follow-up sequences.",
-      "Dashboard showing bookings, open chairs, no-shows, and top services.",
+      {
+        label: "Online Booking & Reminders",
+        explanation:
+          "Lets clients book any service online with automated email and SMS reminders, filling chairs without a booking manager.",
+      },
+      {
+        label: "Rebooking & Waitlist",
+        explanation:
+          "Automatically queues clients for their next visit and fills cancelled slots from the waitlist, so no chair sits empty.",
+      },
+      {
+        label: "Client Profile & Smart Suggestions",
+        explanation:
+          "Keeps a full service history and suggests the right next visit per client, so every appointment feels personal.",
+      },
+      {
+        label: "Aftercare & Product Upsell",
+        explanation:
+          "Sends aftercare tips, product recommendations, and review requests at the perfect moment after each service.",
+      },
+      {
+        label: "Bookings Dashboard",
+        explanation:
+          "Shows upcoming chairs, no-shows, and top services at a glance so staffing and promotions are no longer guesswork.",
+      },
     ],
   },
   {
@@ -510,11 +655,31 @@ const PACKAGES = [
       "Past travelers become your best marketers with effortless reviews and referrals.",
     ],
     delivery_points: [
-      "AI trip-quote assistant that builds personalised itineraries from one conversation.",
-      "Automated proposal, deposit, payment, and booking-confirmation workflow.",
-      "Trip document hub with itineraries, tickets, insurance, and reminders in one place.",
-      "Automated pre-trip and post-trip check-in, review-request, and referral sequences.",
-      "Booking and commission dashboard tracking trips sold, revenue, and client base.",
+      {
+        label: "AI Trip-Quote Assistant",
+        explanation:
+          "Builds personalised itineraries from one conversation, turning an inquiry into a tailored proposal in minutes.",
+      },
+      {
+        label: "Booking & Payment Flow",
+        explanation:
+          "Automates proposals, deposits, payments, and confirmation so every trip is locked in before the client thinks to ask.",
+      },
+      {
+        label: "Trip Document Hub",
+        explanation:
+          "Keeps itineraries, tickets, insurance, and reminders in one tidy place travellers can always access.",
+      },
+      {
+        label: "Pre & Post-Trip Follow-Up",
+        explanation:
+          "Checks in automatically before departure and requests reviews and referrals after return, so happy travelers market for you.",
+      },
+      {
+        label: "Commission Dashboard",
+        explanation:
+          "Tracks trips sold, revenue, and client base so you always know which destinations and offers pay off.",
+      },
     ],
   },
 ];

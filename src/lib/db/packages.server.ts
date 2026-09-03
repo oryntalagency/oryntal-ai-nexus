@@ -19,7 +19,7 @@ export type PackageDoc = {
   tagline: string;
   icon: string;
   vision_points: string[];
-  delivery_points: string[];
+  delivery_points: { label: string; explanation: string }[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -47,8 +47,20 @@ const PACKAGES_VALIDATOR = {
       delivery_points: {
         bsonType: "array",
         minItems: 1,
-        items: { bsonType: "string" },
-        description: "'delivery_points' must be an array of at least 1 deliverable string.",
+        items: {
+          bsonType: "object",
+          required: ["label", "explanation"],
+          additionalProperties: false,
+          properties: {
+            label: { bsonType: "string", description: "'label' must be a short deliverable name." },
+            explanation: {
+              bsonType: "string",
+              description: "'explanation' must be the fuller deliverable description.",
+            },
+          },
+        },
+        description:
+          "'delivery_points' must be an array of at least 1 {label, explanation} object.",
       },
       createdAt: { bsonType: "date", description: "'createdAt' must be a date." },
       updatedAt: { bsonType: "date", description: "'updatedAt' must be a date." },

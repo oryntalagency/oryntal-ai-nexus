@@ -11,12 +11,17 @@ import {
 } from "../db/packages.server";
 import type { AIPackage } from "../mockData";
 
+const deliveryPointInput = z.object({
+  label: z.string().min(1),
+  explanation: z.string().min(1),
+});
+
 const packageInput = z.object({
   name: z.string().min(1),
   tagline: z.string().min(1),
   icon: z.string().min(1),
   vision_points: z.array(z.string().min(1)).min(4),
-  delivery_points: z.array(z.string().min(1)).min(1),
+  delivery_points: z.array(deliveryPointInput).min(1),
 });
 
 function toAIPackage(data: z.infer<typeof packageInput>, id: string): AIPackage {

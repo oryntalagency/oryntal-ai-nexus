@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Home, RotateCw, Share2, Sparkles, Wrench } from 
 import { toast } from "sonner";
 import { getPackageBySlug } from "@/lib/api/packages";
 import { NICHE_ICONS, type AIPackage } from "@/lib/mockData";
+import { DeliveryAccordion } from "@/components/DeliveryAccordion";
 
 type PackageLoaderData = {
   pkg: AIPackage | null;
@@ -257,17 +258,9 @@ function PackageDetail() {
                   The real deliverables that make the {pkg.name} vision happen.
                 </p>
 
-                <ul className="mt-6 space-y-4">
-                  {delivery.map((point, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-3 text-[15px] font-medium leading-[1.6] text-foreground/80"
-                    >
-                      <span className="mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
+                <div className="mt-6">
+                  <DeliveryAccordion items={delivery} />
+                </div>
 
                 <div className="mt-auto pt-8">
                   <p className="text-xs text-muted-foreground">
