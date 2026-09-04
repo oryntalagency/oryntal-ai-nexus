@@ -95,6 +95,22 @@ async function main() {
     const db = client.db();
     const col = db.collection("packages");
 
+    // Temporarily relax validation so legacy documents (which may be missing
+    // newly-required fields like icon/createdAt/updatedAt) can be updated.
+    let previousValidator = null;
+    try {
+      const info = await db.command({ collStats: "packages" });
+      previousValidator = info.options?.validator ?? null;
+    } catch {
+      // collection may not exist yet — that's fine
+    }
+    await db.command({
+      collMod: "packages",
+      validator: {},
+      validationLevel: "off",
+    });
+    console.log("Validation relaxed for migration.");
+
     const all = await col.find({}).toArray();
     let migrated = 0;
     let skipped = 0;
@@ -117,6 +133,44 @@ async function main() {
       migrated++;
       console.log(`Migrated: ${doc.name} (${points.length} -> ${next.length} points)`);
     }
+
+    // Restore original validator (or the current one from packages.server.ts).
+    const PACKAGES_VALIDATOR = {
+      $jsonSchema: {
+        bsonType: "object",
+        required: ["name", "slug", "tagline", "icon", "vision_points", "delivery_points"],
+        additionalProperties: true,
+        properties: {
+          _id: { bsonType: "objectId" },
+          name: { bsonType: "string" },
+          slug: { bsonType: "string" },
+          tagline: { bsonType: "string" },
+          icon: { bsonType: "string" },
+          vision_points: { bsonType: "array", minItems: 4, items: { bsonType: "string" } },
+          delivery_points: {
+            bsonType: "array",
+            minItems: 1,
+            items: {
+              bsonType: "object",
+              required: ["label", "explanation"],
+              additionalProperties: false,
+              properties: {
+                label: { bsonType: "string" },
+                explanation: { bsonType: "string" },
+              },
+            },
+          },
+          createdAt: { bsonType: "date" },
+          updatedAt: { bsonType: "date" },
+        },
+      },
+    };
+    await db.command({
+      collMod: "packages",
+      validator: PACKAGES_VALIDATOR,
+      validationLevel: "strict",
+    });
+    console.log("Validator restored to strict.");
 
     console.log(`\nDone. Migrated ${migrated}, skipped ${skipped} package(s).`);
   } finally {

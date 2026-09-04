@@ -2,6 +2,7 @@ import { ObjectId, type Db, type WithId } from "mongodb";
 
 import { getDb } from "../mongodb";
 import type { AIPackage } from "../mockData";
+import { normalizeDeliveryPoints, normalizeVisionPoints } from "../mockData";
 import { kebab } from "./shared.server";
 
 // Repository for the `packages` collection. Each row is one niche edition —
@@ -132,8 +133,8 @@ function fromPackageDoc(doc: WithId<PackageDoc>): AIPackage {
     name: doc.name,
     tagline: doc.tagline,
     icon: doc.icon,
-    vision_points: doc.vision_points ?? [],
-    delivery_points: doc.delivery_points ?? [],
+    vision_points: normalizeVisionPoints(doc.vision_points),
+    delivery_points: normalizeDeliveryPoints(doc.delivery_points),
     slug: doc.slug,
   };
 }

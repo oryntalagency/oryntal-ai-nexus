@@ -440,6 +440,30 @@ export type AIPackage = {
   slug: string;
 };
 
+// Defensive normalizers for legacy package data. Older documents may still
+// hold `vision_points` as loose/missing entries and `delivery_points` as plain
+// strings (pre-{label,explanation}). Every read path normalizes through these
+// so a missing property or a string entry never throws on .trim().
+export function normalizeVisionPoints(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((v): v is string => typeof v === "string").map((v) => v.trim());
+}
+
+export function normalizeDeliveryPoints(value: unknown): DeliveryPoint[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((entry): DeliveryPoint => {
+    if (typeof entry === "string") return { label: entry, explanation: "" };
+    if (entry && typeof entry === "object") {
+      const obj = entry as Partial<DeliveryPoint>;
+      return {
+        label: typeof obj.label === "string" ? obj.label.trim() : "",
+        explanation: typeof obj.explanation === "string" ? obj.explanation.trim() : "",
+      };
+    }
+    return { label: "", explanation: "" };
+  });
+}
+
 // Icon tokens map to Lucide icons. The token string is what's persisted on the
 // `packages` collection; keep every picker option here so the admin form and the
 // public cards always agree.

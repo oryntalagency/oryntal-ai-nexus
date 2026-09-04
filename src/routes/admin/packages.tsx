@@ -110,7 +110,7 @@ function PackagesPage() {
             const Icon = NICHE_ICONS[p.icon] ?? Sparkles;
             const filled = p.vision_points.filter((v) => v.trim()).length;
             const deliveryFilled = (p.delivery_points ?? []).filter(
-              (d) => d.label.trim() || d.explanation.trim(),
+              (d) => d.label?.trim() || d.explanation?.trim(),
             ).length;
             return (
               <div key={p.id} className="flex flex-wrap items-center gap-3 px-5 py-4">
