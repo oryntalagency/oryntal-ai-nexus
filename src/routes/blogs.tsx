@@ -114,17 +114,9 @@ function Blogs() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <p className="truncate text-sm font-medium leading-tight">{b.author}</p>
-                      {b.linkedinUrl && (
-                        <a
-                          href={b.linkedinUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`${b.author} on LinkedIn`}
-                          className="shrink-0 text-muted-foreground transition hover:text-primary"
-                        >
-                          <Linkedin className="h-3.5 w-3.5" />
-                        </a>
-                      )}
+                      <button className="shrink-0 inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-medium transition hover:bg-primary hover:text-primary-foreground">
+                        Follow
+                      </button>
                       {b.instagramUrl && (
                         <a
                           href={b.instagramUrl}
@@ -140,9 +132,17 @@ function Blogs() {
                     <p className="text-[11px] text-muted-foreground">{b.readTime}</p>
                   </div>
                 </div>
-                <button className="inline-flex min-h-9 items-center rounded-full bg-secondary px-3 py-1.5 text-[11px] font-medium hover:bg-primary hover:text-primary-foreground transition sm:py-1">
-                  Follow
-                </button>
+                {b.linkedinUrl && (
+                  <a
+                    href={b.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${b.author} on LinkedIn`}
+                    className="shrink-0 text-muted-foreground transition hover:text-primary"
+                  >
+                    <Linkedin className="h-4 w-4" />
+                  </a>
+                )}
               </div>
 
               {/* Hook */}
