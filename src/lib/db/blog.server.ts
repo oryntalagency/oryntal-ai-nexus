@@ -11,13 +11,12 @@ import { kebab, omitUndefined } from "./shared.server";
 export type BlogDoc = {
   id: string;
   title: string;
+  heading: string;
   hook: string;
   author: string;
   initials: string;
   readTime: string;
   tags: string[];
-  likes: number;
-  comments: number;
   gradient: string;
   height: number;
   trending: boolean;
@@ -38,13 +37,12 @@ function toBlogDoc(post: Blog, timestamps: { createdAt: Date; updatedAt: Date })
   return omitUndefined({
     id: post.id,
     title: post.title,
+    heading: post.heading,
     hook: post.hook,
     author: post.author,
     initials: post.initials,
     readTime: post.readTime,
     tags: post.tags,
-    likes: post.likes,
-    comments: post.comments,
     gradient: post.gradient,
     height: post.height,
     trending: post.trending,
@@ -61,13 +59,12 @@ function fromBlogDoc(doc: WithId<BlogDoc>): Blog {
   return {
     id: doc.id,
     title: doc.title,
+    heading: doc.heading,
     hook: doc.hook,
     author: doc.author,
     initials: doc.initials,
     readTime: doc.readTime,
     tags: doc.tags,
-    likes: doc.likes,
-    comments: doc.comments,
     gradient: doc.gradient,
     height: doc.height,
     trending: doc.trending,

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, MessageCircle, Bookmark, PenLine, Linkedin, Instagram } from "lucide-react";
+import { PenLine, Linkedin, Instagram } from "lucide-react";
 import { listBlogPosts } from "@/lib/api/blog";
 import { ThoughtComposer } from "@/components/ThoughtComposer";
 
@@ -147,24 +147,9 @@ function Blogs() {
 
               {/* Hook */}
               <h2 className="mt-4 font-display text-xl font-semibold leading-snug text-foreground">
-                {b.title}
+                {b.heading ?? b.title}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.hook}</p>
-
-              {/* Interaction bar */}
-              <div className="mt-5 flex items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
-                <div className="flex items-center gap-4">
-                  <button className="inline-flex min-h-10 min-w-10 items-center justify-center gap-1.5 hover:text-primary transition">
-                    <Heart className="h-4 w-4" /> {b.likes}
-                  </button>
-                  <button className="inline-flex min-h-10 min-w-10 items-center justify-center gap-1.5 hover:text-primary transition">
-                    <MessageCircle className="h-4 w-4" /> {b.comments}
-                  </button>
-                </div>
-                <button className="grid min-h-10 min-w-10 place-items-center hover:text-primary transition">
-                  <Bookmark className="h-4 w-4" />
-                </button>
-              </div>
             </div>
           </article>
         ))}

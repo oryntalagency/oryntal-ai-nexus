@@ -27,6 +27,7 @@ export function ThoughtComposer({
   onPublished: () => void;
 }) {
   const [name, setName] = useState("");
+  const [heading, setHeading] = useState("");
   const [thought, setThought] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [instagram, setInstagram] = useState("");
@@ -39,15 +40,17 @@ export function ThoughtComposer({
   const instagramValid = ig === "" || INSTAGRAM_PATTERN.test(ig);
   const hasLink = li !== "" || ig !== "";
   const nameOk = name.trim().length >= 2;
+  const headingOk = heading.trim().length > 0;
   const thoughtOk = thought.trim().length >= 10;
 
   const canSubmit =
-    nameOk && thoughtOk && hasLink && linkedinValid && instagramValid && !submitting;
+    nameOk && headingOk && thoughtOk && hasLink && linkedinValid && instagramValid && !submitting;
 
   const wordCount = useMemo(() => thought.split(/\s+/).filter(Boolean).length, [thought]);
 
   const reset = () => {
     setName("");
+    setHeading("");
     setThought("");
     setLinkedin("");
     setInstagram("");
@@ -60,7 +63,13 @@ export function ThoughtComposer({
     setSubmitting(true);
     setError(null);
     const res = await submitThought({
-      data: { name: name.trim(), thought: thought.trim(), linkedin: li, instagram: ig },
+      data: {
+        name: name.trim(),
+        heading: heading.trim(),
+        thought: thought.trim(),
+        linkedin: li,
+        instagram: ig,
+      },
     });
     if (res.ok) {
       reset();
@@ -101,6 +110,24 @@ export function ThoughtComposer({
             />
             {!nameOk && (
               <p className="mt-1 text-[11px] text-destructive">Please enter your name.</p>
+            )}
+          </div>
+
+          <div>
+            <Label className="text-xs font-semibold uppercase tracking-wide">Heading *</Label>
+            <Input
+              value={heading}
+              onChange={(e) => setHeading(e.target.value)}
+              maxLength={100}
+              placeholder="e.g. Why Every Business Needs Automation"
+              className="mt-1.5"
+            />
+            <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+              <span>Short title for your post.</span>
+              {heading.trim().length > 0 && <span>{heading.trim().length}/100</span>}
+            </div>
+            {!headingOk && (
+              <p className="mt-1 text-[11px] text-destructive">Please add a short heading.</p>
             )}
           </div>
 

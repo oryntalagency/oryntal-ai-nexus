@@ -13,13 +13,12 @@ import type { Blog } from "../mockData";
 
 const postInput = z.object({
   title: z.string().min(1),
+  heading: z.string().optional(),
   hook: z.string().min(1),
   author: z.string(),
   initials: z.string(),
   readTime: z.string(),
   tags: z.array(z.string()),
-  likes: z.number().optional(),
-  comments: z.number().optional(),
   gradient: z.string(),
   height: z.number().optional(),
   trending: z.boolean().optional(),
@@ -30,16 +29,16 @@ const postInput = z.object({
 });
 
 function toBlog(data: z.infer<typeof postInput>, id: string): Blog {
+  const heading = data.heading?.trim() || data.title;
   return {
     id,
     title: data.title,
+    heading,
     hook: data.hook,
     author: data.author,
     initials: data.initials,
     readTime: data.readTime,
     tags: data.tags,
-    likes: data.likes ?? 0,
-    comments: data.comments ?? 0,
     gradient: data.gradient,
     height: data.height ?? 260,
     trending: data.trending ?? false,
@@ -116,6 +115,11 @@ const thoughtInput = z
       .trim()
       .min(2, "Please enter your name.")
       .max(60, "Please keep your name under 60 characters."),
+    heading: z
+      .string()
+      .trim()
+      .min(1, "Please add a short heading for your post.")
+      .max(100, "Please keep your heading under 100 characters."),
     thought: z
       .string()
       .trim()
@@ -169,28 +173,18 @@ function initialsOf(name: string): string {
   );
 }
 
-function titleOf(thought: string): string {
-  const firstLine =
-    thought
-      .split("\n")
-      .map((l) => l.trim())
-      .find(Boolean) ?? thought;
-  return firstLine.length > 60 ? `${firstLine.slice(0, 57).trimEnd()}…` : firstLine;
-}
-
 function buildThoughtPost(data: z.infer<typeof thoughtInput>): Blog {
   const thought = data.thought;
   const words = thought.split(/\s+/).filter(Boolean).length;
   return {
-    id: newPostId(data.name),
-    title: titleOf(thought),
+    id: newPostId(data.heading),
+    title: data.heading,
+    heading: data.heading,
     hook: thought,
     author: data.name,
     initials: initialsOf(data.name),
     readTime: `${Math.max(1, Math.round(words / 200))} min read`,
     tags: ["#Community"],
-    likes: 0,
-    comments: 0,
     gradient: THOUGHT_GRADIENTS[data.name.length % THOUGHT_GRADIENTS.length],
     height: 160,
     trending: false,
