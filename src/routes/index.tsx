@@ -89,7 +89,7 @@ function Home() {
     [tagItems],
   );
 
-  const openVideo = (l: Listing) => setVideoUrl(l.video ?? null);
+  const openVideo = (l: Listing) => setVideoUrl(l.video ?? l.loomUrl ?? null);
 
   return (
     <div className="px-6 py-10 md:px-12 md:py-14 max-w-[1600px] mx-auto">

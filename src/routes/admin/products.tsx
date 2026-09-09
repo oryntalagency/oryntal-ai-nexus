@@ -846,7 +846,7 @@ function ProductForm({
           setPlay(l);
         }}
       />
-      <VideoLightbox url={play?.video ?? null} onClose={() => setPlay(null)} />
+      <VideoLightbox url={play?.video ?? play?.loomUrl ?? null} onClose={() => setPlay(null)} />
     </Dialog>
   );
 }

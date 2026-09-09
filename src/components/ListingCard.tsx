@@ -67,7 +67,7 @@ export function ListingCard({ listing, onShow, onPlay }: Props) {
         />
 
         {/* Video / Loom play badge */}
-        {listing.video && (
+        {(listing.video || listing.loomUrl) && (
           <button
             type="button"
             aria-label="Play preview"
