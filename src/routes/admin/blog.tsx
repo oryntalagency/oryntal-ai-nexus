@@ -3,8 +3,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, BookOpen, AlertCircle } from "lucide-react";
 import { createBlogPost, deleteBlogPost, listBlogPosts, updateBlogPost } from "@/lib/api/blog";
-import { uploadMedia } from "@/lib/api/media";
-import { uploadLimitError, UPLOAD_LIMITS } from "@/lib/upload-limits";
+import { uploadMedia } from "@/lib/client-media";
 import type { Blog } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -232,27 +231,10 @@ function PostForm({
 
   const onCoverUpload = async (file: File | undefined) => {
     if (!file) return;
-    if (file.size > UPLOAD_LIMITS.image.bytes) {
-      setCoverError(uploadLimitError("image"));
-      return;
-    }
     setCoverLoading(true);
     setCoverError(null);
     try {
-      const reader = new FileReader();
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(String(reader.result));
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-      });
-      const res = await uploadMedia({
-        data: {
-          name: file.name,
-          kind: "image",
-          mime: file.type,
-          dataBase64: dataUrl.split(",")[1] ?? dataUrl,
-        },
-      });
+      const res = await uploadMedia(file, "image");
       if (res.ok) {
         setF((prev) => ({ ...prev, cover: res.url }));
       } else {

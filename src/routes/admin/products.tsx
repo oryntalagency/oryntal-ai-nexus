@@ -18,9 +18,8 @@ import {
 import { useAdminStore } from "@/lib/adminStore";
 import { createProduct, deleteProduct, listProducts, updateProduct } from "@/lib/api/products";
 import { listTags } from "@/lib/api/tags";
-import { uploadMedia } from "@/lib/api/media";
+import { uploadMedia } from "@/lib/client-media";
 import { FEATURED_CAP, OFFERING_LABEL, OFFERING_META } from "@/lib/mockData";
-import { uploadLimitError, UPLOAD_LIMITS } from "@/lib/upload-limits";
 import type { Listing, ListingStatus, OfferingType } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,26 +46,6 @@ function slugify(s: string): string {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-}
-
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-function dataUrlToBase64(dataUrl: string): string {
-  const comma = dataUrl.indexOf(",");
-  return comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
-}
-
-function dataUrlToExtension(dataUrl: string): string {
-  const m = /^data:([^;]+);/.exec(dataUrl);
-  if (!m) return "bin";
-  return (m[1].split("/")[1] ?? "bin").split("+")[0] || "bin";
 }
 
 type FormState = {
@@ -925,23 +904,10 @@ function Dropzone({
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const onFile = async (file: File) => {
-    const limit = UPLOAD_LIMITS[kind];
-    if (file.size > limit.bytes) {
-      setUploadError(uploadLimitError(kind));
-      return;
-    }
-    const dataUrl = await readFileAsDataUrl(file);
     setUploading(true);
     setUploadError(null);
     try {
-      const res = await uploadMedia({
-        data: {
-          name: file.name,
-          kind,
-          mime: file.type,
-          dataBase64: dataUrlToBase64(dataUrl),
-        },
-      });
+      const res = await uploadMedia(file, kind);
       if (res.ok) {
         onChange(res.url);
       } else {

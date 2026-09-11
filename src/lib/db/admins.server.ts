@@ -4,7 +4,9 @@ import { getDb } from "../mongodb";
 import {
   clearSessionCookie,
   createSessionToken,
+  parseSessionToken,
   readSessionCookie,
+  SESSION_COOKIE,
   writeSessionCookie,
 } from "./session.server";
 
@@ -60,6 +62,26 @@ export async function loginAdmin(input: { email: string; password: string }): Pr
 /** Verify the request's session cookie and return the signed-in admin. */
 export async function currentAdmin(): Promise<AdminSummary | null> {
   const session = readSessionCookie();
+  if (!session) return null;
+
+  const admin = await findAdminByEmail(session.email);
+  if (!admin) return null;
+  return { email: admin.email, role: admin.role };
+}
+
+/**
+ * Same guard as currentAdmin(), but fed from a raw Request's Cookie header.
+ * Used by request handlers that run outside the TanStack request context
+ * (e.g. the /api/upload-media token endpoint in src/server.ts).
+ */
+export async function currentAdminFromRequest(request: Request): Promise<AdminSummary | null> {
+  const cookie = request.headers.get("cookie") ?? "";
+  const raw = cookie
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${SESSION_COOKIE}=`))
+    ?.slice(SESSION_COOKIE.length + 1);
+  const session = parseSessionToken(raw ? decodeURIComponent(raw) : undefined);
   if (!session) return null;
 
   const admin = await findAdminByEmail(session.email);
