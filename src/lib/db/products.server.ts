@@ -128,6 +128,12 @@ function fromProductDoc(doc: WithId<ProductDoc>): Listing {
   };
 }
 
+export async function getProductBySlug(slug: string): Promise<Listing | null> {
+  const db = await getDb();
+  const doc = await db.collection<ProductDoc>("products").findOne({ slug });
+  return doc ? fromProductDoc(doc) : null;
+}
+
 export async function listProducts(input: ProductFilterInput = {}): Promise<Listing[]> {
   const db = await getDb();
   const products = db.collection<ProductDoc>("products");

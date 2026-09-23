@@ -1,5 +1,6 @@
-import { Eye, Play, Check, ArrowUpRight } from "lucide-react";
+import { Eye, Play, Check, ArrowUpRight, Share2 } from "lucide-react";
 import type { Listing } from "@/lib/mockData";
+import { shareProduct } from "@/lib/share";
 import { OfferingBadge } from "./OfferingBadge";
 
 type Props = {
@@ -83,17 +84,31 @@ export function ListingCard({ listing, onShow, onPlay }: Props) {
 
         {/* Hover overlay (fine pointer only — touch taps the card) */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition-opacity duration-300 supports-[pointer:fine]:group-hover:opacity-100">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onShow(listing);
-            }}
-            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full glass text-foreground transition hover:text-primary sm:h-9 sm:w-9"
-            aria-label="Quick preview"
-          >
-            <Eye className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onShow(listing);
+              }}
+              className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full glass text-foreground transition hover:text-primary sm:h-9 sm:w-9"
+              aria-label="Quick preview"
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                void shareProduct(listing);
+              }}
+              className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full glass text-foreground transition hover:text-primary sm:h-9 sm:w-9"
+              aria-label="Share this project"
+              title="Share this project"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
+          </div>
           {primaryCta}
         </div>
       </div>

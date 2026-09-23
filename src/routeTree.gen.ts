@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BlogsRouteImport } from './routes/blogs'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PackagesRouteImport } from './routes/packages'
+import { Route as ProductsRouteImport } from './routes/products'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminBlogRouteImport } from './routes/admin/blog'
 import { Route as AdminMediaRouteImport } from './routes/admin/media'
@@ -23,6 +24,7 @@ import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as PackagesIndexRouteImport } from './routes/packages/index'
 import { Route as PackagesSlugRouteImport } from './routes/packages/$slug'
+import { Route as ProductsSlugRouteImport } from './routes/products/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +54,11 @@ const ContactRoute = ContactRouteImport.update({
 const PackagesRoute = PackagesRouteImport.update({
   id: '/packages',
   path: '/packages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -94,6 +101,11 @@ const PackagesSlugRoute = PackagesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => PackagesRoute,
 } as any)
+const ProductsSlugRoute = ProductsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ProductsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -102,12 +114,14 @@ export interface FileRoutesByFullPath {
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
   '/packages': typeof PackagesRouteWithChildren
+  '/products': typeof ProductsRouteWithChildren
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/packages/': typeof PackagesIndexRoute
 }
@@ -116,12 +130,14 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
+  '/products': typeof ProductsRouteWithChildren
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/packages': typeof PackagesIndexRoute
 }
@@ -133,12 +149,14 @@ export interface FileRoutesById {
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
   '/packages': typeof PackagesRouteWithChildren
+  '/products': typeof ProductsRouteWithChildren
   '/admin/blog': typeof AdminBlogRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/packages': typeof AdminPackagesRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/packages/': typeof PackagesIndexRoute
 }
@@ -151,12 +169,14 @@ export interface FileRouteTypes {
     | '/blogs'
     | '/contact'
     | '/packages'
+    | '/products'
     | '/admin/blog'
     | '/admin/media'
     | '/admin/packages'
     | '/admin/products'
     | '/admin/settings'
     | '/packages/$slug'
+    | '/products/$slug'
     | '/admin/'
     | '/packages/'
   fileRoutesByTo: FileRoutesByTo
@@ -165,12 +185,14 @@ export interface FileRouteTypes {
     | '/about'
     | '/blogs'
     | '/contact'
+    | '/products'
     | '/admin/blog'
     | '/admin/media'
     | '/admin/packages'
     | '/admin/products'
     | '/admin/settings'
     | '/packages/$slug'
+    | '/products/$slug'
     | '/admin'
     | '/packages'
   id:
@@ -181,12 +203,14 @@ export interface FileRouteTypes {
     | '/blogs'
     | '/contact'
     | '/packages'
+    | '/products'
     | '/admin/blog'
     | '/admin/media'
     | '/admin/packages'
     | '/admin/products'
     | '/admin/settings'
     | '/packages/$slug'
+    | '/products/$slug'
     | '/admin/'
     | '/packages/'
   fileRoutesById: FileRoutesById
@@ -198,6 +222,7 @@ export interface RootRouteChildren {
   BlogsRoute: typeof BlogsRoute
   ContactRoute: typeof ContactRoute
   PackagesRoute: typeof PackagesRouteWithChildren
+  ProductsRoute: typeof ProductsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -242,6 +267,13 @@ declare module '@tanstack/react-router' {
       path: '/packages'
       fullPath: '/packages'
       preLoaderRoute: typeof PackagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -300,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PackagesSlugRouteImport
       parentRoute: typeof PackagesRoute
     }
+    '/products/$slug': {
+      id: '/products/$slug'
+      path: '/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof ProductsSlugRouteImport
+      parentRoute: typeof ProductsRoute
+    }
   }
 }
 
@@ -337,6 +376,18 @@ const PackagesRouteWithChildren = PackagesRoute._addFileChildren(
   PackagesRouteChildren,
 )
 
+interface ProductsRouteChildren {
+  ProductsSlugRoute: typeof ProductsSlugRoute
+}
+
+const ProductsRouteChildren: ProductsRouteChildren = {
+  ProductsSlugRoute: ProductsSlugRoute,
+}
+
+const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
+  ProductsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -344,6 +395,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogsRoute: BlogsRoute,
   ContactRoute: ContactRoute,
   PackagesRoute: PackagesRouteWithChildren,
+  ProductsRoute: ProductsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

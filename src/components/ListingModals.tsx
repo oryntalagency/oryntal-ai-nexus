@@ -7,9 +7,11 @@ import {
   GraduationCap,
   MessageCircle,
   Play,
+  Share2,
 } from "lucide-react";
 import type { Listing } from "@/lib/mockData";
 import { OFFERING_META } from "@/lib/mockData";
+import { shareProduct } from "@/lib/share";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { WatermarkedVideoPlayer } from "@/components/WatermarkedVideoPlayer";
 
@@ -87,6 +89,15 @@ function DetailContent({ listing, onPlay }: { listing: Listing; onPlay: (l: List
           <OfferingIcon className="h-3.5 w-3.5" />
           {offeringLabel}
         </span>
+        <button
+          type="button"
+          onClick={() => void shareProduct(l)}
+          className="absolute right-3 top-3 inline-flex h-11 w-11 touch-manipulation items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/40 active:scale-95 sm:h-9 sm:w-9"
+          aria-label="Share this project"
+          title="Share this project"
+        >
+          <Share2 className="h-4 w-4" />
+        </button>
         {l.video && (
           <button
             type="button"

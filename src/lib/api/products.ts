@@ -5,6 +5,7 @@ import { currentAdmin } from "../db/admins.server";
 import {
   createProduct as createProductRecord,
   deleteProduct as deleteProductRecord,
+  getProductBySlug as getProductBySlugRecord,
   getProductStats as getProductStatsRecord,
   listProducts as listProductRecords,
   updateProduct as updateProductRecord,
@@ -45,6 +46,19 @@ export const listProducts = createServerFn({ method: "GET" })
     } catch (error) {
       console.error("[products][list]", error);
       return { ok: false as const, error: "Failed to load products." };
+    }
+  });
+
+export const getProductBySlug = createServerFn({ method: "GET" })
+  .validator((slug: string) => slug)
+  .handler(async ({ data: slug }) => {
+    try {
+      const item = await getProductBySlugRecord(slug);
+      if (!item) return { ok: false as const, error: "Product not found." };
+      return { ok: true as const, item };
+    } catch (error) {
+      console.error("[products][getBySlug]", error);
+      return { ok: false as const, error: "Failed to load product." };
     }
   });
 
