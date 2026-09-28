@@ -92,7 +92,7 @@ function DetailContent({ listing, onPlay }: { listing: Listing; onPlay: (l: List
         <button
           type="button"
           onClick={() => void shareProduct(l)}
-          className="absolute right-3 top-3 inline-flex h-11 w-11 touch-manipulation items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/40 active:scale-95 sm:h-9 sm:w-9"
+          className="absolute left-3 top-3 inline-flex h-11 w-11 touch-manipulation items-center justify-center rounded-full glass text-foreground ring-1 ring-border transition hover:text-primary hover:ring-primary/40 active:scale-95 sm:h-9 sm:w-9"
           aria-label="Share this project"
           title="Share this project"
         >
