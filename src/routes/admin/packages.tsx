@@ -3,7 +3,13 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, Sparkles } from "lucide-react";
 import { createPackage, deletePackage, listPackages, updatePackage } from "@/lib/api/packages";
-import { NICHE_ICONS, NICHE_ICON_OPTIONS } from "@/lib/mockData";
+import {
+  NICHE_ICONS,
+  NICHE_ICON_OPTIONS,
+  DEFAULT_CTA_LABEL,
+  emptyTiers,
+  TIER_COUNT,
+} from "@/lib/mockData";
 import type { AIPackage } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { PageHeader } from "@/components/admin/admin-ui";
 import { BulletEditor } from "@/components/admin/BulletEditor";
 import { DeliveryPointEditor } from "@/components/admin/DeliveryPointEditor";
+import { PricingTierEditor } from "@/components/admin/PricingTierEditor";
 
 export const Route = createFileRoute("/admin/packages")({
   component: PackagesPage,
@@ -27,8 +34,22 @@ function emptyPkg(): AIPackage {
     icon: "shopping-cart",
     vision_points: ["", "", "", ""],
     delivery_points: [{ label: "", explanation: "" }],
+    tiers: emptyTiers(),
     slug: "",
   };
+}
+
+// A tier is saveable only once it has a name, both prices, and one non-blank
+// feature. Anything less would be rejected by the packages validator, so we
+// block the save and point at the offending tier instead.
+function tierComplete(tiers: AIPackage["tiers"]): boolean {
+  return tiers.every(
+    (t) =>
+      t.tier_name.trim() !== "" &&
+      t.setup_price.trim() !== "" &&
+      t.monthly_price.trim() !== "" &&
+      t.features.some((feature) => feature.trim() !== ""),
+  );
 }
 
 function PackagesPage() {
@@ -61,6 +82,7 @@ function PackagesPage() {
       icon: p.icon,
       vision_points: p.vision_points,
       delivery_points: p.delivery_points,
+      tiers: p.tiers,
     };
     const res = editing
       ? await updatePackage({ data: { id: p.id, ...data } })
@@ -92,7 +114,7 @@ function PackagesPage() {
             <span className="text-gold-gradient">editions</span>
           </>
         }
-        description="One package per industry — a vision pitch for what the client's business looks like after working with Oryntal. No pricing, no deliverable checklists."
+        description="One package per industry — a vision pitch for what the client's business looks like after working with Oryntal, plus three pricing tiers with a one-time setup cost and a recurring monthly fee."
         actions={
           <Button onClick={openCreate} className="rounded-full shadow-gold-glow">
             <Plus className="h-4 w-4" /> Add niche
@@ -200,8 +222,22 @@ function PkgForm({
   const deliveryFilledCount = f.delivery_points.filter(
     (d) => (d.label?.trim() ?? "") || (d.explanation?.trim() ?? ""),
   ).length;
+  // Guard against a doc that somehow carries the wrong number of tiers — the
+  // editor and the schema both expect exactly TIER_COUNT.
+  const tiersComplete = f.tiers.length === TIER_COUNT && tierComplete(f.tiers);
   const valid =
-    f.name.trim().length > 0 && filledCount >= MIN_VISION_POINTS && deliveryFilledCount >= 1;
+    f.name.trim().length > 0 &&
+    filledCount >= MIN_VISION_POINTS &&
+    deliveryFilledCount >= 1 &&
+    tiersComplete;
+
+  const firstIncompleteTier = f.tiers.findIndex(
+    (t) =>
+      !t.tier_name.trim() ||
+      !t.setup_price.trim() ||
+      !t.monthly_price.trim() ||
+      !t.features.some((feature) => feature.trim()),
+  );
 
   const submit = async () => {
     if (!valid) return;
@@ -216,6 +252,14 @@ function PkgForm({
           explanation: (d.explanation ?? "").trim(),
         }))
         .filter((d) => d.label || d.explanation),
+      tiers: f.tiers.map((t) => ({
+        tier_name: t.tier_name.trim(),
+        setup_price: t.setup_price.trim(),
+        monthly_price: t.monthly_price.trim(),
+        features: t.features.map((feature) => feature.trim()).filter(Boolean),
+        highlighted: t.highlighted,
+        cta_label: t.cta_label.trim() || DEFAULT_CTA_LABEL,
+      })),
       slug: f.slug,
     };
     setSaving(true);
@@ -298,6 +342,18 @@ function PkgForm({
           error={
             f.name.trim() !== "" && deliveryFilledCount < 1
               ? "Add at least one point describing what Oryntal actually builds."
+              : undefined
+          }
+        />
+      </div>
+
+      <div>
+        <PricingTierEditor
+          tiers={f.tiers}
+          onChange={(tiers) => set("tiers", tiers)}
+          error={
+            f.name.trim() !== "" && firstIncompleteTier !== -1
+              ? `Tier ${firstIncompleteTier + 1} needs a name, a setup price, a monthly price, and at least one feature.`
               : undefined
           }
         />

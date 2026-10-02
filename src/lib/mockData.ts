@@ -430,6 +430,23 @@ export type DeliveryPoint = {
   explanation: string;
 };
 
+// A purchasable tier of a niche edition. Setup and monthly are deliberately two
+// separate strings rather than a number pair: both are shown exactly as the
+// admin typed them (currency symbol, Indian digit grouping, "/month" suffix),
+// so we never round-trip money through a float and lose the formatting.
+export type PackageTier = {
+  tier_name: string;
+  setup_price: string;
+  monthly_price: string;
+  features: string[];
+  highlighted: boolean;
+  cta_label: string;
+};
+
+// Every niche edition ships exactly three tiers, in ascending order.
+export const TIER_COUNT = 3;
+export const DEFAULT_CTA_LABEL = "Get Started";
+
 export type AIPackage = {
   id: string;
   name: string;
@@ -437,8 +454,28 @@ export type AIPackage = {
   icon: string;
   vision_points: string[];
   delivery_points: DeliveryPoint[];
+  tiers: PackageTier[];
   slug: string;
 };
+
+export function emptyTier(): PackageTier {
+  return {
+    tier_name: "",
+    setup_price: "",
+    monthly_price: "",
+    features: [""],
+    highlighted: false,
+    cta_label: DEFAULT_CTA_LABEL,
+  };
+}
+
+// Niche editions that haven't had their pricing written yet ship three blank
+// tiers so the schema stays uniform. The public page hides tier cards whose
+// name and both prices are empty, and the admin form refuses to save until
+// they're filled in.
+export function emptyTiers(): PackageTier[] {
+  return Array.from({ length: TIER_COUNT }, () => emptyTier());
+}
 
 // Defensive normalizers for legacy package data. Older documents may still
 // hold `vision_points` as loose/missing entries and `delivery_points` as plain
@@ -462,6 +499,37 @@ export function normalizeDeliveryPoints(value: unknown): DeliveryPoint[] {
     }
     return { label: "", explanation: "" };
   });
+}
+
+const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+
+// Tolerates documents written before `tiers` existed by padding out to
+// TIER_COUNT placeholders, so a read never yields a short array and the
+// public grid always has three cards to lay out.
+export function normalizeTiers(value: unknown): PackageTier[] {
+  const list = Array.isArray(value) ? value : [];
+  const tiers: PackageTier[] = [];
+
+  for (let i = 0; i < TIER_COUNT; i++) {
+    const entry = (list[i] ?? {}) as Partial<PackageTier>;
+    tiers.push({
+      tier_name: str(entry.tier_name),
+      setup_price: str(entry.setup_price),
+      monthly_price: str(entry.monthly_price),
+      features: normalizeVisionPoints(entry.features),
+      highlighted: entry.highlighted === true,
+      cta_label: str(entry.cta_label) || DEFAULT_CTA_LABEL,
+    });
+  }
+
+  return tiers;
+}
+
+// Anchor token for a tier's share link (?tier=…). Tier names are free text and
+// can repeat or contain spaces, so the link keys off the array position and the
+// public page resolves it by index. Stable as long as tiers aren't reordered.
+export function tierAnchor(tier: PackageTier, index: number): string {
+  return `${index + 1}`;
 }
 
 // Icon tokens map to Lucide icons. The token string is what's persisted on the
@@ -576,6 +644,7 @@ export const packages: AIPackage[] = [
           "Automated win-back offers and re-engagement emails for customers who went quiet, bringing dormant buyers back into the funnel.",
       },
     ],
+    tiers: emptyTiers(),
   },
   {
     id: "pkg-solar",
@@ -616,6 +685,7 @@ export const packages: AIPackage[] = [
           "A reporting view of leads, close rates, and active installations so you always know exactly where the business stands.",
       },
     ],
+    tiers: emptyTiers(),
   },
   {
     id: "pkg-edtech",
@@ -656,6 +726,7 @@ export const packages: AIPackage[] = [
           "Tracks completion, drop-off, and per-module mastery so you can see what works and fix what quietly loses students.",
       },
     ],
+    tiers: emptyTiers(),
   },
   {
     id: "pkg-realestate",
@@ -694,6 +765,57 @@ export const packages: AIPackage[] = [
         label: "Evergreen Client Follow-Up",
         explanation:
           "Quiet anniversary, referral, and past-client touchpoints that run forever, keeping you top of mind without nagging.",
+      },
+    ],
+    tiers: [
+      {
+        tier_name: "Lead Response Starter",
+        setup_price: "₹30,000",
+        monthly_price: "₹7,000/month",
+        highlighted: false,
+        cta_label: DEFAULT_CTA_LABEL,
+        features: [
+          "Central CRM for all property enquiries",
+          "Lead capture from website, WhatsApp, Facebook/Instagram, and manual entry",
+          "Instant auto-reply on WhatsApp, SMS, and email",
+          "Follow-up sequence on Day 0, 1, 3, and 7",
+          "Lead assignment to agents",
+          "Simple dashboard: new, contacted, follow-up pending, site visits booked",
+          "Team onboarding and training",
+        ],
+      },
+      {
+        tier_name: "Lead Conversion Growth Partner",
+        setup_price: "₹60,000",
+        monthly_price: "₹15,000/month",
+        highlighted: true,
+        cta_label: DEFAULT_CTA_LABEL,
+        features: [
+          "Everything in Lead Response Starter",
+          "Full pipeline: New → Contacted → Qualified → Site Visit → Booking → Lost",
+          "Custom fields: budget, location, BHK, timeline, source, agent, notes",
+          "WhatsApp Business API integration and property-portal lead import",
+          "Missed-call WhatsApp trigger and site-visit reminders",
+          "AI chatbot for qualification, brochure sharing, and booking",
+          "Full reporting dashboard: response time, conversion by agent and source",
+          "Monthly system monitoring, optimization, and strategy call",
+        ],
+      },
+      {
+        tier_name: "Premium Builder Automation",
+        setup_price: "₹1,20,000",
+        monthly_price: "₹30,000/month",
+        highlighted: false,
+        cta_label: DEFAULT_CTA_LABEL,
+        features: [
+          "Everything in Lead Conversion Growth Partner",
+          "Multi-project CRM with separate pipelines per project",
+          "Central dashboard across all projects",
+          "Voice agent for missed calls and outbound reminders",
+          "Call tracking and ads-manager campaign reporting",
+          "Lead leakage audit and sales-process SOPs",
+          "Dedicated account manager and priority support",
+        ],
       },
     ],
   },
@@ -736,6 +858,7 @@ export const packages: AIPackage[] = [
           "A clear view of no-shows, capacity, and patient satisfaction so you can spot problems early and keep care on track.",
       },
     ],
+    tiers: emptyTiers(),
   },
   {
     id: "pkg-hotel-travel",
@@ -776,6 +899,7 @@ export const packages: AIPackage[] = [
           "Tracks bookings, revenue, and reviews in one place so you can price and market with confidence.",
       },
     ],
+    tiers: emptyTiers(),
   },
   {
     id: "pkg-salon-beauty",
@@ -816,6 +940,7 @@ export const packages: AIPackage[] = [
           "Shows upcoming chairs, no-shows, and top services at a glance so staffing and promotions are no longer guesswork.",
       },
     ],
+    tiers: emptyTiers(),
   },
   {
     id: "pkg-travel-agency",
@@ -856,6 +981,7 @@ export const packages: AIPackage[] = [
           "Tracks trips sold, revenue, and client base so you always know which destinations and offers pay off.",
       },
     ],
+    tiers: emptyTiers(),
   },
 ];
 

@@ -10,10 +10,23 @@ import {
   updatePackage as updatePackageRecord,
 } from "../db/packages.server";
 import type { AIPackage } from "../mockData";
+import { DEFAULT_CTA_LABEL, TIER_COUNT } from "../mockData";
 
 const deliveryPointInput = z.object({
   label: z.string().min(1),
   explanation: z.string().min(1),
+});
+
+// Prices stay as strings all the way through — the admin's formatting
+// ("₹1,20,000", "₹30,000/month") is what the card renders, so validating them
+// as numbers would strip the currency symbol and grouping we want to keep.
+const tierInput = z.object({
+  tier_name: z.string().min(1),
+  setup_price: z.string().min(1),
+  monthly_price: z.string().min(1),
+  features: z.array(z.string().min(1)).min(1),
+  highlighted: z.boolean().default(false),
+  cta_label: z.string().default(DEFAULT_CTA_LABEL),
 });
 
 const packageInput = z.object({
@@ -22,6 +35,7 @@ const packageInput = z.object({
   icon: z.string().min(1),
   vision_points: z.array(z.string().min(1)).min(4),
   delivery_points: z.array(deliveryPointInput).min(1),
+  tiers: z.array(tierInput).length(TIER_COUNT),
 });
 
 function toAIPackage(data: z.infer<typeof packageInput>, id: string): AIPackage {
@@ -32,6 +46,14 @@ function toAIPackage(data: z.infer<typeof packageInput>, id: string): AIPackage 
     icon: data.icon,
     vision_points: data.vision_points,
     delivery_points: data.delivery_points,
+    tiers: data.tiers.map((tier) => ({
+      tier_name: tier.tier_name.trim(),
+      setup_price: tier.setup_price.trim(),
+      monthly_price: tier.monthly_price.trim(),
+      features: tier.features.map((f) => f.trim()),
+      highlighted: tier.highlighted,
+      cta_label: tier.cta_label.trim() || DEFAULT_CTA_LABEL,
+    })),
     slug: "",
   };
 }

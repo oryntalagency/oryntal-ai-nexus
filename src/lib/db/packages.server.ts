@@ -1,8 +1,13 @@
 import { ObjectId, type Db, type WithId } from "mongodb";
 
 import { getDb } from "../mongodb";
-import type { AIPackage } from "../mockData";
-import { normalizeDeliveryPoints, normalizeVisionPoints } from "../mockData";
+import type { AIPackage, PackageTier } from "../mockData";
+import {
+  TIER_COUNT,
+  normalizeDeliveryPoints,
+  normalizeTiers,
+  normalizeVisionPoints,
+} from "../mockData";
 import { kebab } from "./shared.server";
 
 // Repository for the `packages` collection. Each row is one niche edition —
@@ -21,6 +26,7 @@ export type PackageDoc = {
   icon: string;
   vision_points: string[];
   delivery_points: { label: string; explanation: string }[];
+  tiers: PackageTier[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -28,7 +34,7 @@ export type PackageDoc = {
 const PACKAGES_VALIDATOR = {
   $jsonSchema: {
     bsonType: "object",
-    required: ["name", "slug", "tagline", "icon", "vision_points", "delivery_points"],
+    required: ["name", "slug", "tagline", "icon", "vision_points", "delivery_points", "tiers"],
     additionalProperties: true,
     properties: {
       _id: { bsonType: "objectId" },
@@ -62,6 +68,51 @@ const PACKAGES_VALIDATOR = {
         },
         description:
           "'delivery_points' must be an array of at least 1 {label, explanation} object.",
+      },
+      // Exactly TIER_COUNT entries. Setup and monthly are separate display
+      // strings so the currency symbol, digit grouping, and "/month" suffix
+      // survive a round trip untouched.
+      tiers: {
+        bsonType: "array",
+        minItems: TIER_COUNT,
+        maxItems: TIER_COUNT,
+        items: {
+          bsonType: "object",
+          required: [
+            "tier_name",
+            "setup_price",
+            "monthly_price",
+            "features",
+            "highlighted",
+            "cta_label",
+          ],
+          additionalProperties: false,
+          properties: {
+            tier_name: { bsonType: "string", description: "'tier_name' must be a string." },
+            setup_price: {
+              bsonType: "string",
+              description:
+                "'setup_price' is the one-time setup cost, shown verbatim (e.g. '₹30,000').",
+            },
+            monthly_price: {
+              bsonType: "string",
+              description:
+                "'monthly_price' is the recurring cost shown verbatim (e.g. '₹7,000/month').",
+            },
+            features: {
+              bsonType: "array",
+              minItems: 1,
+              items: { bsonType: "string" },
+              description: "'features' must be an array of at least 1 string.",
+            },
+            highlighted: {
+              bsonType: "bool",
+              description: "'highlighted' marks the featured tier.",
+            },
+            cta_label: { bsonType: "string", description: "'cta_label' must be a string." },
+          },
+        },
+        description: `'tiers' must be an array of exactly ${TIER_COUNT} tier objects.`,
       },
       createdAt: { bsonType: "date", description: "'createdAt' must be a date." },
       updatedAt: { bsonType: "date", description: "'updatedAt' must be a date." },
@@ -122,6 +173,7 @@ function toPackageDoc(
     icon: pkg.icon,
     vision_points: pkg.vision_points,
     delivery_points: pkg.delivery_points,
+    tiers: normalizeTiers(pkg.tiers),
     createdAt: timestamps.createdAt,
     updatedAt: timestamps.updatedAt,
   };
@@ -135,6 +187,7 @@ function fromPackageDoc(doc: WithId<PackageDoc>): AIPackage {
     icon: doc.icon,
     vision_points: normalizeVisionPoints(doc.vision_points),
     delivery_points: normalizeDeliveryPoints(doc.delivery_points),
+    tiers: normalizeTiers(doc.tiers),
     slug: doc.slug,
   };
 }

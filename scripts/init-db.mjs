@@ -202,11 +202,15 @@ const productsValidator = {
 // ---- packages -------------------------------------------------------------
 // One package per industry niche. Fields are outcome-framed vision copy on the
 // front (name, tagline, vision_points) and the concrete deliverables behind it
-// on the back (delivery_points). Deliberately no price field.
+// on the back (delivery_points). Pricing lives in `tiers` — exactly three per
+// package, each carrying its own one-time setup cost and recurring monthly cost.
+// Must stay in sync with PACKAGES_VALIDATOR in src/lib/db/packages.server.ts.
+const TIER_COUNT = 3;
+
 const packagesValidator = {
   $jsonSchema: {
     bsonType: "object",
-    required: ["name", "slug", "tagline", "icon", "vision_points", "delivery_points"],
+    required: ["name", "slug", "tagline", "icon", "vision_points", "delivery_points", "tiers"],
     additionalProperties: true,
     properties: {
       _id: { bsonType: "objectId" },
@@ -240,6 +244,50 @@ const packagesValidator = {
         },
         description:
           "'delivery_points' must be an array of at least 1 {label, explanation} object.",
+      },
+      // Setup and monthly are separate display strings so the currency symbol,
+      // digit grouping, and "/month" suffix survive a round trip untouched.
+      tiers: {
+        bsonType: "array",
+        minItems: TIER_COUNT,
+        maxItems: TIER_COUNT,
+        items: {
+          bsonType: "object",
+          required: [
+            "tier_name",
+            "setup_price",
+            "monthly_price",
+            "features",
+            "highlighted",
+            "cta_label",
+          ],
+          additionalProperties: false,
+          properties: {
+            tier_name: { bsonType: "string", description: "'tier_name' must be a string." },
+            setup_price: {
+              bsonType: "string",
+              description:
+                "'setup_price' is the one-time setup cost, shown verbatim (e.g. '₹30,000').",
+            },
+            monthly_price: {
+              bsonType: "string",
+              description:
+                "'monthly_price' is the recurring cost shown verbatim (e.g. '₹7,000/month').",
+            },
+            features: {
+              bsonType: "array",
+              minItems: 1,
+              items: { bsonType: "string" },
+              description: "'features' must be an array of at least 1 string.",
+            },
+            highlighted: {
+              bsonType: "bool",
+              description: "'highlighted' marks the featured tier.",
+            },
+            cta_label: { bsonType: "string", description: "'cta_label' must be a string." },
+          },
+        },
+        description: `'tiers' must be an array of exactly ${TIER_COUNT} tier objects.`,
       },
       createdAt: dateField("createdAt"),
       updatedAt: dateField("updatedAt"),

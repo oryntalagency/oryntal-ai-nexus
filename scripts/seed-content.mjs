@@ -364,6 +364,24 @@ const LISTINGS = [
   },
 ];
 
+// The packages validator requires exactly this many tiers per package. Niches
+// whose pricing hasn't been written yet get blank placeholders — the schema
+// only checks presence and type, and the admin form refuses to save a tier
+// that's missing a name or a price. The public page hides unpriced tiers.
+const TIER_COUNT = 3;
+const DEFAULT_CTA_LABEL = "Get Started";
+
+function blankTiers() {
+  return Array.from({ length: TIER_COUNT }, () => ({
+    tier_name: "",
+    setup_price: "",
+    monthly_price: "",
+    features: [""],
+    highlighted: false,
+    cta_label: DEFAULT_CTA_LABEL,
+  }));
+}
+
 const PACKAGES = [
   {
     name: "E-Commerce",
@@ -408,6 +426,7 @@ const PACKAGES = [
           "Automated win-back offers and re-engagement emails for customers who went quiet, bringing dormant buyers back into the funnel.",
       },
     ],
+    tiers: blankTiers(),
   },
   {
     name: "Solar Energy",
@@ -447,6 +466,7 @@ const PACKAGES = [
           "A reporting view of leads, close rates, and active installations so you always know exactly where the business stands.",
       },
     ],
+    tiers: blankTiers(),
   },
   {
     name: "EdTech",
@@ -486,6 +506,7 @@ const PACKAGES = [
           "Tracks completion, drop-off, and per-module mastery so you can see what works and fix what quietly loses students.",
       },
     ],
+    tiers: blankTiers(),
   },
   {
     name: "Real Estate",
@@ -523,6 +544,57 @@ const PACKAGES = [
         label: "Evergreen Client Follow-Up",
         explanation:
           "Quiet anniversary, referral, and past-client touchpoints that run forever, keeping you top of mind without nagging.",
+      },
+    ],
+    tiers: [
+      {
+        tier_name: "Lead Response Starter",
+        setup_price: "₹30,000",
+        monthly_price: "₹7,000/month",
+        highlighted: false,
+        cta_label: "Get Started",
+        features: [
+          "Central CRM for all property enquiries",
+          "Lead capture from website, WhatsApp, Facebook/Instagram, and manual entry",
+          "Instant auto-reply on WhatsApp, SMS, and email",
+          "Follow-up sequence on Day 0, 1, 3, and 7",
+          "Lead assignment to agents",
+          "Simple dashboard: new, contacted, follow-up pending, site visits booked",
+          "Team onboarding and training",
+        ],
+      },
+      {
+        tier_name: "Lead Conversion Growth Partner",
+        setup_price: "₹60,000",
+        monthly_price: "₹15,000/month",
+        highlighted: true,
+        cta_label: "Get Started",
+        features: [
+          "Everything in Lead Response Starter",
+          "Full pipeline: New → Contacted → Qualified → Site Visit → Booking → Lost",
+          "Custom fields: budget, location, BHK, timeline, source, agent, notes",
+          "WhatsApp Business API integration and property-portal lead import",
+          "Missed-call WhatsApp trigger and site-visit reminders",
+          "AI chatbot for qualification, brochure sharing, and booking",
+          "Full reporting dashboard: response time, conversion by agent and source",
+          "Monthly system monitoring, optimization, and strategy call",
+        ],
+      },
+      {
+        tier_name: "Premium Builder Automation",
+        setup_price: "₹1,20,000",
+        monthly_price: "₹30,000/month",
+        highlighted: false,
+        cta_label: "Get Started",
+        features: [
+          "Everything in Lead Conversion Growth Partner",
+          "Multi-project CRM with separate pipelines per project",
+          "Central dashboard across all projects",
+          "Voice agent for missed calls and outbound reminders",
+          "Call tracking and ads-manager campaign reporting",
+          "Lead leakage audit and sales-process SOPs",
+          "Dedicated account manager and priority support",
+        ],
       },
     ],
   },
@@ -564,6 +636,7 @@ const PACKAGES = [
           "A clear view of no-shows, capacity, and patient satisfaction so you can spot problems early and keep care on track.",
       },
     ],
+    tiers: blankTiers(),
   },
   {
     name: "Hotel & Travel",
@@ -603,6 +676,7 @@ const PACKAGES = [
           "Tracks bookings, revenue, and reviews in one place so you can price and market with confidence.",
       },
     ],
+    tiers: blankTiers(),
   },
   {
     name: "Salon & Beauty",
@@ -642,6 +716,7 @@ const PACKAGES = [
           "Shows upcoming chairs, no-shows, and top services at a glance so staffing and promotions are no longer guesswork.",
       },
     ],
+    tiers: blankTiers(),
   },
   {
     name: "Travel Agency",
@@ -681,6 +756,7 @@ const PACKAGES = [
           "Tracks trips sold, revenue, and client base so you always know which destinations and offers pay off.",
       },
     ],
+    tiers: blankTiers(),
   },
 ];
 
@@ -797,14 +873,16 @@ async function main() {
         icon: p.icon,
         vision_points: p.vision_points,
         delivery_points: p.delivery_points,
+        tiers: p.tiers ?? blankTiers(),
         createdAt: now,
         updatedAt: now,
       };
       for (const key of Object.keys(doc)) {
         if (doc[key] === undefined) delete doc[key];
       }
-      // The `packages` schema changed from service tiers to niche editions, so
-      // drop every legacy field that no longer exists and purge the old tiers.
+      // The `packages` schema has moved twice — service tiers, then niche
+      // editions, now niche editions plus three pricing tiers — so drop every
+      // legacy field that no longer exists before writing.
       await db.collection("packages").updateOne(
         { slug: doc.slug },
         {

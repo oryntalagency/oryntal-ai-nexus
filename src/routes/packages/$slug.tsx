@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Home, RotateCw, Share2, Sparkles, Wrench } from "lucide-react";
-import { toast } from "sonner";
 import { getPackageBySlug } from "@/lib/api/packages";
 import { NICHE_ICONS, type AIPackage } from "@/lib/mockData";
+import { sharePackage } from "@/lib/share";
 import { DeliveryAccordion } from "@/components/DeliveryAccordion";
+import { PricingTierCards } from "@/components/PricingTierCards";
 
 type PackageLoaderData = {
   pkg: AIPackage | null;
@@ -86,31 +87,23 @@ function PackageDetail() {
   const { pkg, notFound } = Route.useLoaderData() as PackageLoaderData;
   const [flipped, setFlipped] = useState(false);
 
-  const shareLink = pkg ? `https://oryntal-ai-labs.vercel.app/packages/${pkg.slug}` : "";
-
   const handleShare = async () => {
     if (!pkg) return;
-    const title = `Oryntal AI Labs — ${pkg.name}`;
-    const text = pkg.tagline;
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({ title, text, url: shareLink });
-        return;
-      } catch {
-        // fall through to clipboard copy
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(shareLink);
-      toast("Link copied", {
-        description: "This package's link is now on your clipboard.",
-      });
-    } catch {
-      toast("Couldn't copy", {
-        description: "Copy this link manually: " + shareLink,
-      });
-    }
+    await sharePackage(pkg);
   };
+
+  // ?tier=<n> is what each tier's Share button copies. Brings that card into
+  // view once the tier grid has painted. Unknown or blank values are ignored so
+  // a stale link just lands at the top of the page.
+  useEffect(() => {
+    if (!pkg) return;
+    const requested = new URLSearchParams(window.location.search).get("tier");
+    if (!requested) return;
+    document.getElementById(`tier-${requested}`)?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [pkg]);
 
   if (notFound || !pkg) {
     return (
@@ -272,6 +265,8 @@ function PackageDetail() {
             </div>
           </div>
         </div>
+
+        {pkg && <PricingTierCards pkg={pkg} />}
 
         <div className="mt-10 text-center">
           <Link

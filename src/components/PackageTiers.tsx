@@ -2,41 +2,11 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, RotateCw, Share2, Sparkles, Wrench } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { listPackages } from "@/lib/api/packages";
 import { NICHE_ICONS } from "@/lib/mockData";
 import type { AIPackage } from "@/lib/mockData";
+import { sharePackage } from "@/lib/share";
 import { DeliveryAccordion } from "@/components/DeliveryAccordion";
-
-function buildShareUrl(pkg: AIPackage): string {
-  return `https://oryntal-ai-labs.vercel.app/packages/${pkg.slug}`;
-}
-
-async function sharePackage(pkg: AIPackage): Promise<void> {
-  const url = buildShareUrl(pkg);
-  const title = `Oryntal AI Labs — ${pkg.name}`;
-  const text = pkg.tagline;
-
-  if (typeof navigator !== "undefined" && navigator.share) {
-    try {
-      await navigator.share({ title, text, url });
-      return;
-    } catch {
-      // user cancelled or the native sheet isn't available — fall through to copy
-    }
-  }
-
-  try {
-    await navigator.clipboard.writeText(url);
-    toast("Link copied", {
-      description: "This package's link is now on your clipboard.",
-    });
-  } catch {
-    toast("Couldn't copy", {
-      description: "Copy this link manually: " + url,
-    });
-  }
-}
 
 function ShareButton({ pkg }: { pkg: AIPackage }) {
   return (
