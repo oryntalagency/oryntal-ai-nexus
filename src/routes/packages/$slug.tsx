@@ -145,9 +145,6 @@ function PackageDetail() {
         {/* Tiers */}
         <div className="mt-8">
           <PackageTiers tiers={niche.tiers} nicheName={niche.nicheName} />
-          <p className="mt-4 text-xs text-muted-foreground">
-            Prices shown are averages — final scope and pricing are confirmed after a quick discovery call.
-          </p>
         </div>
 
         <div className="mt-10 text-center">

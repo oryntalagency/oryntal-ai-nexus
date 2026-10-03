@@ -263,8 +263,8 @@ export const nichePackages: NichePackage[] = [
           "Clear visibility of agent follow-up",
         ],
         pricing: {
-          setup: "₹32,500 one-time (avg. of ₹25,000–₹40,000 range)",
-          monthly: "₹6,500/month (avg. of ₹5,000–₹8,000 range, optional)",
+          setup: "₹32,500 one-time",
+          monthly: "₹6,500/month (optional)",
         },
       },
       {
@@ -345,9 +345,8 @@ export const nichePackages: NichePackage[] = [
           "Better visibility into lead quality and sales performance",
         ],
         pricing: {
-          setup: "₹62,500 one-time (avg. of ₹45,000–₹80,000 range)",
-          monthly: "₹18,500/month (avg. of ₹12,000–₹25,000 range)",
-          minimumCommitment: "3 months after go-live",
+          setup: "₹62,500 one-time",
+          monthly: "₹18,500/month",
         },
       },
       {
@@ -360,21 +359,71 @@ export const nichePackages: NichePackage[] = [
           "Multiple projects and teams create confusion, lead leakage, poor campaign visibility, and inconsistent sales processes.",
         included: {
           buildPhase: {
-            heading: "Everything in Lead Conversion Growth Partner, plus:",
+            heading: "Build phase (one-time)",
             items: [
-              "Multi-project CRM structure",
-              "Separate pipelines for each project or location",
-              "Central dashboard for all projects",
-              "Advanced AI chat flows",
+              "Multi-project CRM setup",
+              "Separate pipelines for each project/location",
+              "Central dashboard across all projects",
+              "Call tracking and ads-manager integration for campaign reporting",
               "Voice agent for missed calls and outbound reminders",
-              "Call tracking number integration",
-              "Ads manager integration for campaign-level reporting",
-              "Custom management reporting",
-              "Agent performance reports",
               "Lead leakage audit",
               "Sales-process documentation and SOPs",
-              "Dedicated account manager",
-              "Higher-priority support and faster response time",
+              "Dedicated account manager and priority support",
+            ],
+            groups: [
+              {
+                label: "Integrations",
+                items: [
+                  "Website enquiry form",
+                  "WhatsApp Business API / number",
+                  "Facebook/Instagram lead ads",
+                  "Optional: MagicBricks/99acres lead import",
+                ],
+              },
+              {
+                label: "Automation",
+                items: [
+                  "Instant acknowledgement message",
+                  "Multi-day follow-up sequence",
+                  "Missed-call WhatsApp trigger",
+                  "Site-visit reminders and no-show follow-up",
+                  "Lead assignment and escalation rules",
+                ],
+              },
+              {
+                label: "AI assistant",
+                items: [
+                  "WhatsApp/website chatbot",
+                  "Lead qualification questions",
+                  "Project details and brochure sharing",
+                  "Site-visit booking or calendar link",
+                  "Human handoff when required",
+                ],
+              },
+              {
+                label: "Dashboard and reporting",
+                items: [
+                  "Leads by source",
+                  "Response time",
+                  "Follow-up completion",
+                  "Site visits booked",
+                  "Conversion by agent and source",
+                  "Agent performance and campaign-level reports",
+                ],
+              },
+            ],
+          },
+          monthly: {
+            heading: "Monthly Growth Partner",
+            items: [
+              "Weekly system monitoring",
+              "Fixing automation, CRM, and lead-capture issues",
+              "Monthly optimisation of follow-up messages and workflows",
+              "Old-lead reactivation sequences",
+              "AI response and qualification improvements",
+              "Lead assignment and escalation improvements",
+              "Monthly performance report",
+              "Monthly strategy call",
             ],
           },
         },
@@ -384,11 +433,8 @@ export const nichePackages: NichePackage[] = [
           "Stronger sales process and agent accountability",
         ],
         pricing: {
-          setup:
-            "₹1,15,000 one-time, average of ₹80,000–₹1,50,000+ range (final scope-dependent, may exceed this for large portfolios)",
-          monthly:
-            "₹42,500/month, average of ₹25,000–₹60,000+ range (final scope-dependent)",
-          minimumCommitment: "3 months after go-live",
+          setup: "₹1,15,000 one-time",
+          monthly: "₹42,500/month",
         },
       },
     ],
