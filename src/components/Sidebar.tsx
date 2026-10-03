@@ -22,7 +22,6 @@ const items = [
 const adminItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/products", label: "Products", icon: AppWindow },
-  { to: "/admin/packages", label: "Packages", icon: Package },
   { to: "/admin/blog", label: "Blog", icon: BookOpen },
   { to: "/admin/media", label: "Media", icon: Images },
   { to: "/admin/settings", label: "Settings", icon: Settings },

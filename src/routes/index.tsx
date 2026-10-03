@@ -8,7 +8,7 @@ import { listProducts } from "@/lib/api/products";
 import { listTags } from "@/lib/api/tags";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingDetail, VideoLightbox } from "@/components/ListingModals";
-import { PackageTierCards } from "@/components/PackageTiers";
+import { NicheGrid } from "@/components/packages/NicheGrid";
 import { HeroAI } from "@/components/HeroAI";
 import { FacetFilterBar, type OfferingFilter } from "@/components/FacetFilterBar";
 import { OfferingIcon } from "@/components/OfferingBadge";
@@ -233,7 +233,7 @@ function Home() {
             Explore all packages <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
-        <PackageTierCards />
+        <NicheGrid />
       </section>
 
       <footer className="mt-20 border-t border-border pt-8 pb-4 text-center text-xs text-muted-foreground">

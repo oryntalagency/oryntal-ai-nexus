@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { PackageTierCards } from "@/components/PackageTiers";
+import { NicheGrid } from "@/components/packages/NicheGrid";
 
 export const Route = createFileRoute("/packages/")({
   component: PackagesIndex,
@@ -38,8 +38,8 @@ function PackagesIndex() {
             <span className="text-gold-gradient">Packages</span>
           </h1>
           <p className="mt-3 max-w-xl text-muted-foreground">
-            One edition per industry — a vision of your business after working with the lab, not a
-            menu of deliverables. Fixed scope, no pricing games.
+            One edition per industry — pick your niche to see the tiers, what's built, and what it
+            costs. Fixed scope, no pricing games.
           </p>
         </div>
         <Link
@@ -50,9 +50,9 @@ function PackagesIndex() {
         </Link>
       </div>
 
-      {/* Tier cards */}
+      {/* Niche grid */}
       <div className="mt-12">
-        <PackageTierCards />
+        <NicheGrid />
       </div>
 
       {/* How it works */}

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
-import { blogs as seedBlogs, listings as seedListings, packages as seedPackages } from "./mockData";
-import type { Listing, AIPackage, Blog } from "./mockData";
+import { blogs as seedBlogs, listings as seedListings } from "./mockData";
+import type { Listing, Blog } from "./mockData";
 
 export type MediaAsset = {
   id: string;
@@ -12,7 +12,6 @@ export type MediaAsset = {
 
 export type AdminState = {
   listings: Listing[];
-  packages: AIPackage[];
   posts: Blog[];
   media: MediaAsset[];
 };
@@ -30,7 +29,6 @@ const COVER_SEED: MediaAsset[] = Array.from({ length: 12 }, (_, i) => {
 
 let state: AdminState = {
   listings: seedListings,
-  packages: seedPackages,
   posts: seedBlogs,
   media: COVER_SEED,
 };
@@ -60,15 +58,6 @@ export const adminActions = {
   },
   deleteListing(id: string) {
     set({ ...state, listings: state.listings.filter((l) => l.id !== id) });
-  },
-  upsertPackage(pkg: AIPackage) {
-    set({
-      ...state,
-      packages: [pkg, ...state.packages.filter((p) => p.id !== pkg.id)],
-    });
-  },
-  deletePackage(id: string) {
-    set({ ...state, packages: state.packages.filter((p) => p.id !== id) });
   },
   upsertPost(post: Blog) {
     set({
