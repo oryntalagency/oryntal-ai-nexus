@@ -217,7 +217,181 @@ export const nichePackages: NichePackage[] = [
     nicheName: "Real Estate",
     tagline: "Deals Closed Faster Than the Competition Can Prospect",
     icon: "building-2",
-    tiers: [placeholderTier(), REAL_ESTATE_TIER_2, placeholderTier()],
+    tiers: [
+      {
+        title: "Lead Response Starter",
+        bestFor:
+          "Small brokers, individual agents, and teams of 1–5 agents who manage leads through WhatsApp, Excel, or basic tools.",
+        whoItsFor:
+          "Small brokers, individual agents, and teams of 1–5 agents who manage leads through WhatsApp, Excel, or basic tools.",
+        problemItSolves:
+          "Leads come from different sources but get missed, replied late, or never followed up properly.",
+        included: {
+          buildPhase: {
+            heading: "What's included",
+            items: [
+              "Central CRM for all property enquiries",
+              "Instant auto-reply on WhatsApp/SMS/email",
+              "Basic follow-up sequence: Day 0, Day 1, Day 3, Day 7",
+              "Lead assignment to agents",
+              "Simple dashboard: new leads, contacted, follow-up pending, site visits booked",
+              "Team onboarding and training",
+            ],
+            groups: [
+              {
+                label: "Lead capture from",
+                items: [
+                  "Website enquiry form",
+                  "WhatsApp click-to-chat",
+                  "Facebook/Instagram lead forms",
+                  "Manual entry for property-portal leads",
+                ],
+              },
+            ],
+          },
+          monthly: {
+            heading: "Optional Care Plan",
+            items: [
+              "Ongoing monitoring and support for the CRM and automations",
+              "Minor fixes and adjustments as needed",
+            ],
+          },
+        },
+        outcome: [
+          "Faster first response time",
+          "No enquiry left untracked",
+          "Clear visibility of agent follow-up",
+        ],
+        pricing: {
+          setup: "₹32,500 one-time (avg. of ₹25,000–₹40,000 range)",
+          monthly: "₹6,500/month (avg. of ₹5,000–₹8,000 range, optional)",
+        },
+      },
+      {
+        title: "Lead Conversion Growth Partner",
+        bestFor:
+          "Medium brokers, channel partners, and builders with 5–15 agents and consistent lead flow.",
+        whoItsFor:
+          "Medium brokers, channel partners, and builders with 5–15 agents and consistent lead flow.",
+        problemItSolves:
+          "Leads are coming, but conversion to site visits is low because follow-up is inconsistent, lead quality is unclear, and the founder has no pipeline visibility.",
+        included: {
+          buildPhase: {
+            heading: "Build phase (one-time)",
+            items: [
+              "Full real-estate CRM setup",
+              "Lead pipeline: New → Contacted → Qualified → Site Visit → Booking → Lost",
+              "Custom fields: budget, location, BHK, timeline, source, agent, notes",
+            ],
+            groups: [
+              {
+                label: "Integrations",
+                items: [
+                  "Website enquiry form",
+                  "WhatsApp Business API / number",
+                  "Facebook/Instagram lead ads",
+                  "Optional: MagicBricks/99acres lead import",
+                ],
+              },
+              {
+                label: "Automation",
+                items: [
+                  "Instant acknowledgement message",
+                  "Multi-day follow-up sequence",
+                  "Missed-call WhatsApp trigger",
+                  "Site-visit reminders and no-show follow-up",
+                  "Lead assignment and escalation rules",
+                ],
+              },
+              {
+                label: "AI assistant",
+                items: [
+                  "WhatsApp/website chatbot",
+                  "Lead qualification questions",
+                  "Project details and brochure sharing",
+                  "Site-visit booking or calendar link",
+                  "Human handoff when required",
+                ],
+              },
+              {
+                label: "Dashboard and reporting",
+                items: [
+                  "Leads by source",
+                  "Response time",
+                  "Follow-up completion",
+                  "Site visits booked",
+                  "Conversion by agent and source",
+                ],
+              },
+            ],
+          },
+          monthly: {
+            heading: "Monthly Growth Partner",
+            items: [
+              "Weekly system monitoring",
+              "Fixing automation, CRM, and lead-capture issues",
+              "Monthly optimisation of follow-up messages and workflows",
+              "Old-lead reactivation sequences",
+              "AI response and qualification improvements",
+              "Lead assignment and escalation improvements",
+              "Monthly performance report",
+              "Monthly strategy call",
+            ],
+          },
+        },
+        outcome: [
+          "More site visits from the same lead volume",
+          "Faster and consistent follow-up",
+          "Better visibility into lead quality and sales performance",
+        ],
+        pricing: {
+          setup: "₹62,500 one-time (avg. of ₹45,000–₹80,000 range)",
+          monthly: "₹18,500/month (avg. of ₹12,000–₹25,000 range)",
+          minimumCommitment: "3 months after go-live",
+        },
+      },
+      {
+        title: "Premium Builder Automation",
+        bestFor:
+          "Builders with multiple projects, large brokerages with 10+ agents, and companies running multiple campaigns.",
+        whoItsFor:
+          "Builders with multiple projects, large brokerages with 10+ agents, and companies running multiple campaigns.",
+        problemItSolves:
+          "Multiple projects and teams create confusion, lead leakage, poor campaign visibility, and inconsistent sales processes.",
+        included: {
+          buildPhase: {
+            heading: "Everything in Lead Conversion Growth Partner, plus:",
+            items: [
+              "Multi-project CRM structure",
+              "Separate pipelines for each project or location",
+              "Central dashboard for all projects",
+              "Advanced AI chat flows",
+              "Voice agent for missed calls and outbound reminders",
+              "Call tracking number integration",
+              "Ads manager integration for campaign-level reporting",
+              "Custom management reporting",
+              "Agent performance reports",
+              "Lead leakage audit",
+              "Sales-process documentation and SOPs",
+              "Dedicated account manager",
+              "Higher-priority support and faster response time",
+            ],
+          },
+        },
+        outcome: [
+          "Central control over all projects and teams",
+          "Better campaign and lead-source performance visibility",
+          "Stronger sales process and agent accountability",
+        ],
+        pricing: {
+          setup:
+            "₹1,15,000 one-time, average of ₹80,000–₹1,50,000+ range (final scope-dependent, may exceed this for large portfolios)",
+          monthly:
+            "₹42,500/month, average of ₹25,000–₹60,000+ range (final scope-dependent)",
+          minimumCommitment: "3 months after go-live",
+        },
+      },
+    ],
   },
   {
     slug: "healthcare-wellness",
