@@ -692,8 +692,9 @@ export const nichePackages: NichePackage[] = [
       monthly: "₹34,999/month",
       minimumCommitment: "3 months after go-live"
     }
-  }
+  },
 ],
+  },
   {
     slug: "solar-energy",
     nicheName: "Solar Energy",
@@ -701,8 +702,8 @@ export const nichePackages: NichePackage[] = [
     icon: "sun",
     tiers: [placeholderTier(), placeholderTier(), placeholderTier()],
   },
+  },
   {
-    slug: "edtech",
     nicheName: "EdTech",
     tagline: "Learning That Adapts to Every Student, Not the Other Way Around",
     icon: "graduation-cap",

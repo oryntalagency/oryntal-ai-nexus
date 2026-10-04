@@ -1,0 +1,5 @@
+﻿lines = open('src/data/packages.ts', encoding='utf-8').readlines()
+lines.insert(700, '    tagline: "From First Click to Installed Panels, On Autopilot",\n')
+lines.insert(700, '    nicheName: "Solar Energy",\n')
+open('src/data/packages.ts', 'w', encoding='utf-8').writelines(lines)
+print('ok')
