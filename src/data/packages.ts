@@ -694,7 +694,6 @@ export const nichePackages: NichePackage[] = [
     }
   },
 ],
-  },
   {
     slug: "solar-energy",
     nicheName: "Solar Energy",
